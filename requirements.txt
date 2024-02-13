@@ -6,3 +6,7 @@ uvicorn==0.20.0
 pydantic-geojson==0.1.1
 sqlmodel
 geoalchemy2
+python-multipart
+requests
+PyJWT
+python-dotenv

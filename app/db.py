@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
 from geoalchemy2 import Geometry
 from datetime import datetime
@@ -30,6 +31,8 @@ class Campaigns(Base):
     contactemail = Column(String, nullable=True)
     startdate = Column(DateTime)
     enddate = Column(DateTime, nullable=True)
+    station = relationship("Station" , lazy="joined")
+    allocation = Column(String, nullable=False)
 
 class Sensor(Base):
     """
@@ -43,8 +46,8 @@ class Sensor(Base):
     postprocess = Column(Boolean, default=True)
     postprocessscript = Column(String, nullable=True)
     units = Column(String, nullable=True)
-
-
+    measurement = relationship("Measurement" , lazy="joined")
+    station  = relationship("Station" , lazy="joined")
 
 class Measurement(Base):
     """
@@ -53,13 +56,19 @@ class Measurement(Base):
     __tablename__ = "measurements"
     measurementid = Column(Integer, primary_key=True, index=True)
     sensorid = Column(Integer, ForeignKey('sensors.sensorid'))
+    stationid = Column(Integer)
     variablename = Column(String)
     collectiontime = Column(DateTime)
     variabletype = Column(String, nullable=True)
     description = Column(String, nullable=True)
     measurementvalue = Column(Float, nullable=True)
+    locationid = Column(Integer, ForeignKey('locations.locationid'))
+    location = relationship("Locations", lazy="joined")
 
-
+    # __mapper_args__ = {
+    #     "primary_key": [Locations.stationid, Locations.collectiontime]
+    # }
+    
 class SensorObject(Base):
     """
     Represents a sensor object in the database.
@@ -89,3 +98,4 @@ class Station(Base):
     contactemail = Column(String, nullable=True)
     active = Column(Boolean, default=True)
     startdate = Column(DateTime)
+    sensor = relationship("Sensor", lazy="joined")

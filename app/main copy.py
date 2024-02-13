@@ -14,10 +14,8 @@ from .db import Campaigns, Locations, Sensor, Measurement, Station, Base
 from .config import settings
 
 from .pytas.http import TASClient
-import jwt
-from dotenv import dotenv_values
 
-config = dotenv_values(".env")
+
 
 engine = create_engine(settings.db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -26,6 +24,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+# @app.get("/items/")
+# async def read_items(token: str = Depends(oauth2_scheme)):
+#     return {"token": token}
+
 
 
 
@@ -41,20 +45,10 @@ def startup():
 def shutdown():
     pass
 
-def authenticate_user(username, password):
-    print(config)
-    client = TASClient(baseURL=config['tasURL'], credentials={'username':config['tasUser'], 'password':config['tasSecret']})
-    return client.authenticate(username, password)
-
-def get_allocations(username):
-   
-    client = TASClient(baseURL=config['tasURL'], credentials={'username':config['tasUser'], 'password':config['tasSecret']})
-    return [u['chargeCode'] for u in client.projects_for_user(username=username)if u['allocations'][0]['status']!='Inactive']
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    user_dict = unhash(token)
-    user = authenticate_user(user_dict['username'], user_dict['password'])
+    user = fake_decode_token(token)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -64,25 +58,26 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 
-def unhash(token):
-    return jwt.decode(token, config['jwtSecret'], algorithms=[config['alg']])
-def hash(payload):
-    return jwt.encode(payload, config['jwtSecret'], algorithm=config['alg'])
+async def get_current_active_user(current_user: User = Depends(get_current_user)):
+    if current_user.disabled:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user
+ 
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    authenticated = authenticate_user(form_data.username, form_data.password)
-
-    if not authenticated:
+    client = TASClient()
+    user_dict = client.authenticate(form_data.username, form_data.password)
+    if not user_dict:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
-    print(    get_allocations(form_data.username))
-    user_dict = {'username':form_data.username, 'password':form_data.password}
-    
-    return {"access_token": hash(user_dict), "token_type": "bearer"}
+    print(user_dict)
+    allocations = [u['chargeCode'] for u in client.projects_for_user(username=form_data.username)if u['allocations'][0]['status']!='Inactive']
+
+    return {"access_token": form_data.username, "token_type": "bearer"}
 
 
 @app.post("/campaign", response_model=CampaignsOut)
-async def post_campaign(campaign: CampaignsIn, current_user: User = Depends(get_current_user)):
+async def post_campaign(campaign: CampaignsIn, token: str = Depends(oauth2_scheme)):
     with SessionLocal() as session:
         db_campaign = Campaigns(**campaign.dict())
         session.add(db_campaign)
@@ -92,7 +87,7 @@ async def post_campaign(campaign: CampaignsIn, current_user: User = Depends(get_
 
 
 @app.get("/campaign", response_model=List[CampaignsOut])
-async def read_campaign(current_user: User = Depends(get_current_user)):
+async def read_campaign(current_user: User = Depends(get_current_active_user)):
     with SessionLocal() as session:
         campaigns = session.query(Campaigns).all()
         print(campaigns)
