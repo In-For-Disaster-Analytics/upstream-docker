@@ -10,7 +10,7 @@ from .config import settings
 Base = declarative_base()
 
 
-
+# Represents a table for storing location data
 class Locations(Base):
     __tablename__ = "locations"
     locationid = Column(Integer, primary_key=True, index=True)
@@ -65,9 +65,7 @@ class Measurement(Base):
     locationid = Column(Integer, ForeignKey('locations.locationid'))
     location = relationship("Locations", lazy="joined")
 
-    # __mapper_args__ = {
-    #     "primary_key": [Locations.stationid, Locations.collectiontime]
-    # }
+
     
 class SensorObject(Base):
     """
