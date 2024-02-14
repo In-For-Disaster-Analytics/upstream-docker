@@ -15,9 +15,10 @@ from .config import settings
 
 from .pytas.http import TASClient
 import jwt
-from dotenv import dotenv_values
+from dotenv import load_dotenv
 
-config = dotenv_values(".env")
+load_dotenv()
+import os
 
 engine = create_engine(settings.db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -42,13 +43,12 @@ def shutdown():
     pass
 
 def authenticate_user(username, password):
-    print(config)
-    client = TASClient(baseURL=config['tasURL'], credentials={'username':config['tasUser'], 'password':config['tasSecret']})
+    client = TASClient(baseURL=os.getenv('tasURL'), credentials={'username':os.getenv('tasUser'), 'password':os.getenv('tasSecret')})
     return client.authenticate(username, password)
 
 def get_allocations(username):
    
-    client = TASClient(baseURL=config['tasURL'], credentials={'username':config['tasUser'], 'password':config['tasSecret']})
+    client = TASClient(baseURL=os.getenv('tasURL'), credentials={'username':os.getenv('tasUser'), 'password':os.getenv('tasSecret')})
     return [u['chargeCode'] for u in client.projects_for_user(username=username)if u['allocations'][0]['status']!='Inactive']
 
 
@@ -65,9 +65,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 def unhash(token):
-    return jwt.decode(token, config['jwtSecret'], algorithms=[config['alg']])
+    return jwt.decode(token, os.getenv('jwtSecret'), algorithms=[os.getenv('alg')])
 def hash(payload):
-    return jwt.encode(payload, config['jwtSecret'], algorithm=config['alg'])
+    return jwt.encode(payload, os.getenv('jwtSecret'), algorithm=os.getenv('alg'))
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
