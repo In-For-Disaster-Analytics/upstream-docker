@@ -24,18 +24,18 @@ class CampaignsIn(BaseModel):
     startdate: datetime
     enddate: Optional[datetime]=None
     allocation: str
-    # Validator for converting string to date for startdate
-    @validator("startdate", pre=True, allow_reuse=True)
-    def string_to_date(cls, v: object) -> object:
-        if isinstance(v, str):
-            return datetime.strptime(v, "%d-%b-%Y").date()
-        return v
-    # Validator for converting string to date for enddate
-    @validator("enddate", pre=True, allow_reuse=True)
-    def string_to_date(cls, v: object) -> object:
-        if isinstance(v, str):
-            return datetime.strptime(v, "%d-%b-%Y").date()
-        return v
+    # # Validator for converting string to date for startdate
+    # @validator("startdate", pre=True, allow_reuse=True)
+    # def string_to_date(cls, v: object) -> object:
+    #     if isinstance(v, str):
+    #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
+    #     return v
+    # # Validator for converting string to date for enddate
+    # @validator("enddate", pre=True, allow_reuse=True)
+    # def string_to_date(cls, v: object) -> object:
+    #     if isinstance(v, str):
+    #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
+    #     return v
     
 
 # Pydantic model for outgoing campaign data
@@ -47,18 +47,18 @@ class CampaignsOut(BaseModel):
     description: Optional[str] = None
     startdate: datetime
     enddate: Optional[datetime]=None
-    # Validator for converting string to date for startdate
-    @validator("startdate", pre=True, allow_reuse=True)
-    def string_to_date(cls, v: object) -> object:
-        if isinstance(v, str):
-            return datetime.strptime(v, "%d-%b-%Y").date()
-        return v
-    # Validator for converting string to date for enddate
-    @validator("enddate", pre=True, allow_reuse=True)
-    def string_to_date(cls, v: object) -> object:
-        if isinstance(v, str):
-            return datetime.strptime(v, "%d-%b-%Y").date()
-        return v
+    # # Validator for converting string to date for startdate
+    # @validator("startdate", pre=True, allow_reuse=True)
+    # def string_to_date(cls, v: object) -> object:
+    #     if isinstance(v, str):
+    #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
+    #     return v
+    # # Validator for converting string to date for enddate
+    # @validator("enddate", pre=True, allow_reuse=True)
+    # def string_to_date(cls, v: object) -> object:
+    #     if isinstance(v, str):
+    #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
+    #     return v
     
 # Pydantic model for incoming station data
 class StationIn(BaseModel):
@@ -70,11 +70,11 @@ class StationIn(BaseModel):
     active: Optional[bool] = True
     startdate: datetime
 
-    @validator("startdate", pre=True, allow_reuse=True)
-    def string_to_date(cls, v: object) -> object:
-        if isinstance(v, str):
-            return datetime.strptime(v, "%d-%b-%Y").date()
-        return v
+    # @validator("startdate", pre=True, allow_reuse=True)
+    # def string_to_date(cls, v: object) -> object:
+    #     if isinstance(v, str):
+    #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
+    #     return v
     
   
 # Pydantic model for outgoing station data
