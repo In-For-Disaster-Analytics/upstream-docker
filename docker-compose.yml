@@ -24,5 +24,15 @@ services:
     environment:
       - PGDATA=/var/lib/postgresql/data
       - POSTGRES_USER=fastapi_traefik
-      - POSTGRES_PASSWORD=fastapi_traefik
       - POSTGRES_DB=fastapi_traefik
+      - tasURL=https://tas-dev.tacc.utexas.edu/api-test
+      - tasUser=tasclient
+      - alg=HS256
+    # some vars are in a file because they should not be checked in:
+    # - POSTGRES_PASSWORD
+    # - tasSecret
+    # - jwtSecret
+    env_file: 
+      - /root/fastapi-env
+
+
