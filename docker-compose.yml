@@ -3,18 +3,31 @@
 #version: '3'
 
 services:
+  proxy:
+    container_name: proxy
+    image: nginx:1.25
+    ports:
+      - 443:443
+    volumes:
+      - /etc/letsencrypt/live/upstream-dso.tacc.utexas.edu/fullchain.pem:/root/ssl/cert.pem
+      - /etc/letsencrypt/live/upstream-dso.tacc.utexas.edu/privkey.pem:/root/ssl/key.pem
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
   web:
+    container_name: web
     build: .
     command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
     volumes:
       - .:/app
     ports:
-      - 8008:8000
+      - 8000:8000
     environment:
       - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db:5432/fastapi_traefik
     depends_on:
       - db
   db:
+    container_name: db
     image: postgis/postgis:16-3.4
     user: "${UIDGID}"
     volumes:
