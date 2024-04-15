@@ -1,0 +1,69 @@
+services:
+
+  traefik:
+    container_name: traefik
+    image: traefik:2.11
+    network_mode: host
+    volumes:
+      - /etc/letsencrypt:/ssl:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/etc/traefik
+      - ./dynamic:/dynamic
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.rule=Host(`upstream-dso.tacc.utexas.edu`) 
+      - traefik.http.routers.traefik.entrypoints=traefik
+      - traefik.http.services.traefik.loadbalancer.server.port=8080
+
+  #whoami:
+  #  container_name: whoami
+  #  image: containous/whoami:latest
+  #  restart: unless-stopped
+  #  ports:
+  #    - 8000:80
+  #  labels:
+  #    - traefik.enable=true
+  #    - traefik.http.routers.whoami.rule=Host(`upstream-dso.tacc.utexas.edu`) && Path(`/whoami`)
+  #    - traefik.http.routers.whoami.tls=true
+
+  app:
+    container_name: app
+    image: app:1
+    #command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
+    command: uvicorn app.main:app --host 0.0.0.0
+    #volumes:
+    #  - .:/app
+    ports:
+      - 8000
+    environment:
+      - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db:5432/fastapi_traefik
+    depends_on:
+      - db
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.app.rule=Host(`upstream-dso.tacc.utexas.edu`) && Path(`/docs`)
+      - traefik.http.routers.app.tls=true
+
+  db:
+    container_name: db
+    image: postgis/postgis:16-3.4
+    user: "${UIDGID}"
+    volumes:
+      - "/root/pgdata:/var/lib/postgresql/data"
+    expose:
+      - 5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data
+      - POSTGRES_USER=fastapi_traefik
+      - POSTGRES_DB=fastapi_traefik
+      - tasURL=https://tas-dev.tacc.utexas.edu/api-test
+      - tasUser=tasclient
+      - alg=HS256
+    # some vars are in a file because they should not be checked in:
+    # - POSTGRES_PASSWORD
+    # - tasSecret
+    # - jwtSecret
+    env_file:
+      - /root/fastapi-env

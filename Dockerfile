@@ -12,8 +12,14 @@ ENV PYTHONUNBUFFERED 1
 
 # install dependencies
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir -r requirements.txt
 
+# install some tools
+RUN apt update && apt install curl procps -y
+
 # copy project
-COPY . .
+COPY venv .
+COPY app .
+COPY requirements.txt .
+COPY Dockerfile .
+COPY README.md .
