@@ -4,7 +4,7 @@
 FROM python:3.11.1-slim
 
 # set work directory
-WORKDIR /app
+WORKDIR /upstream
 
 # set env variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -15,11 +15,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # install some tools
-RUN apt update && apt install curl procps -y
+RUN apt update && apt install curl procps vim -y
 
 # copy project
-COPY venv .
-COPY app .
-COPY requirements.txt .
-COPY Dockerfile .
-COPY README.md .
+COPY . /upstream
+#COPY . .

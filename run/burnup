@@ -1,6 +1,0 @@
-#!/bin/bash
-
-export UIDGID="`id -u`:`id -g`"
-echo $UIDGID
-
-docker-compose up -d 

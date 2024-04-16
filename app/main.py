@@ -23,7 +23,6 @@ import os
 engine = create_engine(settings.db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 app = FastAPI(title="Upstream Sensor Storage",
     description="Sensor Storage for Upstream data",
 
@@ -31,7 +30,10 @@ app = FastAPI(title="Upstream Sensor Storage",
     contact={
         "name": "Will Mobley",
         "email": "wmobley@tacc.utexas.edu",
-    }, )
+    }
+)
+
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
