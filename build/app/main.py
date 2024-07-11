@@ -34,7 +34,6 @@ app = FastAPI(title="Upstream Sensor Storage",
 )
 
 
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Function to create the database and tables based on the declared models
@@ -58,14 +57,14 @@ def shutdown():
 
 # Function to authenticate a user by verifying the provided username and password
 def authenticate_user(username, password):
-     # Initialize a TASClient instance with the TAS server details and credentials
+    # Initialize a TASClient instance with the TAS server details and credentials
 
     client = TASClient(baseURL=os.getenv('tasURL'), credentials={'username':os.getenv('tasUser'), 'password':os.getenv('tasSecret')})
     return client.authenticate(username, password)
 
+
 # Function to retrieve allocations (charge codes) associated with a given username
 def get_allocations(username):
-   
     client = TASClient(baseURL=os.getenv('tasURL'), credentials={'username':os.getenv('tasUser'), 'password':os.getenv('tasSecret')})
     return [u['chargeCode'] for u in client.projects_for_user(username=username)if u['allocations'][0]['status']!='Inactive']
 
@@ -82,9 +81,9 @@ def check_allocation_permission(current_user, campaign_id):
 # Async function to get the current user based on the provided OAuth2 token
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     user_dict = unhash(token)
-    
+
     if not authenticate_user(user_dict['username'], user_dict['password']):
-            # If user authentication fails, raise an HTTPException with 401 UNAUTHORIZED status
+        # If user authentication fails, raise an HTTPException with 401 UNAUTHORIZED status
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
@@ -109,7 +108,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     print(    get_allocations(form_data.username))
     user_dict = {'username':form_data.username, 'password':form_data.password}
-    
+
     return {"access_token": hash(user_dict), "token_type": "bearer"}
 
 # Route for creating a new campaign, requires an authenticated user (current_user)
@@ -131,24 +130,23 @@ async def read_campaign(current_user: User = Depends(get_current_user)):
     with SessionLocal() as session:
         allocations = get_allocations(current_user)
         campaigns = session.query(Campaigns).filter(Campaigns.allocation.in_(allocations)).all()
-        
-        return [CampaignsOut(**campaign.__dict__) for campaign in campaigns]
 
+        return [CampaignsOut(**campaign.__dict__) for campaign in campaigns]
 
 
 # Route to retrieve all stations associated with a specific campaign
 @app.get("/campaign/{campaign_id}/station")
 async def read_station(campaign_id:int, current_user: User = Depends(get_current_user)):
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             stations = session.query(Station).filter(Station.campaignid == campaign_id).all()
             return stations
-        
+
 
 # Route to create a new station associated with a specific campaign
 @app.post("/campaign/{campaign_id}/station", response_model=StationOut)
 async def post_station(station: StationIn, campaign_id:int, current_user: User = Depends(get_current_user)):
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             station.campaignid= campaign_id
             db_station = Station(**station.dict())
@@ -160,7 +158,7 @@ async def post_station(station: StationIn, campaign_id:int, current_user: User =
 # Route to update a station associated with a specific campaign
 @app.patch("/campaign/{campaign_id}/station/{station_id}", response_model=StationOut)
 async def patch_station(station_id: int, station: StationIn, campaign_id:int, current_user: User = Depends(get_current_user)):
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             db_station = session.query(Station).filter(Station.stationid == station_id).first()
             if not db_station:
@@ -172,37 +170,36 @@ async def patch_station(station_id: int, station: StationIn, campaign_id:int, cu
             session.refresh(db_station)
             return StationOut(**db_station.__dict__)
 
+
 # Route to retrieve all sensors associated with a specific station and campaign, with optional filtering parameters
 @app.get("/campaign/{campaign_id}/station/{station_id}/sensor/")
 async def get_sensors(
-    campaign_id: int, 
-    station_id: int, 
-    sensor_id: Optional[int]=None,
-    start_date: Optional[datetime] = None, 
+    campaign_id: int,
+    station_id: int,
+    sensor_id: Optional[int] = None,
+    start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     min_measurement_value: Optional[float] = None,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             db_sensor = session.query(Sensor).all()
         return db_sensor
 
 
-
-
 # Route to retrieve sensor data based on specified parameters (e.g., sensor_id, date range, minimum measurement value)
 @app.get("/campaign/{campaign_id}/station/{station_id}/sensor/{sensor_id}")
 async def get_sensors(
-    campaign_id:int,
-    station_id: int, 
-    sensor_id: int=None,
-    start_date: Optional[datetime] = None, 
+    campaign_id: int,
+    station_id: int,
+    sensor_id: int = None,
+    start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     min_measurement_value: Optional[float] = None,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             db_sensor = session.query(Sensor).filter(Sensor.sensorid == sensor_id).join(Sensor.measurement)
 
@@ -220,11 +217,11 @@ async def get_sensors(
 async def post_sensor_and_measurement(campaign_id:int , data: SensorAndMeasurementIn, station_id: int, current_user: User = Depends(get_current_user)):
     sensor_data = data.sensor.dict()
     measurement_data_list = [measurement.dict() for measurement in data.measurement]
-    if check_allocation_permission(current_user, campaign_id): 
+    if check_allocation_permission(current_user, campaign_id):
 
         with SessionLocal() as session:
             # Save sensor data
-            
+
             sensor_data['stationid']=station_id
 
             db_sensor = Sensor(**sensor_data)
@@ -258,16 +255,15 @@ async def post_sensor_and_measurement(campaign_id:int , data: SensorAndMeasureme
                     # If no existing location is found, create a new one
                     db_location = Locations(**location_data)
                     session.add(db_location)
-                
+
                 session.commit()
                 session.refresh(db_measurement)
                 db_measurements.append(db_measurement.__dict__)
-        
 
             sensor = {key: getattr(db_sensor, key) for key in db_sensor.__table__.columns.keys()}
 
             return {"sensor":sensor, "measurement": db_measurements}
-        
+
 # Route to retrieve measurements with optional filtering based on the minimum measurement value
 @app.get("/measurement")
 async def read_measurement( min_measurement_value: Optional[float] = None, current_user: User = Depends(get_current_user)
@@ -276,9 +272,9 @@ async def read_measurement( min_measurement_value: Optional[float] = None, curre
         measurements = session.query(Measurement)
         if min_measurement_value is not None:
             measurements = measurements.filter(Measurement.measurementvalue > min_measurement_value)
-        
+
         return measurements.all()
-    
+
 
 # Route to create a new measurement in the database
 @app.post("/measurement", response_model=MeasurementOut)
@@ -295,4 +291,3 @@ async def post_measurement(measurement: MeasurementIn, current_user: User = Depe
 @app.get("/allocations")
 async def get_allocations_current_user(current_user: User = Depends(get_current_user)):
     return get_allocations(current_user)
-
