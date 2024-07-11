@@ -289,3 +289,10 @@ async def post_measurement(measurement: MeasurementIn, current_user: User = Depe
         session.commit()
         session.refresh(db_measurement)
         return db_measurement
+
+
+# Route to get the allocation for the current user
+@app.get("/allocations")
+async def get_allocations_current_user(current_user: User = Depends(get_current_user)):
+    return get_allocations(current_user)
+
