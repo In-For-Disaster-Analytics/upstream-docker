@@ -69,6 +69,33 @@ def get_allocations(username):
     return [u['chargeCode'] for u in client.projects_for_user(username=username)if u['allocations'][0]['status']!='Inactive']
 
 
+def get_projects_for_user(user: User):
+    client = TASClient(
+        baseURL=os.getenv("tasURL"),
+        credentials={
+            "username": os.getenv("tasUser"),
+            "password": os.getenv("tasSecret"),
+        },
+    )
+    active_projects = [
+        u
+        for u in client.projects_for_user(username=user.username)
+        if u["allocations"][0]["status"] != "Inactive"
+    ]
+    return active_projects
+
+
+def get_project_members(project_id: str):
+    client = TASClient(
+        baseURL=os.getenv("tasURL"),
+        credentials={
+            "username": os.getenv("tasUser"),
+            "password": os.getenv("tasSecret"),
+        },
+    )
+    return client.get_project_members(project_id=project_id)
+
+
 def check_allocation_permission(current_user, campaign_id):
     allocations = get_allocations(current_user)
     with SessionLocal() as session:
@@ -287,7 +314,11 @@ async def post_measurement(measurement: MeasurementIn, current_user: User = Depe
         return db_measurement
 
 
-# Route to get the allocation for the current user
-@app.get("/allocations")
-async def get_allocations_current_user(current_user: User = Depends(get_current_user)):
-    return get_allocations(current_user)
+@app.get("/projects")
+async def get_projects(current_user: User = Depends(get_current_user)):
+    return get_projects_for_user(current_user)
+
+
+@app.get("/projects/{project_id}/members")
+async def get_project_members_for_user(project_id: str):
+    return get_project_members(project_id)
