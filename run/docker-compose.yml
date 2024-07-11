@@ -19,7 +19,7 @@ services:
 
   app:
     container_name: app
-    image: app:1
+    image: app:2
     command: uvicorn app.main:app --host 0.0.0.0 
     ports:
       - 8000
