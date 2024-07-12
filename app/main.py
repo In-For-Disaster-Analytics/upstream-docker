@@ -79,7 +79,7 @@ def get_projects_for_user(user: User):
     )
     active_projects = [
         u
-        for u in client.projects_for_user(username=user.username)
+        for u in client.projects_for_user(username=user)
         if u["allocations"][0]["status"] != "Inactive"
     ]
     return active_projects
