@@ -3,9 +3,12 @@
 import json
 import os
 import re
+from typing import List
 import requests
 from requests.auth import HTTPBasicAuth
 import logging
+
+from app.basemodels import PyTASProject, PyTASUser
 
 logger = logging.getLogger(__name__)
 
@@ -216,10 +219,8 @@ class TASClient:
             if resp['status'] == 'success':
                 return self._departments(resp['result'])
 
-
     def get_department(self, institution_id, department_id):
         return self.get_institution(department_id)
-
 
     def _departments(self, departments):
         depts = []
@@ -276,7 +277,7 @@ class TASClient:
         else:
             r.raise_for_status()
 
-    def projects_for_user( self, username ):
+    def projects_for_user(self, username: str) -> List[PyTASProject]:
         headers = { 'Content-Type':'application/json' }
         r = requests.get( '{0}/v1/projects/username/{1}'.format(self.baseURL, username), headers=headers, auth=self.auth )
         resp = r.json()
@@ -368,6 +369,17 @@ class TASClient:
             return True
         else:
             raise Exception( 'Failed to remove user from project', resp['message'] )
+
+    def get_project_members(self, project_id: str) -> List[PyTASUser]:
+        headers = {"Content-Type": "application/json"}
+        r = requests.get(
+            "{0}/v1/projects/{1}/users".format(self.baseURL, project_id),
+            headers=headers,
+            auth=self.auth,
+        )
+        resp = r.json()
+        return resp["result"]
+
     """
     Allocation
     """
