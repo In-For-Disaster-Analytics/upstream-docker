@@ -1,6 +1,6 @@
 from pydantic import BaseModel, validator
 from datetime import datetime
-from typing import Optional, List
+from typing import Any, Optional, List
 
 # Pydantic model for incoming location data
 class LocationsIn(BaseModel):
@@ -36,7 +36,7 @@ class CampaignsIn(BaseModel):
     #     if isinstance(v, str):
     #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
     #     return v
-    
+
 
 # Pydantic model for outgoing campaign data
 class CampaignsOut(BaseModel):
@@ -59,7 +59,7 @@ class CampaignsOut(BaseModel):
     #     if isinstance(v, str):
     #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
     #     return v
-    
+
 # Pydantic model for incoming station data
 class StationIn(BaseModel):
     campaignid: Optional[int]
@@ -75,8 +75,8 @@ class StationIn(BaseModel):
     #     if isinstance(v, str):
     #         return datetime.strptime(v, "%Y-%m-%d %H:%M:%S").date()
     #     return v
-    
-  
+
+
 # Pydantic model for outgoing station data
 class StationOut(BaseModel):
     stationid: Optional[int]
@@ -110,7 +110,7 @@ class MeasurementOut(BaseModel):
 
 # Pydantic model for incoming sensor data
 class SensorIn(BaseModel):
- 
+
     alias: Optional[str] = None
     description: Optional[str] = None
     postprocess: Optional[bool] = True
@@ -132,9 +132,79 @@ class SensorOut(BaseModel):
 class SensorAndMeasurementIn(BaseModel):
     sensor: SensorIn
     measurement: List[MeasurementIn]
- 
+
 
 # Pydantic model for outgoing sensor and measurement data
 class SensorAndMeasurementout(BaseModel):
     sensor: SensorOut
     measurement: List[MeasurementOut]
+
+
+class PyTASUser(BaseModel):
+    id: int
+    username: str
+    role: str | None = None
+    firstName: str | None = None
+    lastName: str | None = None
+    email: str | None = None
+
+
+class PyTASPi(BaseModel):
+    id: int
+    username: str
+    email: str
+    firstName: str
+    lastName: str
+    institution: str
+    institutionId: int
+    department: str
+    departmentId: int
+    citizenship: str
+    citizenshipId: int
+    source: str
+    uid: int
+    homeDirectory: str
+    gid: int
+
+
+class PyTASAllocation(BaseModel):
+    id: int
+    start: str
+    end: str
+    status: str
+    justification: str
+    decisionSummary: Optional[str]
+    dateRequested: str
+    dateReviewed: Optional[str]
+    computeRequested: int
+    computeAllocated: int
+    storageRequested: int
+    storageAllocated: int
+    memoryRequested: int
+    memoryAllocated: int
+    resourceId: int
+    resource: str
+    projectId: int
+    project: str
+    requestorId: int
+    requestor: str
+    reviewerId: int
+    reviewer: Any
+    computeUsed: float
+
+
+class PyTASProject(BaseModel):
+    id: int
+    title: str
+    description: str
+    chargeCode: str
+    gid: int
+    source: Any
+    fieldId: int
+    field: str
+    typeId: int
+    type: str
+    piId: int
+    pi: PyTASPi
+    allocations: List[PyTASAllocation]
+    nickname: Any
