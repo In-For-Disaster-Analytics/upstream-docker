@@ -47,6 +47,8 @@ class CampaignsOut(BaseModel):
     description: Optional[str] = None
     startdate: datetime
     enddate: Optional[datetime]=None
+    allocation: str
+
     # # Validator for converting string to date for startdate
     # @validator("startdate", pre=True, allow_reuse=True)
     # def string_to_date(cls, v: object) -> object:
