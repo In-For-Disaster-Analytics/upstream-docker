@@ -1,0 +1,6 @@
+tasUser=user1
+tasSecret=change-me-bro1
+jwtSecret=change-me-bro2
+alg=HS256
+tasURL=https://accounting-system-url.example.com/api-test
+POSTGRES_PASSWORD=change-me-bro3
