@@ -17,7 +17,7 @@ class Locations(Base):
     stationid=Column(Integer)
     collectiontime = Column(DateTime, default=datetime.utcnow)
     geometry = Column(Geometry(geometry_type='POINT', srid=4326))
-
+    measurements = relationship("Measurement", uselist=False) # set uselist=False to indicate that this is a 1-to-1 relationship
 
 class Campaigns(Base):
     """
