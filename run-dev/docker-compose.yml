@@ -1,0 +1,36 @@
+services:
+
+  app-dev:
+    container_name: app-dev
+    image: app:94cdf210d8ddd16fdc7d5b3548d9b886699fe446
+    command: uvicorn app.main:app --host 0.0.0.0 
+    ports:
+      - 8000
+    environment:
+      - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db-dev:5432/fastapi_traefik
+    env_file:
+      - /root/fastapi-dev-env
+    depends_on:
+      - db-dev
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.appdev.rule=Host(`upstream-dso.tacc.utexas.edu`) && PathPrefix(`/dev`)
+      #- traefik.http.routers.appdev.rule=Host(`upstream-dso.tacc.utexas.edu`) 
+      - traefik.http.middlewares.strip-dev.stripprefix.prefixes=/dev
+      - traefik.http.routers.appdev.middlewares=strip-dev
+      - traefik.http.routers.appdev.tls=true
+
+  db-dev:
+    container_name: db-dev
+    image: postgis/postgis:16-3.4
+    user: "${UIDGID}"
+    volumes:
+      - "/root/pgdata-dev:/var/lib/postgresql/data"
+    expose:
+      - 5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data
+      - POSTGRES_USER=fastapi_traefik
+      - POSTGRES_DB=fastapi_traefik
+    env_file:
+      - /root/fastapi-dev-env

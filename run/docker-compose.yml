@@ -9,6 +9,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik:/etc/traefik
       - ./dynamic:/dynamic
+    environment:
+      - TZ=America/Chicago
     restart: unless-stopped
     labels:
       - traefik.enable=true
@@ -19,7 +21,7 @@ services:
 
   app:
     container_name: app
-    image: app:2
+    image: app:94cdf210d8ddd16fdc7d5b3548d9b886699fe446
     command: uvicorn app.main:app --host 0.0.0.0 
     ports:
       - 8000
