@@ -2,7 +2,7 @@ services:
 
   app-dev:
     container_name: app-dev
-    image: app:94cdf210d8ddd16fdc7d5b3548d9b886699fe446
+    image: app:mpackard-dev
     command: uvicorn app.main:app --host 0.0.0.0 
     ports:
       - 8000
