@@ -3,4 +3,4 @@
 export UIDGID="`id -u`:`id -g`"
 echo $UIDGID
 
-docker-compose up -d 
+docker compose up -d 
