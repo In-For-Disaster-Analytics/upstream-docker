@@ -3,13 +3,13 @@ services:
   app-dev:
     container_name: app-dev
     image: app:mpackard-dev
-    command: uvicorn app.main:app --host 0.0.0.0 
+    command: uvicorn app.main:app --host 0.0.0.0 --root-path /dev
     ports:
       - 8000
     environment:
       - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db-dev:5432/fastapi_traefik
     env_file:
-      - /root/fastapi-dev-env
+      - ./fastapi-dev-env
     depends_on:
       - db-dev
     labels:
@@ -33,4 +33,4 @@ services:
       - POSTGRES_USER=fastapi_traefik
       - POSTGRES_DB=fastapi_traefik
     env_file:
-      - /root/fastapi-dev-env
+      - ./fastapi-dev-env
