@@ -1,0 +1,20 @@
+services:
+
+  traefik:
+    container_name: traefik
+    image: traefik:2.11
+    network_mode: host
+    volumes:
+      - /etc/letsencrypt:/ssl:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik:/etc/traefik
+      - ./dynamic:/dynamic
+    environment:
+      - TZ=America/Chicago
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.rule=Host(`example.com`) 
+      - traefik.http.routers.traefik.entrypoints=traefik
+      - traefik.http.services.traefik.loadbalancer.server.port=8080

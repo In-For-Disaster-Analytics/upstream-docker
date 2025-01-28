@@ -1,24 +1,5 @@
 services:
 
-  traefik:
-    container_name: traefik
-    image: traefik:2.11
-    network_mode: host
-    volumes:
-      - /etc/letsencrypt:/ssl:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik:/etc/traefik
-      - ./dynamic:/dynamic
-    environment:
-      - TZ=America/Chicago
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik.tls=true
-      - traefik.http.routers.traefik.rule=Host(`upstream-dso.tacc.utexas.edu`) 
-      - traefik.http.routers.traefik.entrypoints=traefik
-      - traefik.http.services.traefik.loadbalancer.server.port=8080
-
   app:
     container_name: app
     image: app:94cdf210d8ddd16fdc7d5b3548d9b886699fe446
@@ -28,7 +9,7 @@ services:
     environment:
       - DATABASE_URL=postgresql://fastapi_traefik:fastapi_traefik@db:5432/fastapi_traefik
     env_file:
-      - /root/fastapi-env
+      - ./fastapi-env
     depends_on:
       - db
     labels:
@@ -50,4 +31,4 @@ services:
       - POSTGRES_USER=fastapi_traefik
       - POSTGRES_DB=fastapi_traefik
     env_file:
-      - /root/fastapi-env
+      - ./fastapi-env
