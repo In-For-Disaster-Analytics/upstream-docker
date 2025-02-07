@@ -48,6 +48,7 @@ class Sensor(Base):
     units = Column(String, nullable=True)
     measurement = relationship("Measurement" , lazy="joined")
     station  = relationship("Station" , lazy="joined")
+    variablename = Column(String)
 
 class Measurement(Base):
     """

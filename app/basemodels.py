@@ -90,7 +90,7 @@ class StationOut(BaseModel):
 # Pydantic model for incoming measurement data
 class MeasurementIn(BaseModel):
     sensorid: Optional[int] = None
-    variablename: str
+    variablename: Optional[str] = None # modified
     collectiontime: datetime
     variabletype: Optional[str] = None
     description: Optional[str] = None
@@ -101,7 +101,7 @@ class MeasurementIn(BaseModel):
 class MeasurementOut(BaseModel):
     measurementid: int
     sensorid: Optional[int] = None
-    variablename: str
+    variablename: Optional[str] = None # modified
     collectiontime: datetime
     variabletype: Optional[str] = None
     description: Optional[str] = None
@@ -116,6 +116,7 @@ class SensorIn(BaseModel):
     postprocess: Optional[bool] = True
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
+    variablename: str
 
 # Pydantic model for outgoing sensor data
 class SensorOut(BaseModel):
@@ -127,6 +128,7 @@ class SensorOut(BaseModel):
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
     measurements: List[MeasurementOut]
+    variablename: str
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):
