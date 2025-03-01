@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float, PrimaryKeyConstraint, Index
+#from sqlalchemy.schema import PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -33,6 +34,11 @@ class Campaigns(Base):
     enddate = Column(DateTime, nullable=True)
     station = relationship("Station" , lazy="joined")
     allocation = Column(String, nullable=False)
+    bbox_west = Column(Float, nullable=True)
+    bbox_east = Column(Float, nullable=True)
+    bbox_south = Column(Float, nullable=True)
+    bbox_north = Column(Float, nullable=True)
+    sensor_types = relationship("CampaignSensorType", lazy="joined")
 
 class Sensor(Base):
     """
@@ -98,3 +104,17 @@ class Station(Base):
     active = Column(Boolean, default=True)
     startdate = Column(DateTime)
     sensor = relationship("Sensor", lazy="joined")
+
+class CampaignSensorType(Base):
+    """
+    Represents a type of a sensor in each campaign.
+    """
+    __tablename__ = "campaign_sensor_types"
+    campaign_id = Column(Integer, ForeignKey('campaigns.campaignid'), nullable=False)
+    sensor_type = Column(String(50), nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('campaign_id', 'sensor_type', name='campaign_sensor_types_pk'),
+        Index('idx_campaign_sensor_types', 'sensor_type'),
+    )
+
+

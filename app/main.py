@@ -1,7 +1,8 @@
 from fastapi import Depends, FastAPI
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.encoders import jsonable_encoder
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -9,13 +10,15 @@ from geoalchemy2.elements import WKTElement
 from typing import Optional, List, Annotated
 from sqlalchemy.orm.exc import NoResultFound
 
-from .basemodels import User, LocationsIn, CampaignsIn, CampaignsOut, StationIn, StationOut, MeasurementIn, MeasurementOut, SensorAndMeasurementIn, SensorAndMeasurementout, SensorIn, SensorOut
-from .db import Campaigns, Locations, Sensor, Measurement, Station, Base
+from .basemodels import User, LocationsIn, CampaignsIn, CampaignsOut, StationIn, StationOut, MeasurementIn, MeasurementOut, SensorAndMeasurementIn, SensorAndMeasurementout, SensorIn, SensorOut, BoundingBoxFilter
+from .db import Campaigns, Locations, Sensor, Measurement, Station, CampaignSensorType, Base
 from .config import settings
 
 from .pytas.http import TASClient
 import jwt
 from dotenv import load_dotenv
+
+from pydantic import ValidationError
 
 load_dotenv()
 import os
@@ -122,14 +125,119 @@ async def post_campaign(campaign: CampaignsIn, current_user: User = Depends(get_
     else: raise HTTPException(status_code=404, detail="Allocation is incorrect")
 
 # Route to retrieve all campaigns, requires an authenticated user (current_user)
-@app.get("/campaign", response_model=List[CampaignsOut])
-async def read_campaign(current_user: User = Depends(get_current_user)):
-    print("USER",current_user)
+
+# @app.get("/campaign", response_model=List[CampaignsOut])
+# async def read_campaign(current_user: User = Depends(get_current_user)):
+#     print("USER",current_user)
+#     with SessionLocal() as session:
+#         allocations = get_allocations(current_user)
+#         campaigns = session.query(Campaigns).filter(Campaigns.allocation.in_(allocations)).all()
+        
+#         return [CampaignsOut(**campaign.__dict__) for campaign in campaigns]
+
+def format_campaign(campaign):
+    return {
+        "id": campaign.campaignid,
+        "name": campaign.campaignname,
+        "description": campaign.description,
+        "temporal_coverage": {
+            "start_date": campaign.startdate.isoformat(),
+            "end_date": campaign.enddate.isoformat() if campaign.enddate else None
+        },
+        "spatial_coverage": {
+            "bbox": [
+                campaign.bbox_west,
+                campaign.bbox_south,
+                campaign.bbox_east,
+                campaign.bbox_north
+            ],
+            "center": [
+                (campaign.bbox_west + campaign.bbox_east) / 2,
+                (campaign.bbox_south + campaign.bbox_north) / 2
+            ]
+        },
+        "sensor_types": [st.sensor_type for st in campaign.sensor_types],
+        "stations_count": len(campaign.station) # doublecheck this
+    }
+
+@app.get("/campaign")
+async def read_campaigns(
+    bbox: Optional[str]=None,
+    start_date: Optional[datetime]=None,
+    end_date: Optional[str]=None,
+    sensor_types: Optional[str]=None,
+    page: Optional[int]=1,
+    limit: Optional[int]=20,
+    current_user: User = Depends(get_current_user), 
+):
     with SessionLocal() as session:
         allocations = get_allocations(current_user)
-        campaigns = session.query(Campaigns).filter(Campaigns.allocation.in_(allocations)).all()
+        query = session.query(Campaigns)
+        # Filter the query by active allocations
+        query = query.filter(Campaigns.allocation.in_(allocations))
+
+        # Apply filters
+        if bbox:
+            # Parse bbox parameter
+            try:
+                west, south, east, north = map(float, bbox.split(','))
+                # Validate coordinates with Pydantic model
+                BoundingBoxFilter(west=west, south=south, east=east, north=north)
+                
+                # Apply spatial filter
+                query = query.filter(
+                    Campaigns.bbox_west <= east,
+                    Campaigns.bbox_east >= west,
+                    Campaigns.bbox_south <= north,
+                    Campaigns.bbox_north >= south
+                )
+
+            except ValidationError:
+                raise HTTPException(status_code=400, detail="Invalid coordinate values")
+            
+            except (ValueError, TypeError):
+                raise HTTPException(status_code=400, detail="Invalid bbox format")
+
         
-        return [CampaignsOut(**campaign.__dict__) for campaign in campaigns]
+        # Apply date filters    
+        if start_date:
+            query = query.filter(Campaigns.enddate >= start_date)
+        
+        print(f'after start_date!!!! {query.count()}')
+        
+        if end_date: 
+            query = query.filter(Campaigns.startdate <= end_date)
+        
+        #Apply sensor type filter
+        if sensor_types:
+            sensor_list = sensor_types.split(',')
+            query = query.join(CampaignSensorType).filter(
+                CampaignSensorType.sensor_type.in_(sensor_list)
+            )
+        
+        # Count total results before pagination
+        total_count = query.count()
+        
+        # Apply pagination
+        paginated_query = query.offset((page - 1) * limit).limit(limit)
+
+        # Execute query
+        results = paginated_query.all()
+
+         # Format response
+        response = {
+            "data": [format_campaign(c) for c in results],
+            "metadata": {
+                "total": total_count,
+                "page": page,
+                "limit": limit,
+                "pages": (total_count + limit - 1) // limit
+            }
+        }
+        
+    return jsonable_encoder(response)
+
+
 
 
 

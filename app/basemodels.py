@@ -1,4 +1,4 @@
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Field
 from datetime import datetime
 from typing import Optional, List
 
@@ -140,3 +140,13 @@ class SensorAndMeasurementIn(BaseModel):
 class SensorAndMeasurementout(BaseModel):
     sensor: SensorOut
     measurement: List[MeasurementOut]
+
+
+class BoundingBoxFilter(BaseModel):
+    west: float = Field(ge=-180, le=180)
+    south: float = Field(ge=-90, le=90)
+    east: float = Field(ge=-180, le=180)
+    north: float = Field(ge=-90, le=90)
+    
+
+
