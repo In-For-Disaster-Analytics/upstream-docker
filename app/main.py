@@ -162,13 +162,13 @@ def format_campaign(campaign):
 
 @app.get("/campaign")
 async def read_campaigns(
-    bbox: Optional[str]=None,
-    start_date: Optional[datetime]=None,
-    end_date: Optional[str]=None,
-    sensor_types: Optional[str]=None,
-    page: Optional[int]=1,
-    limit: Optional[int]=20,
-    current_user: User = Depends(get_current_user), 
+    bbox: str | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
+    sensor_types: str | None = None,
+    page: int | None = 1,
+    limit: int | None = 20,
+    current_user: User = Depends(get_current_user),
 ):
     with SessionLocal() as session:
         allocations = get_allocations(current_user)
@@ -192,8 +192,11 @@ async def read_campaigns(
                     Campaigns.bbox_north >= south
                 )
 
-            except ValidationError:
-                raise HTTPException(status_code=400, detail="Invalid coordinate values")
+            except ValidationError as exc:
+                error_msgs = {
+                    f"Error value for {err['loc'][0]}: {err['msg']}" for err in exc.errors()
+                }
+                raise HTTPException(status_code=400, detail=str(error_msgs))
             
             except (ValueError, TypeError):
                 raise HTTPException(status_code=400, detail="Invalid bbox format")
@@ -202,8 +205,6 @@ async def read_campaigns(
         # Apply date filters    
         if start_date:
             query = query.filter(Campaigns.enddate >= start_date)
-        
-        print(f'after start_date!!!! {query.count()}')
         
         if end_date: 
             query = query.filter(Campaigns.startdate <= end_date)
