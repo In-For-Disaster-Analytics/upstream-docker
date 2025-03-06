@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, Float, PrimaryKeyConstraint, Index
+#from sqlalchemy.schema import PrimaryKeyConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -17,7 +18,7 @@ class Locations(Base):
     stationid=Column(Integer)
     collectiontime = Column(DateTime, default=datetime.utcnow)
     geometry = Column(Geometry(geometry_type='POINT', srid=4326))
-
+    measurements = relationship("Measurement", uselist=False) # set uselist=False to indicate that this is a 1-to-1 relationship
 
 class Campaigns(Base):
     """
@@ -33,6 +34,11 @@ class Campaigns(Base):
     enddate = Column(DateTime, nullable=True)
     station = relationship("Station" , lazy="joined")
     allocation = Column(String, nullable=False)
+    bbox_west = Column(Float, nullable=True)
+    bbox_east = Column(Float, nullable=True)
+    bbox_south = Column(Float, nullable=True)
+    bbox_north = Column(Float, nullable=True)
+    sensor_types = relationship("CampaignSensorType", lazy="joined")
 
 class Sensor(Base):
     """
@@ -48,6 +54,7 @@ class Sensor(Base):
     units = Column(String, nullable=True)
     measurement = relationship("Measurement" , lazy="joined")
     station  = relationship("Station" , lazy="joined")
+    variablename = Column(String)
 
 class Measurement(Base):
     """
@@ -97,3 +104,17 @@ class Station(Base):
     active = Column(Boolean, default=True)
     startdate = Column(DateTime)
     sensor = relationship("Sensor", lazy="joined")
+
+class CampaignSensorType(Base):
+    """
+    Represents a type of a sensor in each campaign.
+    """
+    __tablename__ = "campaign_sensor_types"
+    campaign_id = Column(Integer, ForeignKey('campaigns.campaignid'), nullable=False)
+    sensor_type = Column(String(50), nullable=False)
+    __table_args__ = (
+        PrimaryKeyConstraint('campaign_id', 'sensor_type', name='campaign_sensor_types_pk'),
+        Index('idx_campaign_sensor_types', 'sensor_type'),
+    )
+
+

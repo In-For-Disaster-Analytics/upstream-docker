@@ -10,3 +10,4 @@ python-multipart
 requests
 PyJWT
 python-dotenv
+alembic
