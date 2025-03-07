@@ -22,6 +22,8 @@ from pydantic import ValidationError
 
 load_dotenv()
 import os
+from app.api.v1.main import api_router
+
 
 engine = create_engine(settings.db_url)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -37,6 +39,7 @@ app = FastAPI(title="Upstream Sensor Storage",
     }, )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+app.include_router(api_router, prefix="/api/v1")
 
 # Function to create the database and tables based on the declared models
 
