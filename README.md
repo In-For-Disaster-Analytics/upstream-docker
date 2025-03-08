@@ -1,6 +1,10 @@
-# upstream-docker
+# Upstream API
 
-Class diagram
+A RESTful API service for managing environmental sensor data and campaigns.
+
+## Database Schema
+
+The following diagram shows the relationships between the main entities in the system:
 
 ```mermaid
 classDiagram
@@ -56,27 +60,97 @@ classDiagram
     Measurement "1" --> "1" Location : has
 ```
 
-## How to update the DEV instance
+## Installation & Setup
 
-As of the moment of writing these instructions, there're
-_two_ upstream-dso instances running on the same VM (upstream-dso.tacc.utexas.edu): **production**, which can be accessed through https://upstream-dso.tacc.utexas.edu, and **dev** - https://upstream-dso.tacc.utexas.edu/dev/ .
+1. Clone the repository
+2. Install dependencies (Docker and Docker Compose required)
+3. Initialize the database:
+   ```bash
+   # Run database migrations
+   alembic upgrade head
+   ```
 
-1. ssh to the VM with your TACC's credentials
-   `ssh <tacc_username>@upstream-dso.tacc.utexas.edu`
-1. login as root
-   `sudo su`
-1. navigate to the dev source code's directory
-   `cd ~/upstream-docker-original-branch`
-1. verify the branch (**Original** for the dev's instance)
-   `git branch`
-1. pull the changes from **Original** branch
-   `git pull`
-1. (Re)build the Docker container (and increment the "version_id" (e.g., from 11 to 12))
-   `docker build -t app-mpackard-dev:<version_id> .`
-1. navigate to the directory for running the dev instance
-   `cd ~/upstream-dev`
-1. update the **docker-compose.yml** file to reflet the new image, i.e.<version_id> (see Step 6)
-   `vim docker-compose.yml`
-1. from the same directory (~/upstream-dev) run two bash scripts that stop and run the containers
-   `./burndown && ./burnup`
-1. navigate to https://upstream-dso.tacc.utexas.edu/dev/ to see the updates
+## Development Environment
+
+### Setting up Dev Instance
+
+1. SSH to the VM with your TACC credentials:
+
+   ```bash
+   ssh <tacc_username>@upstream-dso.tacc.utexas.edu
+   ```
+
+2. Switch to root:
+
+   ```bash
+   sudo su
+   ```
+
+3. Navigate to dev source code directory:
+
+   ```bash
+   cd ~/upstream-docker-original-branch
+   ```
+
+4. Verify you're on the correct branch (Original):
+
+   ```bash
+   git branch
+   ```
+
+5. Pull latest changes:
+
+   ```bash
+   git pull
+   ```
+
+6. Build Docker container (increment version_id):
+
+   ```bash
+   docker build -t app-mpackard-dev:<version_id> .
+   ```
+
+7. Navigate to dev instance directory:
+
+   ```bash
+   cd ~/upstream-dev
+   ```
+
+8. Update docker-compose.yml with new version_id:
+
+   ```bash
+   vim docker-compose.yml
+   ```
+
+9. Restart containers:
+
+   ```bash
+   ./burndown && ./burnup
+   ```
+
+10. Verify the updates at https://upstream-dso.tacc.utexas.edu/dev/
+
+## Deployment
+
+There are two instances running on upstream-dso.tacc.utexas.edu:
+
+- **Production**: https://upstream-dso.tacc.utexas.edu
+- **Development**: https://upstream-dso.tacc.utexas.edu/dev/
+
+## Database Migrations
+
+The project uses Alembic for database migrations. Key commands:
+
+```bash
+# Create a new migration
+alembic revision --autogenerate -m "description"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback last migration
+alembic downgrade -1
+
+# View migration history
+alembic history
+```
