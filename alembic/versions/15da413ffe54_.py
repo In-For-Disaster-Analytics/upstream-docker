@@ -9,7 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
-
+import geoalchemy2
 
 # revision identifiers, used by Alembic.
 revision: str = '15da413ffe54'
@@ -45,7 +45,7 @@ def upgrade() -> None:
     sa.Column('geometry', geoalchemy2.types.Geometry(geometry_type='POINT', srid=4326, from_text='ST_GeomFromEWKT', name='geometry'), nullable=True),
     sa.PrimaryKeyConstraint('locationid')
     )
-    op.create_index('idx_locations_geometry', 'locations', ['geometry'], unique=False, postgresql_using='gist')
+    #op.create_index('idx_locations_geometry', 'locations', ['geometry'], unique=False, postgresql_using='gist')
     op.create_index(op.f('ix_locations_locationid'), 'locations', ['locationid'], unique=False)
     op.create_table('campaign_sensor_types',
     sa.Column('campaign_id', sa.Integer(), nullable=False),
@@ -109,7 +109,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('objectid')
     )
     op.create_index(op.f('ix_sensorobjects_objectid'), 'sensorobjects', ['objectid'], unique=False)
-    op.drop_table('spatial_ref_sys')
+    #op.drop_table('spatial_ref_sys')
     # ### end Alembic commands ###
 
 
