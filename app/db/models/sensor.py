@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from ..db.base import Base
+from app.db.base import Base
 
 class Sensor(Base):
     __tablename__ = "sensors"

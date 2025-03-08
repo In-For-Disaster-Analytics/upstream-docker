@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from geoalchemy2 import Geometry
-from ..db.base import Base
+from app.db.base import Base
 
 class Locations(Base):
     __tablename__ = "locations"
