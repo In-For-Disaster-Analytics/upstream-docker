@@ -6,7 +6,8 @@ from app.api.dependencies.pytas import check_allocation_permission
 from app.db.models.sensor import Sensor
 from app.db.models.measurement import Measurement
 from app.db.models.location import Locations
-from app.basemodels import SensorAndMeasurementIn, User
+from app.api.v1.schemas.sensor import SensorAndMeasurementIn
+from app.api.v1.schemas.user import User
 from app.db.session import SessionLocal
 
 router = APIRouter(prefix="/campaigns/{campaign_id}/stations/{station_id}", tags=["campaign_station_sensors"])

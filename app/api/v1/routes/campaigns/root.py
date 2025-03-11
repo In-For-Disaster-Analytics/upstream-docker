@@ -5,13 +5,15 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 
 from app.api.v1.utils.formatters import format_campaign
-from app.basemodels import BoundingBoxFilter, CampaignsOut, CampaignsIn, User
+from app.api.v1.schemas.campaign import CampaignsOut, CampaignsIn
+from app.api.v1.schemas.user import User
 from app.db.models.campaign import Campaign
 from app.db.models.campaignSensorType import CampaignSensorType
 from app.db.session import SessionLocal
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.routes.campaigns.campaing_stations import router as stations_router
+from app.api.v1.routes.campaigns.campaign_stations import router
+from app.api.v1.schemas.locations import BoundingBoxFilter
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 # Route for creating a new campaign, requires an authenticated user (current_user)

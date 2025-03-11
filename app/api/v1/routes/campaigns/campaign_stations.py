@@ -3,7 +3,8 @@ from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.db.models.station import Station
 from app.db.session import SessionLocal
-from app.basemodels import StationIn, StationOut, User
+from app.api.v1.schemas.station import StationIn, StationOut
+from app.api.v1.schemas.user import User
 
 router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["campaign_stations"])
 
@@ -13,11 +14,10 @@ async def read_station(campaign_id:int, current_user: User = Depends(get_current
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             stations = session.query(Station).filter(Station.campaignid == campaign_id).all()
-            return stations
-            # for station in stations:
-            #     print(station.sensor[0].measurement[0].location.geometry)
-            # return {'result': 'success'}
-
+            return {
+                "count": len(stations),
+                "data": [StationOut(**station.__dict__) for station in stations]
+            }
 
 # Route to create a new station associated with a specific campaign
 @router.post("/stations", response_model=StationOut)
