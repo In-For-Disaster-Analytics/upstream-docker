@@ -1,0 +1,18 @@
+//hide some folder and files
+{
+  "files.exclude": {
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.pyd": true,
+    "**/*.pyw": true,
+    "**/*.pyz": true,
+    "**/*.pywz": true,
+    "**/*.pyzw": true,
+    "**/*.pyzwz": true,
+    "**/*.pyzwzw": true,
+    "**/*.pyzwzwz": true,
+    "**/*.pyzwzwzw": true,
+    "**/*__pycache__": true,
+    "**/.venv": true
+  }
+}

@@ -24,7 +24,6 @@ class TASClient:
     BASIC Auth.
     """
     def __init__(self, baseURL = None, credentials = None):
-        print(credentials)
         # if (baseURL == None):
 
         #     baseURL =config['tasURL']
@@ -43,7 +42,8 @@ class TASClient:
     def authenticate(self, username, password):
         payload = {'username': username, 'password': password}
         headers = { 'Content-Type':'application/json' }
-        r = requests.post(self.baseURL + '/auth/login', data=json.dumps( payload ), auth=self.auth, headers=headers)
+        print(self.baseURL + '/auth/login')
+        r = requests.post(self.baseURL + '/auth/login', data=json.dumps( payload ), auth=self.auth, headers=headers, timeout=10)
         resp = r.json()
         if resp['status'] == 'success':
             return resp['result']
