@@ -10,7 +10,5 @@ class Locations(Base):
     stationid = Column(Integer, ForeignKey("stations.stationid"))
     collectiontime = Column(DateTime)
     geometry = Column(Geometry('POINT', srid=4326))
-
-    # Relationships
-    station = relationship("Station", back_populates="locations")
-    measurement = relationship("Measurement", back_populates="location")
+    # station = relationship("Station", back_populates="locations")
+    measurements = relationship("Measurement", uselist=False) # set uselist=False to indicate that this is a 1-to-1 relationship

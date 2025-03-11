@@ -1,15 +1,16 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 class Station(Base):
     __tablename__ = "stations"
-
     stationid = Column(Integer, primary_key=True, index=True)
-    stationname = Column(String)
-    description = Column(String)
-    campaignid = Column(Integer, ForeignKey("campaigns.campaignid"))
-
-    # Relationships
-    campaign = relationship("Campaigns", back_populates="station")
-    sensor = relationship("Sensor", back_populates="station")
-    locations = relationship("Locations", back_populates="station")
+    campaignid = Column(Integer, ForeignKey('campaigns.campaignid'), nullable=True)
+    stationname = Column(String, unique=True)
+    projectid = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    contactname = Column(String, nullable=True)
+    contactemail = Column(String, nullable=True)
+    active = Column(Boolean, default=True)
+    startdate = Column(DateTime)
+    sensor = relationship("Sensor", lazy="joined")
+    # location = relationship("Locations", lazy="joined")

@@ -1,17 +1,16 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 class Sensor(Base):
     __tablename__ = "sensors"
-
     sensorid = Column(Integer, primary_key=True, index=True)
-    sensorname = Column(String)
-    description = Column(String)
-    sensortype = Column(String)
-    units = Column(String)
-    stationid = Column(Integer, ForeignKey("stations.stationid"))
-
-    # Relationships
-    station = relationship("Station", back_populates="sensor")
-    measurement = relationship("Measurement", back_populates="sensor")
+    stationid = Column(Integer, ForeignKey('stations.stationid'))
+    alias = Column(String)
+    description = Column(String, nullable=True)
+    postprocess = Column(Boolean, default=True)
+    postprocessscript = Column(String, nullable=True)
+    units = Column(String, nullable=True)
+    measurement = relationship("Measurement" , lazy="joined")
+    station  = relationship("Station" , lazy="joined")
+    variablename = Column(String)
