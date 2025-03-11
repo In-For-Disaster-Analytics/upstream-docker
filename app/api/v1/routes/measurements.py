@@ -1,7 +1,8 @@
-
 # Route to retrieve measurements with optional filtering based on the minimum measurement value
 from typing import Optional
+
 from fastapi import APIRouter
+
 from app.basemodels import MeasurementIn, MeasurementOut
 from app.db.models.measurement import Measurement
 from app.db.session import SessionLocal
@@ -10,11 +11,13 @@ router = APIRouter(prefix="/measurements", tags=["measurements"])
 
 
 @router.get("/measurement")
-async def read_measurement( min_measurement_value: Optional[float] = None):
+async def read_measurement(min_measurement_value: Optional[float] = None):
     with SessionLocal() as session:
         measurements = session.query(Measurement)
         if min_measurement_value is not None:
-            measurements = measurements.filter(Measurement.measurementvalue > min_measurement_value)
+            measurements = measurements.filter(
+                Measurement.measurementvalue > min_measurement_value
+            )
         return measurements.all()
 
 

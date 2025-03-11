@@ -4,6 +4,6 @@
 #
 #####
 from .base import TASModel
-from .projects import Project, Allocation
+from .misc import Department, Institution
+from .projects import Allocation, Project
 from .users import User
-from .misc import Institution, Department

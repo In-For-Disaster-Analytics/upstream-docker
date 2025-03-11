@@ -1,9 +1,9 @@
-from pytas.models.base import TASModel
 from pytas.http import TASClient
+from pytas.models.base import TASModel
+
 
 class Institution(TASModel):
-
-    _resource_uri = 'institutions/'
+    _resource_uri = "institutions/"
 
     def __init__(self, id=None, initial={}):
         super(Institution, self).__init__()
@@ -15,14 +15,14 @@ class Institution(TASModel):
             self.__populate(initial)
 
     def __str__(self):
-        return getattr(self, 'name', '<new institution>')
+        return getattr(self, "name", "<new institution>")
 
     def __populate(self, data):
         self.__dict__.update(data)
 
     @classmethod
     def list(cls):
-        api = TASClient();
+        api = TASClient()
         institutions = []
         data = api.institutions()
         for inst in data:
@@ -40,7 +40,6 @@ class Institution(TASModel):
 
 
 class Department(TASModel):
-
     def __init__(self, id=None, initial={}):
         super(Department, self).__init__()
         if id is not None:
@@ -51,9 +50,7 @@ class Department(TASModel):
             self.__populate(initial)
 
     def __str__(self):
-        return getattr(self, 'name', '<new department>')
+        return getattr(self, "name", "<new department>")
 
     def __populate(self, data):
         self.__dict__.update(data)
-
-

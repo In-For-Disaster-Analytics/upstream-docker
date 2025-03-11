@@ -1,42 +1,54 @@
 import os
+
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+
 from app.pytas.http import TASClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
-ENVIRONMENT = os.getenv('ENVIRONMENT')
+ENVIRONMENT = os.getenv("ENVIRONMENT")
+
 
 def authenticate_user(username, password):
-     # Initialize a TASClient instance with the TAS server details and credentials
-    if ENVIRONMENT == 'dev':
-        return {"status":"success","message":None,"result":True}
+    # Initialize a TASClient instance with the TAS server details and credentials
+    if ENVIRONMENT == "dev":
+        return {"status": "success", "message": None, "result": True}
     else:
-        client = TASClient(baseURL=os.getenv('tasURL'), credentials={'username':os.getenv('tasUser'), 'password':os.getenv('tasSecret')})
+        client = TASClient(
+            baseURL=os.getenv("tasURL"),
+            credentials={
+                "username": os.getenv("tasUser"),
+                "password": os.getenv("tasSecret"),
+            },
+        )
         return client.authenticate(username, password)
+
 
 # Async function to get the current user based on the provided OAuth2 token
 async def get_current_user(token: str = Depends(oauth2_scheme)):
-    if ENVIRONMENT == 'dev':
+    if ENVIRONMENT == "dev":
         return {
-            'username': 'test',
+            "username": "test",
         }
 
     user_dict = unhash(token)
 
-    if not authenticate_user(user_dict['username'], user_dict['password']):
-            # If user authentication fails, raise an HTTPException with 401 UNAUTHORIZED status
+    if not authenticate_user(user_dict["username"], user_dict["password"]):
+        # If user authentication fails, raise an HTTPException with 401 UNAUTHORIZED status
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user_dict['username']
+    return user_dict["username"]
+
 
 # Function to decode a JWT token using the specified secret and algorithm
 def unhash(token):
-    return jwt.decode(token, os.getenv('jwtSecret'), algorithms=[os.getenv('alg')])
+    return jwt.decode(token, os.getenv("jwtSecret"), algorithms=[os.getenv("alg")])
+
 
 # Function to encode a payload into a JWT token using the specified secret and algorithm
 def hash(payload):
-    return jwt.encode(payload, os.getenv('jwtSecret'), algorithm=os.getenv('alg'))
+    return jwt.encode(payload, os.getenv("jwtSecret"), algorithm=os.getenv("alg"))

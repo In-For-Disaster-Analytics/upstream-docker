@@ -3,39 +3,41 @@
 #
 #
 ###
-from .base import TASModel
-from .users import User
 from pytas.http import TASClient
 
+from .base import TASModel
+from .users import User
+
 PROJECT_TYPES = (
-    (0, 'Research'),
-    (2, 'Startup'),
-    (4, 'Educational'),
-    (1, 'Institutional'),
-    (6, 'Partner'),
+    (0, "Research"),
+    (2, "Startup"),
+    (4, "Educational"),
+    (1, "Institutional"),
+    (6, "Partner"),
 )
 
+
 class Project(TASModel):
-    _resource_uri = 'projects/'
+    _resource_uri = "projects/"
     _fields = [
-        'id',
-        'title',
-        'chargeCode',
-        'typeId',
-        'description',
-        'source',
-        'fieldId',
-        'piId',
-        'allocations',
+        "id",
+        "title",
+        "chargeCode",
+        "typeId",
+        "description",
+        "source",
+        "fieldId",
+        "piId",
+        "allocations",
     ]
 
     def __populate(self, data):
         self.__dict__.update(data)
 
-        self.pi = User(initial=data['pi'])
+        self.pi = User(initial=data["pi"])
 
         allocations = []
-        for alloc in data['allocations']:
+        for alloc in data["allocations"]:
             allocations.append(Allocation(initial=alloc))
         self.allocations = allocations
 
@@ -49,11 +51,11 @@ class Project(TASModel):
             self.__populate(initial)
 
     def __str__(self):
-        return getattr(self, 'chargeCode', '<new project>')
+        return getattr(self, "chargeCode", "<new project>")
 
     def as_dict(self):
-        proj_dict =  {f:getattr(self, f, None) for f in self._fields}
-        proj_dict['allocations'] = [a.as_dict() for a in self.allocations]
+        proj_dict = {f: getattr(self, f, None) for f in self._fields}
+        proj_dict["allocations"] = [a.as_dict() for a in self.allocations]
         return proj_dict
 
     @classmethod
@@ -64,9 +66,9 @@ class Project(TASModel):
         may be provided.
         """
         if username is None and group is None:
-            raise TypeError('Argument username or group is required')
+            raise TypeError("Argument username or group is required")
         if username is not None and group is not None:
-            raise TypeError('One one of username or group can be passed')
+            raise TypeError("One one of username or group can be passed")
 
         api = TASClient()
         if username:
@@ -95,35 +97,34 @@ class Project(TASModel):
         return api.del_project_user(self.id, username)
 
 
-
 class Allocation(TASModel):
-    _resource_uri = 'allocations/'
+    _resource_uri = "allocations/"
     _fields = [
-        'computeUsed',
-        'computeAllocated',
-        'computeRequested',
-        'dateRequested',
-        'dateReviewed',
-        'decisionSummary',
-        'end',
-        'id',
-        'justification',
-        'memoryUsed',
-        'memoryAllocated',
-        'memoryRequested',
-        'project',
-        'projectId',
-        'requestor',
-        'requestorId',
-        'resource',
-        'resourceId',
-        'reviewer',
-        'reviewerId',
-        'start',
-        'status',
-        'storageUsed',
-        'storageAllocated',
-        'storageRequested',
+        "computeUsed",
+        "computeAllocated",
+        "computeRequested",
+        "dateRequested",
+        "dateReviewed",
+        "decisionSummary",
+        "end",
+        "id",
+        "justification",
+        "memoryUsed",
+        "memoryAllocated",
+        "memoryRequested",
+        "project",
+        "projectId",
+        "requestor",
+        "requestorId",
+        "resource",
+        "resourceId",
+        "reviewer",
+        "reviewerId",
+        "start",
+        "status",
+        "storageUsed",
+        "storageAllocated",
+        "storageRequested",
     ]
 
     def __init__(self, initial={}):
@@ -135,12 +136,11 @@ class Allocation(TASModel):
 
     @property
     def percentComputeUsed(self):
-        used = getattr(self, 'computeUsed', 0)
-        alloc = getattr(self, 'computeAllocated', 0)
+        used = getattr(self, "computeUsed", 0)
+        alloc = getattr(self, "computeAllocated", 0)
         if alloc > 0:
             return (used / alloc) * 100
         return 0
-
 
 
 class AllocationApproval(object):
