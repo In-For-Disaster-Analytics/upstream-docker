@@ -9,7 +9,6 @@ from app.pytas.http import TASClient
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 
-# Function to retrieve allocations (charge codes) associated with a given username
 def get_allocations(username):
     if ENVIRONMENT == "dev":
         return ["test"]

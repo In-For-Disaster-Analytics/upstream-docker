@@ -7,7 +7,9 @@ from app.db.base import Base
 class Station(Base):
     __tablename__ = "stations"
     stationid = Column(Integer, primary_key=True, index=True)
-    campaignid = Column(Integer, ForeignKey("campaigns.campaignid"), nullable=True)
+    campaignid = Column(
+        Integer, ForeignKey("campaigns.campaignid"), nullable=True
+    )
     stationname = Column(String, unique=True)
     projectid = Column(String, nullable=True)
     description = Column(String, nullable=True)

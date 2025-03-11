@@ -1,9 +1,6 @@
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import FastAPI
 
-from app.api.dependencies.auth import authenticate_user
-from app.api.dependencies.pytas import get_allocations
 from app.api.v1.main import api_router
 
 load_dotenv()

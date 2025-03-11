@@ -1,9 +1,8 @@
-# Route to retrieve measurements with optional filtering based on the minimum measurement value
 from typing import Optional
 
 from fastapi import APIRouter
 
-from app.basemodels import MeasurementIn, MeasurementOut
+from app.api.v1.schemas.measurement import MeasurementIn, MeasurementOut
 from app.db.models.measurement import Measurement
 from app.db.session import SessionLocal
 

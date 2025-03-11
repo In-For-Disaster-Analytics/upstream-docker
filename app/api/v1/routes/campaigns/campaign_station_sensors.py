@@ -2,6 +2,8 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from geoalchemy2 import WKTElement
+from sqlalchemy.orm.exc import NoResultFound
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
@@ -18,7 +20,6 @@ router = APIRouter(
 )
 
 
-# Route to retrieve sensor data based on specified parameters (e.g., sensor_id, date range, minimum measurement value)
 @router.get("/sensor/{sensor_id}")
 async def get_sensors(
     campaign_id: int,
@@ -39,11 +40,15 @@ async def get_sensors(
 
             if start_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(Measurement.collectiontime >= start_date)
+                    Sensor.measurement.any(
+                        Measurement.collectiontime >= start_date
+                    )
                 )
             if end_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(Measurement.collectiontime <= end_date)
+                    Sensor.measurement.any(
+                        Measurement.collectiontime <= end_date
+                    )
                 )
             if min_measurement_value is not None:
                 db_sensor = db_sensor.filter(
@@ -52,7 +57,6 @@ async def get_sensors(
             return db_sensor.all()
 
 
-# Route to create a new sensor and associated measurements for a specific station and campaign
 @router.post("/sensor/", response_model=dict)
 async def post_sensor_and_measurement(
     campaign_id: int,
@@ -61,7 +65,9 @@ async def post_sensor_and_measurement(
     current_user: User = Depends(get_current_user),
 ):
     sensor_data = data.sensor.dict()
-    measurement_data_list = [measurement.dict() for measurement in data.measurement]
+    measurement_data_list = [
+        measurement.dict() for measurement in data.measurement
+    ]
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             # Save sensor data
@@ -87,12 +93,16 @@ async def post_sensor_and_measurement(
             location_data = {}
             for measurement_data in measurement_data_list:
                 measurement_data["sensorid"] = db_sensor.sensorid
-                location_data["geometry"] = measurement_data.pop("geometry", None)
+                location_data["geometry"] = measurement_data.pop(
+                    "geometry", None
+                )
                 location_data["geometry"] = WKTElement(
                     location_data["geometry"], srid=4326
                 )
                 location_data["stationid"] = station_id
-                location_data["collectiontime"] = measurement_data["collectiontime"]
+                location_data["collectiontime"] = measurement_data[
+                    "collectiontime"
+                ]
                 db_measurement = Measurement(**measurement_data)
                 session.add(db_measurement)
                 try:

@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.api.v1.schemas.location import LocationsIn
+
 
 # Pydantic model for incoming measurement data
 class MeasurementIn(BaseModel):

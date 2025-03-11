@@ -38,7 +38,9 @@ def post_sensor_and_measurement(
 
     data = SensorAndMeasurementIn(**data)
     sensor_data = data.sensor.dict()
-    measurement_data_list = [measurement.dict() for measurement in data.measurement]
+    measurement_data_list = [
+        measurement.dict() for measurement in data.measurement
+    ]
     del data
 
     if check_allocation_permission(current_user, campaign_id):
@@ -77,7 +79,8 @@ def post_sensor_and_measurement(
 
                 try:
                     # Try to find an existing location
-                    db_location = (
+                    # noqa: F841
+                    (
                         session.query(Locations)
                         .filter_by(
                             collectiontime=loc_collectiontime,

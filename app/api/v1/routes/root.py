@@ -12,9 +12,14 @@ router = APIRouter()
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     authenticated = authenticate_user(form_data.username, form_data.password)
     if not authenticated:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(
+            status_code=400, detail="Incorrect username or password"
+        )
     # Create jwt token
-    return {"access_token": create_token(form_data.username), "token_type": "bearer"}
+    return {
+        "access_token": create_token(form_data.username),
+        "token_type": "bearer",
+    }
 
 
 def create_token(username: str):

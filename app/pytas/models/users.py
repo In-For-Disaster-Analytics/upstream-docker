@@ -61,7 +61,9 @@ class User(TASModel):
     def confirm_password_reset(self, code, new_password, source=None):
         if self.username:
             api = TASClient()
-            return api.confirm_password_reset(self.username, code, new_password, source)
+            return api.confirm_password_reset(
+                self.username, code, new_password, source
+            )
         else:
             raise Exception("Cannot reset password: username is not set")
 

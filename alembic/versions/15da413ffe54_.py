@@ -40,7 +40,10 @@ def upgrade() -> None:
         sa.UniqueConstraint("campaignname"),
     )
     op.create_index(
-        op.f("ix_campaigns_campaignid"), "campaigns", ["campaignid"], unique=False
+        op.f("ix_campaigns_campaignid"),
+        "campaigns",
+        ["campaignid"],
+        unique=False,
     )
     op.create_table(
         "locations",
@@ -59,9 +62,12 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("locationid"),
     )
-    # op.create_index('idx_locations_geometry', 'locations', ['geometry'], unique=False, postgresql_using='gist')
+    # noqa: E501
     op.create_index(
-        op.f("ix_locations_locationid"), "locations", ["locationid"], unique=False
+        op.f("ix_locations_locationid"),
+        "locations",
+        ["locationid"],
+        unique=False,
     )
     op.create_table(
         "campaign_sensor_types",
@@ -118,7 +124,9 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint("sensorid"),
     )
-    op.create_index(op.f("ix_sensors_sensorid"), "sensors", ["sensorid"], unique=False)
+    op.create_index(
+        op.f("ix_sensors_sensorid"), "sensors", ["sensorid"], unique=False
+    )
     op.create_table(
         "measurements",
         sa.Column("measurementid", sa.Integer(), nullable=False),
@@ -162,7 +170,10 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("objectid"),
     )
     op.create_index(
-        op.f("ix_sensorobjects_objectid"), "sensorobjects", ["objectid"], unique=False
+        op.f("ix_sensorobjects_objectid"),
+        "sensorobjects",
+        ["objectid"],
+        unique=False,
     )
     # op.drop_table('spatial_ref_sys')
     # ### end Alembic commands ###
@@ -175,33 +186,53 @@ def downgrade() -> None:
         "spatial_ref_sys",
         sa.Column("srid", sa.INTEGER(), autoincrement=False, nullable=False),
         sa.Column(
-            "auth_name", sa.VARCHAR(length=256), autoincrement=False, nullable=True
+            "auth_name",
+            sa.VARCHAR(length=256),
+            autoincrement=False,
+            nullable=True,
         ),
-        sa.Column("auth_srid", sa.INTEGER(), autoincrement=False, nullable=True),
         sa.Column(
-            "srtext", sa.VARCHAR(length=2048), autoincrement=False, nullable=True
+            "auth_srid", sa.INTEGER(), autoincrement=False, nullable=True
         ),
         sa.Column(
-            "proj4text", sa.VARCHAR(length=2048), autoincrement=False, nullable=True
+            "srtext",
+            sa.VARCHAR(length=2048),
+            autoincrement=False,
+            nullable=True,
+        ),
+        sa.Column(
+            "proj4text",
+            sa.VARCHAR(length=2048),
+            autoincrement=False,
+            nullable=True,
         ),
         sa.CheckConstraint(
-            "(srid > 0) AND (srid <= 998999)", name="spatial_ref_sys_srid_check"
+            "(srid > 0) AND (srid <= 998999)",
+            name="spatial_ref_sys_srid_check",
         ),
         sa.PrimaryKeyConstraint("srid", name="spatial_ref_sys_pkey"),
     )
-    op.drop_index(op.f("ix_sensorobjects_objectid"), table_name="sensorobjects")
+    op.drop_index(
+        op.f("ix_sensorobjects_objectid"), table_name="sensorobjects"
+    )
     op.drop_table("sensorobjects")
-    op.drop_index(op.f("ix_measurements_measurementid"), table_name="measurements")
+    op.drop_index(
+        op.f("ix_measurements_measurementid"), table_name="measurements"
+    )
     op.drop_table("measurements")
     op.drop_index(op.f("ix_sensors_sensorid"), table_name="sensors")
     op.drop_table("sensors")
     op.drop_index(op.f("ix_stations_stationid"), table_name="stations")
     op.drop_table("stations")
-    op.drop_index("idx_campaign_sensor_types", table_name="campaign_sensor_types")
+    op.drop_index(
+        "idx_campaign_sensor_types", table_name="campaign_sensor_types"
+    )
     op.drop_table("campaign_sensor_types")
     op.drop_index(op.f("ix_locations_locationid"), table_name="locations")
     op.drop_index(
-        "idx_locations_geometry", table_name="locations", postgresql_using="gist"
+        "idx_locations_geometry",
+        table_name="locations",
+        postgresql_using="gist",
     )
     op.drop_table("locations")
     op.drop_index(op.f("ix_campaigns_campaignid"), table_name="campaigns")

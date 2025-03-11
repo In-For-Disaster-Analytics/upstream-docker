@@ -6,9 +6,8 @@ from pydantic import ValidationError
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.routes.campaigns.campaign_stations import router
 from app.api.v1.schemas.campaign import CampaignsIn, CampaignsOut
-from app.api.v1.schemas.locations import BoundingBoxFilter
+from app.api.v1.schemas.location import BoundingBoxFilter
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
 from app.db.models.campaign import Campaign
@@ -18,7 +17,6 @@ from app.db.session import SessionLocal
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 
-# Route for creating a new campaign, requires an authenticated user (current_user)
 @router.post("", response_model=CampaignsOut)
 async def post_campaign(
     campaign: CampaignsIn, current_user: User = Depends(get_current_user)
@@ -56,7 +54,9 @@ async def get_campaigns(
             try:
                 west, south, east, north = map(float, bbox.split(","))
                 # Validate coordinates with Pydantic model
-                BoundingBoxFilter(west=west, south=south, east=east, north=north)
+                BoundingBoxFilter(
+                    west=west, south=south, east=east, north=north
+                )
 
                 # Apply spatial filter
                 query = query.filter(
@@ -74,7 +74,9 @@ async def get_campaigns(
                 raise HTTPException(status_code=400, detail=str(error_msgs))
 
             except (ValueError, TypeError):
-                raise HTTPException(status_code=400, detail="Invalid bbox format")
+                raise HTTPException(
+                    status_code=400, detail="Invalid bbox format"
+                )
 
         # Apply date filters
         if start_date:

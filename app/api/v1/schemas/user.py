@@ -1,7 +1,4 @@
-from datetime import datetime
-from typing import Any, List, Optional
-
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel
 
 
 class User(BaseModel):
