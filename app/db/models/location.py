@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from app.db.base import Base
 
 
-class Locations(Base):
+class Location(Base):
     __tablename__ = "locations"
 
     locationid = Column(Integer, primary_key=True, index=True)

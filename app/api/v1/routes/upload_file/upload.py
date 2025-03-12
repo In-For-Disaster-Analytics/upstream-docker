@@ -7,8 +7,9 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.basemodels import SensorAndMeasurementIn, User
-from app.db.models.location import Locations
+from app.api.v1.schemas.sensor import SensorAndMeasurementIn
+from app.api.v1.schemas.user import User
+from app.db.models.location import Location
 from app.db.models.measurement import Measurement
 from app.db.models.sensor import Sensor
 from app.db.session import SessionLocal
@@ -38,9 +39,7 @@ def post_sensor_and_measurement(
 
     data = SensorAndMeasurementIn(**data)
     sensor_data = data.sensor.dict()
-    measurement_data_list = [
-        measurement.dict() for measurement in data.measurement
-    ]
+    measurement_data_list = [measurement.dict() for measurement in data.measurement]
     del data
 
     if check_allocation_permission(current_user, campaign_id):
@@ -69,7 +68,7 @@ def post_sensor_and_measurement(
                 loc_geometry = measurement_data.pop("geometry", None)
                 loc_geometry = WKTElement(loc_geometry, srid=4326)
                 loc_collectiontime = measurement_data["collectiontime"]
-                location_instance = Locations(
+                location_instance = Location(
                     stationid=station_id,
                     collectiontime=loc_collectiontime,
                     geometry=loc_geometry,
@@ -81,7 +80,7 @@ def post_sensor_and_measurement(
                     # Try to find an existing location
                     # noqa: F841
                     (
-                        session.query(Locations)
+                        session.query(Location)
                         .filter_by(
                             collectiontime=loc_collectiontime,
                             geometry=loc_geometry,

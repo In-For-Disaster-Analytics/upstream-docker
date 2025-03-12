@@ -7,7 +7,9 @@ from typing import List
 import requests
 from requests.auth import HTTPBasicAuth
 
-from app.basemodels import PyTASProject, PyTASUser
+from app.pytas.models.schemas import PyTASProject, PyTASUser
+
+# from app.pytas.models import PyTASProject, PyTASUser
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +20,6 @@ Client class for the TAS REST APIs.
 
 
 class TASClient:
-
     """
     Instantiate the API Object with a base URI and service account credentials.
     The credentials should be a hash with keys `username` and `password` for
@@ -36,9 +37,7 @@ class TASClient:
 
         self.baseURL = baseURL
         self.credentials = credentials
-        self.auth = HTTPBasicAuth(
-            credentials["username"], credentials["password"]
-        )
+        self.auth = HTTPBasicAuth(credentials["username"], credentials["password"])
 
     """
     Authenticate a user
@@ -129,24 +128,18 @@ class TASClient:
                 self.baseURL, username, source
             )
         else:
-            url = "{0}/v1/users/{1}/passwordResets".format(
-                self.baseURL, username
-            )
+            url = "{0}/v1/users/{1}/passwordResets".format(self.baseURL, username)
         r = requests.post(url, auth=self.auth)
         resp = r.json()
         if resp["status"] == "success":
             return resp["result"]
         else:
             raise Exception(
-                "Error requesting password reset for user={0}".format(
-                    username
-                ),
+                "Error requesting password reset for user={0}".format(username),
                 resp["message"],
             )
 
-    def confirm_password_reset(
-        self, username, code, new_password, source=None
-    ):
+    def confirm_password_reset(self, username, code, new_password, source=None):
         if source:
             url = "{0}/v1/users/{1}/passwordResets/{2}?source={3}".format(
                 self.baseURL, username, code, source
@@ -157,9 +150,7 @@ class TASClient:
             )
         body = {"password": new_password}
         headers = {"Content-Type": "application/json"}
-        r = requests.post(
-            url, data=json.dumps(body), auth=self.auth, headers=headers
-        )
+        r = requests.post(url, data=json.dumps(body), auth=self.auth, headers=headers)
         if r.status_code == 200:
             resp = r.json()
             if resp["status"] == "success":
@@ -179,9 +170,7 @@ class TASClient:
         url = "{0}/v1/users/{1}/passwordChanges".format(self.baseURL, username)
         body = {"password": current_password, "newPassword": new_password}
         headers = {"Content-Type": "application/json"}
-        r = requests.post(
-            url, data=json.dumps(body), auth=self.auth, headers=headers
-        )
+        r = requests.post(url, data=json.dumps(body), auth=self.auth, headers=headers)
         if r.ok:
             resp = r.json()
             if resp["status"] == "success":
@@ -216,9 +205,7 @@ class TASClient:
                     "Failed to fetch institution list: %s" % resp["message"]
                 )
         else:
-            raise Exception(
-                "Failed to fetch institution list: %s" % "Server error"
-            )
+            raise Exception("Failed to fetch institution list: %s" % "Server error")
 
     def _get_departments(self, institution):
         depts = []
@@ -250,31 +237,23 @@ class TASClient:
                 inst = {
                     "id": resp["result"]["id"],
                     "name": resp["result"]["name"],
-                    "children": self._departments(
-                        resp["result"]["departments"]
-                    ),
+                    "children": self._departments(resp["result"]["departments"]),
                 }
 
                 return inst
             else:
                 raise Exception(
-                    "Failed to fetch institution for id={0}".format(
-                        institution_id
-                    ),
+                    "Failed to fetch institution for id={0}".format(institution_id),
                     resp["message"],
                 )
         else:
             raise Exception(
-                "Failed to fetch institution for id={0}".format(
-                    institution_id
-                ),
+                "Failed to fetch institution for id={0}".format(institution_id),
                 "Server error",
             )
 
     def get_departments(self, institution_id):
-        url = "{0}/v1/institutions/{1}/departments".format(
-            self.baseURL, institution_id
-        )
+        url = "{0}/v1/institutions/{1}/departments".format(self.baseURL, institution_id)
 
         headers = {"Content-Type": "application/json"}
 
@@ -305,22 +284,16 @@ class TASClient:
             if resp["status"] == "success":
                 return resp["result"]
             else:
-                raise Exception(
-                    "Failed to fetch country list: %s" % resp["message"]
-                )
+                raise Exception("Failed to fetch country list: %s" % resp["message"])
         else:
-            raise Exception(
-                "Failed to fetch country list: %s" % "Server error"
-            )
+            raise Exception("Failed to fetch country list: %s" % "Server error")
 
     """
     Fields
     """
 
     def fields(self):
-        r = requests.get(
-            "{0}/tup/projects/fields".format(self.baseURL), auth=self.auth
-        )
+        r = requests.get("{0}/tup/projects/fields".format(self.baseURL), auth=self.auth)
         resp = r.json()
         return resp["result"]
 
@@ -403,9 +376,7 @@ class TASClient:
     def edit_project(self, project):
         url = "{0}/v1/projects/{1}".format(self.baseURL, project["id"])
         headers = {"Content-Type": "application/json"}
-        r = requests.put(
-            url, data=json.dumps(project), auth=self.auth, headers=headers
-        )
+        r = requests.put(url, data=json.dumps(project), auth=self.auth, headers=headers)
         resp = r.json()
         if resp["status"] == "success":
             return resp["result"]
@@ -453,9 +424,7 @@ class TASClient:
 
     def add_project_user(self, project_id, username):
         r = requests.post(
-            "{0}/v1/projects/{1}/users/{2}".format(
-                self.baseURL, project_id, username
-            ),
+            "{0}/v1/projects/{1}/users/{2}".format(self.baseURL, project_id, username),
             auth=self.auth,
         )
         resp = r.json()
@@ -466,18 +435,14 @@ class TASClient:
 
     def del_project_user(self, project_id, username):
         r = requests.delete(
-            "{0}/v1/projects/{1}/users/{2}".format(
-                self.baseURL, project_id, username
-            ),
+            "{0}/v1/projects/{1}/users/{2}".format(self.baseURL, project_id, username),
             auth=self.auth,
         )
         resp = r.json()
         if resp["status"] == "success":
             return True
         else:
-            raise Exception(
-                "Failed to remove user from project", resp["message"]
-            )
+            raise Exception("Failed to remove user from project", resp["message"])
 
     def get_project_members(self, project_id: str) -> List[PyTASUser]:
         headers = {"Content-Type": "application/json"}
@@ -509,8 +474,6 @@ class TASClient:
             return resp["result"]
         else:
             raise Exception(
-                "Unable to process allocation approval for allocation id:".format(
-                    id
-                ),
+                "Unable to process allocation approval for allocation id:".format(id),
                 resp["message"],
             )

@@ -20,6 +20,3 @@ class Campaign(Base):
     bbox_south = Column(Float, nullable=True)
     bbox_north = Column(Float, nullable=True)
     sensor_types = relationship("CampaignSensorType", lazy="joined")
-
-    def __repr__(self):
-        return f"<Campaign(campaignname='{self.campaignname}')>"

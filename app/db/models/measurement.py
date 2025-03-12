@@ -15,4 +15,4 @@ class Measurement(Base):
     description = Column(String, nullable=True)
     measurementvalue = Column(Float, nullable=True)
     locationid = Column(Integer, ForeignKey("locations.locationid"))
-    location = relationship("Locations", lazy="joined")
+    location = relationship("Location", lazy="joined")

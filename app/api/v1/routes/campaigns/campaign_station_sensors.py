@@ -9,7 +9,7 @@ from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.sensor import SensorAndMeasurementIn
 from app.api.v1.schemas.user import User
-from app.db.models.location import Locations
+from app.db.models.location import Location
 from app.db.models.measurement import Measurement
 from app.db.models.sensor import Sensor
 from app.db.session import SessionLocal
@@ -40,15 +40,11 @@ async def get_sensors(
 
             if start_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(
-                        Measurement.collectiontime >= start_date
-                    )
+                    Sensor.measurement.any(Measurement.collectiontime >= start_date)
                 )
             if end_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(
-                        Measurement.collectiontime <= end_date
-                    )
+                    Sensor.measurement.any(Measurement.collectiontime <= end_date)
                 )
             if min_measurement_value is not None:
                 db_sensor = db_sensor.filter(
@@ -65,9 +61,7 @@ async def post_sensor_and_measurement(
     current_user: User = Depends(get_current_user),
 ):
     sensor_data = data.sensor.dict()
-    measurement_data_list = [
-        measurement.dict() for measurement in data.measurement
-    ]
+    measurement_data_list = [measurement.dict() for measurement in data.measurement]
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             # Save sensor data
@@ -93,22 +87,18 @@ async def post_sensor_and_measurement(
             location_data = {}
             for measurement_data in measurement_data_list:
                 measurement_data["sensorid"] = db_sensor.sensorid
-                location_data["geometry"] = measurement_data.pop(
-                    "geometry", None
-                )
+                location_data["geometry"] = measurement_data.pop("geometry", None)
                 location_data["geometry"] = WKTElement(
                     location_data["geometry"], srid=4326
                 )
                 location_data["stationid"] = station_id
-                location_data["collectiontime"] = measurement_data[
-                    "collectiontime"
-                ]
+                location_data["collectiontime"] = measurement_data["collectiontime"]
                 db_measurement = Measurement(**measurement_data)
                 session.add(db_measurement)
                 try:
                     # Try to find an existing location
                     db_location = (
-                        session.query(Locations)
+                        session.query(Location)
                         .filter_by(
                             stationid=location_data["stationid"],
                             collectiontime=location_data["collectiontime"],
@@ -119,7 +109,7 @@ async def post_sensor_and_measurement(
 
                 except NoResultFound:
                     # If no existing location is found, create a new one
-                    db_location = Locations(**location_data)
+                    db_location = Location(**location_data)
                     session.add(db_location)
 
                 session.commit()

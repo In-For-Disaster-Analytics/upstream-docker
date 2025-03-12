@@ -44,12 +44,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 # Function to decode a JWT token using the specified secret and algorithm
 def unhash(token):
-    return jwt.decode(
-        token, os.getenv("jwtSecret"), algorithms=[os.getenv("alg")]
-    )
+    return jwt.decode(token, os.getenv("jwtSecret"), algorithms=[os.getenv("alg")])
 
 
 def hash(payload):
-    return jwt.encode(
-        payload, os.getenv("jwtSecret"), algorithm=os.getenv("alg")
-    )
+    return jwt.encode(payload, os.getenv("jwtSecret"), algorithm=os.getenv("alg"))

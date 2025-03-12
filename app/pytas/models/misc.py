@@ -1,5 +1,5 @@
-from pytas.http import TASClient
-from pytas.models.base import TASModel
+from app.pytas.http import TASClient
+from app.pytas.models.base import TASModel
 
 
 class Institution(TASModel):

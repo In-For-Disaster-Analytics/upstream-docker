@@ -2,16 +2,14 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
-from pydantic import ValidationError
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
 from app.api.v1.schemas.campaign import CampaignsIn, CampaignsOut
-from app.api.v1.schemas.location import BoundingBoxFilter
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
 from app.db.models.campaign import Campaign
-from app.db.models.campaignSensorType import CampaignSensorType
+from app.db.repositories.campaign_repository import CampaignRepository
 from app.db.session import SessionLocal
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
@@ -37,70 +35,17 @@ async def get_campaigns(
     bbox: str | None = None,
     start_date: datetime | None = None,
     end_date: datetime | None = None,
-    sensor_types: str | None = None,
-    page: int | None = 1,
-    limit: int | None = 20,
+    sensor_type_ids: str | None = None,
+    page: int = 1,
+    limit: int = 20,
     current_user: User = Depends(get_current_user),
 ):
+    allocations = get_allocations(current_user)
     with SessionLocal() as session:
-        allocations = get_allocations(current_user)
-        query = session.query(Campaign)
-        # Filter the query by active allocations
-        query = query.filter(Campaign.allocation.in_(allocations))
-
-        # Apply filters
-        if bbox:
-            # Parse bbox parameter
-            try:
-                west, south, east, north = map(float, bbox.split(","))
-                # Validate coordinates with Pydantic model
-                BoundingBoxFilter(
-                    west=west, south=south, east=east, north=north
-                )
-
-                # Apply spatial filter
-                query = query.filter(
-                    Campaign.bbox_west <= east,
-                    Campaign.bbox_east >= west,
-                    Campaign.bbox_south <= north,
-                    Campaign.bbox_north >= south,
-                )
-
-            except ValidationError as exc:
-                error_msgs = {
-                    f"Error value for {err['loc'][0]}: {err['msg']}"
-                    for err in exc.errors()
-                }
-                raise HTTPException(status_code=400, detail=str(error_msgs))
-
-            except (ValueError, TypeError):
-                raise HTTPException(
-                    status_code=400, detail="Invalid bbox format"
-                )
-
-        # Apply date filters
-        if start_date:
-            query = query.filter(Campaign.enddate >= start_date)
-
-        if end_date:
-            query = query.filter(Campaign.startdate <= end_date)
-
-        # Apply sensor type filter
-        if sensor_types:
-            sensor_list = sensor_types.split(",")
-            query = query.join(CampaignSensorType).filter(
-                CampaignSensorType.sensor_type.in_(sensor_list)
-            )
-
-        # Count total results before pagination
-        total_count = query.count()
-
-        # Apply pagination
-        paginated_query = query.offset((page - 1) * limit).limit(limit)
-
-        # Execute query
-        results = paginated_query.all()
-
+        campaign_repository = CampaignRepository(session)
+        results, total_count = campaign_repository.get_campaigns(
+            allocations, bbox, start_date, end_date, sensor_type_ids, page, limit
+        )
         # Format response
         response = {
             "data": [format_campaign(c) for c in results],

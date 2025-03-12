@@ -7,9 +7,7 @@ from app.api.v1.schemas.user import User
 from app.db.models.station import Station
 from app.db.session import SessionLocal
 
-router = APIRouter(
-    prefix="/campaigns/{campaign_id}", tags=["campaign_stations"]
-)
+router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["campaign_stations"])
 
 
 # Route to retrieve all stations associated with a specific campaign
@@ -20,15 +18,11 @@ async def read_station(
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             stations = (
-                session.query(Station)
-                .filter(Station.campaignid == campaign_id)
-                .all()
+                session.query(Station).filter(Station.campaignid == campaign_id).all()
             )
             return {
                 "count": len(stations),
-                "data": [
-                    StationOut(**station.__dict__) for station in stations
-                ],
+                "data": [StationOut(**station.__dict__) for station in stations],
             }
 
 
@@ -60,14 +54,10 @@ async def patch_station(
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
             db_station = (
-                session.query(Station)
-                .filter(Station.stationid == station_id)
-                .first()
+                session.query(Station).filter(Station.stationid == station_id).first()
             )
             if not db_station:
-                raise HTTPException(
-                    status_code=404, detail="Station not found"
-                )
+                raise HTTPException(status_code=404, detail="Station not found")
             station_data = station.dict(exclude_unset=True)
             for key, value in station_data.items():
                 setattr(db_station, key, value)
