@@ -26,7 +26,7 @@ A RESTful API service for managing environmental sensor data and campaigns.
    or
 
    ```bash
-   docker compose up -f docker-compose.dev.yml -d
+   docker compose -f docker-compose.dev.yml  up -d
    ```
 
 6. Initialize the database:
