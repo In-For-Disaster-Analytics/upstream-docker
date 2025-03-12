@@ -9,9 +9,11 @@ class Location(Base):
     __tablename__ = "locations"
 
     locationid = Column(Integer, primary_key=True, index=True)
-    stationid = Column(Integer, ForeignKey("stations.stationid"))
-    collectiontime = Column(DateTime)
-    geometry = Column(Geometry("POINT", srid=4326))
+    stationid = Column(Integer, ForeignKey("stations.stationid"), nullable=True)
+    collectiontime = Column(DateTime, nullable=True)
+    geometry = Column(Geometry("POINT", srid=4326), nullable=True) 
+
+    #relationships
     # station = relationship("Station", back_populates="locations")
     measurements = relationship(
         "Measurement", uselist=False
