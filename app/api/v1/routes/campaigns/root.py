@@ -5,7 +5,7 @@ from fastapi.encoders import jsonable_encoder
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.schemas.campaign import CampaignsIn, CampaignsOut
+from app.api.v1.schemas.campaign import CampaignResponse, CampaignsIn, CampaignsOut
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
 from app.db.models.campaign import Campaign
@@ -39,7 +39,7 @@ async def get_campaigns(
     page: int = 1,
     limit: int = 20,
     current_user: User = Depends(get_current_user),
-):
+) -> CampaignResponse:
     allocations = get_allocations(current_user)
     with SessionLocal() as session:
         campaign_repository = CampaignRepository(session)
@@ -47,14 +47,12 @@ async def get_campaigns(
             allocations, bbox, start_date, end_date, sensor_type_ids, page, limit
         )
         # Format response
-        response = {
-            "data": [format_campaign(c) for c in results],
-            "metadata": {
-                "total": total_count,
-                "page": page,
-                "limit": limit,
-                "pages": (total_count + limit - 1) // limit,
-            },
-        }
+        response = CampaignResponse(
+            items=[format_campaign(c) for c in results],
+            total=total_count,
+            page=page,
+            size=limit,
+            pages=(total_count + limit - 1) // limit,
+        )
 
     return jsonable_encoder(response)

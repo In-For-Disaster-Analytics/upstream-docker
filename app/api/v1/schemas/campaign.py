@@ -15,10 +15,18 @@ class CampaignsIn(BaseModel):
 
 
 class CampaignsOut(BaseModel):
-    campaignid: int
-    campaignname: str
-    contactname: Optional[str]
-    contactemail: Optional[str]
+    id: int
+    name: str
     description: Optional[str] = None
-    startdate: datetime
-    enddate: Optional[datetime] = None
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    contact_name: Optional[str]
+    contact_email: Optional[str]
+
+
+class CampaignResponse(BaseModel):
+    items: list[CampaignsOut]
+    total: int
+    page: int
+    size: int
+    pages: int
