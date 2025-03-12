@@ -6,13 +6,18 @@ from app.db.base import Base
 
 class Sensor(Base):
     __tablename__ = "sensors"
+
     sensorid = Column(Integer, primary_key=True, index=True)
-    stationid = Column(Integer, ForeignKey("stations.stationid"))
-    alias = Column(String)
+    stationid = Column(Integer, ForeignKey("stations.stationid"), nullable=True)
+    alias = Column(String, nullable=True)
     description = Column(String, nullable=True)
-    postprocess = Column(Boolean, default=True)
+    postprocess = Column(Boolean, nullable=True)
     postprocessscript = Column(String, nullable=True)
     units = Column(String, nullable=True)
-    measurement = relationship("Measurement", lazy="joined")
+    variablename = Column(String, nullable=True)
+
+    #relationships
     station = relationship("Station", lazy="joined")
-    variablename = Column(String)
+    measurement = relationship("Measurement", lazy="joined")
+    
+
