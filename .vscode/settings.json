@@ -1,0 +1,22 @@
+//hide some folder and files
+{
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "python.formatting.blackPath": "black",
+  "python.formatting.blackArgs": [],
+  "files.exclude": {
+    "**/*.pyc": true,
+    "**/*.pyo": true,
+    "**/*.pyd": true,
+    "**/*.pyw": true,
+    "**/*.pyz": true,
+    "**/*.pywz": true,
+    "**/*.pyzw": true,
+    "**/*.pyzwz": true,
+    "**/*.pyzwzw": true,
+    "**/*.pyzwzwz": true,
+    "**/*.pyzwzwzw": true,
+    "**/*__pycache__": true,
+    "**/.venv": true
+  }
+}

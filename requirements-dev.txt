@@ -1,2 +1,6 @@
 geoalchemy2
 alembic
+pre-commit
+black
+flake8
+isort

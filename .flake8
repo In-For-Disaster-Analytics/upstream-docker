@@ -1,0 +1,6 @@
+[flake8]
+exclude =
+    app/pytas/*
+ignore =
+    E501
+    W503

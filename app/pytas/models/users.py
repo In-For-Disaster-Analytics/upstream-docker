@@ -3,12 +3,12 @@
 #
 #
 ###
-from .base import TASModel
-import pytas.models.projects
-from pytas.http import TASClient
+from app.pytas.http import TASClient
+from app.pytas.models.base import TASModel
+
 
 class User(TASModel):
-    _resource_uri = 'users/'
+    _resource_uri = "users/"
 
     def __init__(self, username=None, id=None, initial={}):
         super(User, self).__init__()
@@ -25,7 +25,7 @@ class User(TASModel):
             self.__populate(initial)
 
     def __str__(self):
-        return getattr(self, 'username', '<new user>')
+        return getattr(self, "username", "<new user>")
 
     def __populate(self, data):
         self.__dict__.update(data)
@@ -54,14 +54,14 @@ class User(TASModel):
             api = TASClient()
             return api.request_password_reset(self.username, source)
         else:
-            raise Exception('Cannot reset password: username is not set')
+            raise Exception("Cannot reset password: username is not set")
 
     def confirm_password_reset(self, code, new_password, source=None):
         if self.username:
             api = TASClient()
             return api.confirm_password_reset(self.username, code, new_password, source)
         else:
-            raise Exception('Cannot reset password: username is not set')
+            raise Exception("Cannot reset password: username is not set")
 
     def verify_user(self, code):
         api = TASClient()

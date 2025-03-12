@@ -5,6 +5,7 @@
 ###
 import json
 
+
 class TASModel(object):
     _resource_uri = None
     _fields = None
@@ -17,15 +18,16 @@ class TASModel(object):
 
     def get_uri(self):
         if self.id:
-            return '%s%s' % (self._resource_uri, self.id)
+            return "%s%s" % (self._resource_uri, self.id)
         else:
             return self._resource_uri
 
     def as_dict(self):
         if self._fields:
-            return {f:getattr(self, f, None) for f in self._fields}
+            return {f: getattr(self, f, None) for f in self._fields}
         return self.__dict__
 
     def as_json(self, indent=None):
-        return json.dumps(self, default=lambda o: o.as_dict() ,
-                                          sort_keys=True, indent=indent)
+        return json.dumps(
+            self, default=lambda o: o.as_dict(), sort_keys=True, indent=indent
+        )

@@ -2,75 +2,36 @@
 
 A RESTful API service for managing environmental sensor data and campaigns.
 
-## Database Schema
-
-The following diagram shows the relationships between the main entities in the system:
-
-```mermaid
-classDiagram
-    class Campaign {
-        +int campaignid
-        +string campaignname
-        +string contactname
-        +string contactemail
-        +string description
-        +datetime startdate
-        +datetime enddate
-        +string allocation
-    }
-
-    class Station {
-        +int stationid
-        +string stationname
-        +string description
-        +string contactname
-        +string contactemail
-        +bool active
-        +datetime startdate
-    }
-
-    class Sensor {
-        +string alias
-        +string description
-        +bool postprocess
-        +string postprocessscript
-        +string units
-    }
-
-    class Measurement {
-        +int measurementid
-        +int sensorid
-        +string variablename
-        +datetime collectiontime
-        +string variabletype
-        +string description
-        +number measurementvalue
-        +Location location
-    }
-
-    class Location {
-        +int stationid
-        +datetime collectiontime
-        +string geometry
-    }
-
-    Campaign "1" --> "*" Station : has
-    Station "1" --> "*" Sensor : contains
-    Sensor "1" --> "*" Measurement : records
-    Measurement "1" --> "1" Location : has
-```
-
 ## Installation & Setup
 
 1. Clone the repository
 2. Install dependencies (Docker and Docker Compose required)
-3. Initialize the database:
+3. Create a virtual environment and install dependencies:
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   pip install -r requirements-dev.txt
+   ```
+4. Start containers:
+
+   ```bash
+   docker compose up -d
+   ```
+
+   or
+
+   ```bash
+   docker compose up -f docker-compose.dev.yml -d
+   ```
+
+5. Initialize the database:
    ```bash
    # Run database migrations
    alembic upgrade head
    ```
 
-## Development Environment
+## On-premise Environment
 
 ### Setting up Dev Instance
 
@@ -153,4 +114,62 @@ alembic downgrade -1
 
 # View migration history
 alembic history
+```
+
+## Database Schema
+
+The following diagram shows the relationships between the main entities in the system:
+
+```mermaid
+classDiagram
+    class Campaign {
+        +int campaignid
+        +string campaignname
+        +string contactname
+        +string contactemail
+        +string description
+        +datetime startdate
+        +datetime enddate
+        +string allocation
+    }
+
+    class Station {
+        +int stationid
+        +string stationname
+        +string description
+        +string contactname
+        +string contactemail
+        +bool active
+        +datetime startdate
+    }
+
+    class Sensor {
+        +string alias
+        +string description
+        +bool postprocess
+        +string postprocessscript
+        +string units
+    }
+
+    class Measurement {
+        +int measurementid
+        +int sensorid
+        +string variablename
+        +datetime collectiontime
+        +string variabletype
+        +string description
+        +number measurementvalue
+        +Location location
+    }
+
+    class Location {
+        +int stationid
+        +datetime collectiontime
+        +string geometry
+    }
+
+    Campaign "1" --> "*" Station : has
+    Station "1" --> "*" Sensor : contains
+    Sensor "1" --> "*" Measurement : records
+    Measurement "1" --> "1" Location : has
 ```
