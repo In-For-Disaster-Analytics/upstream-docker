@@ -13,7 +13,11 @@ A RESTful API service for managing environmental sensor data and campaigns.
    pip install -r requirements.txt
    pip install -r requirements-dev.txt
    ```
-4. Start containers:
+4. Create a `.env` file and set the environment variables:
+   ```bash
+   cp .env.sample .env
+   ```
+5. Start containers:
 
    ```bash
    docker compose up -d
@@ -25,7 +29,7 @@ A RESTful API service for managing environmental sensor data and campaigns.
    docker compose up -f docker-compose.dev.yml -d
    ```
 
-5. Initialize the database:
+6. Initialize the database:
    ```bash
    # Run database migrations
    alembic upgrade head
