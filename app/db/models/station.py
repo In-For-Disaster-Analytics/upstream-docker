@@ -1,22 +1,24 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from typing import List, Optional
+from datetime import datetime
 from app.db.base import Base
-
 
 class Station(Base):
     __tablename__ = "stations"
 
-    stationid = Column(Integer, primary_key=True, index=True)
-    campaignid = Column(Integer, ForeignKey("campaigns.campaignid"), nullable=True)
-    stationname = Column(String, unique=True)
-    projectid = Column(String, nullable=True)
-    description = Column(String, nullable=True)
-    contactname = Column(String, nullable=True)
-    contactemail = Column(String, nullable=True)
-    active = Column(Boolean, nullable=True)
-    startdate = Column(DateTime, nullable=True)
+    stationid: Mapped[int] = mapped_column(primary_key=True, index=True)
+    campaignid: Mapped[int] = mapped_column(ForeignKey("campaigns.campaignid"), nullable=True)
+    stationname: Mapped[str] = mapped_column(unique=True)
+    projectid: Mapped[Optional[str]] = mapped_column()
+    description: Mapped[Optional[str]] = mapped_column()
+    contactname: Mapped[Optional[str]] = mapped_column()
+    contactemail: Mapped[Optional[str]] = mapped_column()
+    active: Mapped[Optional[bool]] = mapped_column()
+    startdate: Mapped[Optional[datetime]] = mapped_column()
     
     #relationships
-    sensor = relationship("Sensor", lazy="joined")
-    #location = relationship("Location", lazy="joined")
+    campaigns: Mapped["Campaign"] = relationship(back_populates="stations", lazy="joined")
+    sensors: Mapped[List["Sensor"]] = relationship(back_populates="station", lazy="joined")
+    locations: Mapped[List["Location"]] = relationship(back_populates="station", lazy="joined")
+
