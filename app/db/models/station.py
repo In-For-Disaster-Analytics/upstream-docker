@@ -24,8 +24,8 @@ class Station(Base):
 
     # relationships
     campaign: Mapped["Campaign"] = relationship(
-        back_populates="stations", lazy="joined"
+        back_populates="stations"
     )
     sensors: Mapped[List["Sensor"]] = relationship(
-        back_populates="station", lazy="joined"
+        back_populates="station"
     )
