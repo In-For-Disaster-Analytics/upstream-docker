@@ -24,8 +24,8 @@ async def get_sensor(sensor_id: int, current_user: User = Depends(get_current_us
     sensor = sensor_repository.get_sensor(sensor_id)
     return sensor
 
-@router.get("/sensor/{sensor_id}")
-async def get_sensors(
+@router.get("/sensors/{sensor_id}/measurements")
+async def get_sensor_measurements(
     campaign_id: int,
     station_id: int,
     sensor_id: int = None,
