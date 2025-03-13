@@ -1,7 +1,9 @@
 from datetime import datetime
 from typing import Optional
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base
 
 
@@ -16,8 +18,10 @@ class Measurement(Base):
     variabletype: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     measurementvalue: Mapped[Optional[float]] = mapped_column()
-    locationid: Mapped[int] = mapped_column(ForeignKey("locations.locationid"))
+    # locationid: Mapped[int] = mapped_column(ForeignKey("locations.locationid"))
 
-    #relationships
-    sensors: Mapped["Sensor"] = relationship(back_populates="measurements", lazy="joined")
-    locations: Mapped["Location"] = relationship(back_populates="measurements", lazy="joined")
+    # relationships
+    sensor: Mapped["Sensor"] = relationship(
+        back_populates="measurements", lazy="joined"
+    )
+    # locations: Mapped["Location"] = relationship(back_populates="measurements", lazy="joined")

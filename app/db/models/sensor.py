@@ -1,6 +1,8 @@
 from typing import List, Optional
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base
 
 
@@ -16,8 +18,8 @@ class Sensor(Base):
     units: Mapped[Optional[str]] = mapped_column()
     variablename: Mapped[Optional[str]] = mapped_column()
 
-    #relationships
-    stations: Mapped["Station"] = relationship(back_populates="sensors", lazy="joined")
-    measurements: Mapped[List["Measurement"]] = relationship(back_populates="sensor", lazy="joined")
-    
-
+    # relationships
+    station: Mapped["Station"] = relationship(back_populates="sensors", lazy="joined")
+    measurements: Mapped[List["Measurement"]] = relationship(
+        back_populates="sensor", lazy="joined"
+    )
