@@ -1,4 +1,5 @@
 geoalchemy2
+psycopg2-binary
 alembic
 pre-commit
 black
