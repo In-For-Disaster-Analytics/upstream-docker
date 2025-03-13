@@ -1,7 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base
+from app.db.models.station import Station
+
 
 class Campaign(Base):
     __tablename__ = "campaigns"
@@ -18,7 +22,8 @@ class Campaign(Base):
     bbox_east: Mapped[Optional[float]] = mapped_column()
     bbox_south: Mapped[Optional[float]] = mapped_column()
     bbox_north: Mapped[Optional[float]] = mapped_column()
- 
-    #relationships
-    stations: Mapped[List["Station"]] = relationship(back_populates="campaign", lazy="joined")
-    #sensor_types = relationship("CampaignSensorType", lazy="joined")
+
+    # relationships
+    stations: Mapped[List[Station]] = relationship(
+        back_populates="campaign", lazy="joined"
+    )

@@ -6,9 +6,6 @@ from app.api.v1.schemas.campaign import CampaignsIn
 from app.db.models.campaign import (  # Adjust the import based on your model's location
     Campaign,
 )
-from app.db.models.campaignSensorType import (  # Adjust the import based on your schema's location
-    CampaignSensorType,
-)
 
 
 class CampaignRepository:
@@ -31,7 +28,6 @@ class CampaignRepository:
         bbox: str | None,
         start_date: datetime | None,
         end_date: datetime | None,
-        sensor_type_ids: list[str] | None,
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[Campaign], int]:
@@ -46,13 +42,9 @@ class CampaignRepository:
                 Campaign.bbox_north >= bbox[3],
             )
         if start_date:
-            query = query.filter(Campaign.start_date >= start_date)
+            query = query.filter(Campaign.startdate >= start_date)
         if end_date:
-            query = query.filter(Campaign.end_date <= end_date)
-        if sensor_type_ids:
-            query = query.join(CampaignSensorType).filter(
-                CampaignSensorType.sensor_type_id.in_(sensor_type_ids)
-            )
+            query = query.filter(Campaign.enddate <= end_date)
         total_count = query.count()
         return query.offset((page - 1) * limit).limit(limit).all(), total_count
 
