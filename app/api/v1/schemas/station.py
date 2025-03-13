@@ -1,11 +1,9 @@
 from datetime import datetime
-from typing import Optional
-
+from typing import Optional, List
 from pydantic import BaseModel
 
 
 class StationIn(BaseModel):
-    campaignid: Optional[int]
     stationname: str
     description: Optional[str] = None
     contactname: Optional[str] = None
@@ -22,3 +20,10 @@ class StationOut(BaseModel):
     contactemail: Optional[str] = None
     active: Optional[bool] = True
     startdate: datetime
+
+class StationPagination(BaseModel):
+    items: List[StationOut]
+    total: int
+    page: int
+    size: int
+    pages: int

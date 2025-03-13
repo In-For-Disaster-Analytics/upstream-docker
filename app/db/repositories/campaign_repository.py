@@ -27,8 +27,8 @@ class CampaignRepository:
         self.db.refresh(db_campaign)
         return db_campaign
 
-    def get_campaign(self, campaign_id: int) -> Campaign | None:
-        return self.db.query(Campaign).get(campaign_id)
+    def get_campaign(self, id: int) -> Campaign | None:
+        return self.db.query(Campaign).get(id)
 
     def get_campaigns(
         self,

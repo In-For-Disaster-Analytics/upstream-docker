@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
 
@@ -24,3 +24,11 @@ class MeasurementOut(BaseModel):
     variabletype: Optional[str] = None
     description: Optional[str] = None
     measurementvalue: Optional[float] = None
+
+
+class MeasurementPagination(BaseModel):
+    items: List[MeasurementOut]
+    total: int
+    page: int
+    size: int
+    pages: int
