@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Optional
+
+from geoalchemy2 import Geometry
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.db.base import Base
 
 
@@ -16,8 +19,9 @@ class Measurement(Base):
     variabletype: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     measurementvalue: Mapped[Optional[float]] = mapped_column()
-    locationid: Mapped[int] = mapped_column(ForeignKey("locations.locationid"))
+    # relationships
+    sensor: Mapped["Sensor"] = relationship(
+        back_populates="measurements", lazy="joined"
+    )
+    geometry: Mapped[Geometry] = mapped_column(Geometry("POINT", srid=4326))
 
-    #relationships
-    sensors: Mapped["Sensor"] = relationship(back_populates="measurements", lazy="joined")
-    locations: Mapped["Location"] = relationship(back_populates="measurements", lazy="joined")

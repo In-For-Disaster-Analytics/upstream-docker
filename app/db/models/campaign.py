@@ -4,7 +4,6 @@ from typing import List, Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.models.station import Station
 
 
 class Campaign(Base):
@@ -24,6 +23,6 @@ class Campaign(Base):
     bbox_north: Mapped[Optional[float]] = mapped_column()
 
     # relationships
-    stations: Mapped[List[Station]] = relationship(
+    stations: Mapped[List["Station"]] = relationship(
         back_populates="campaign", lazy="joined"
     )
