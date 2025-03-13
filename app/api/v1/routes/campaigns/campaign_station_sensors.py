@@ -34,16 +34,16 @@ async def get_sensors(
             db_sensor = (
                 session.query(Sensor)
                 .filter(Sensor.sensorid == sensor_id)
-                .join(Sensor.measurement)
+                .join(Sensor.measurements)
             )
 
             if start_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(Measurement.collectiontime >= start_date)
+                    Sensor.measurements.any(Measurement.collectiontime >= start_date)
                 )
             if end_date:
                 db_sensor = db_sensor.filter(
-                    Sensor.measurement.any(Measurement.collectiontime <= end_date)
+                    Sensor.measurements.any(Measurement.collectiontime <= end_date)
                 )
             if min_measurement_value is not None:
                 db_sensor = db_sensor.filter(
@@ -63,61 +63,43 @@ async def post_sensor_and_measurement(
     measurement_data_list = [measurement.dict() for measurement in data.measurement]
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
-            # Save sensor data
+            try:
+                # Save sensor data
+                sensor_data["stationid"] = station_id
+                db_sensor = Sensor(**sensor_data)
+                session.add(db_sensor)
+                session.commit()  # Commit sensor first to get its ID
+                session.refresh(db_sensor)
 
-            sensor_data["stationid"] = station_id
+                # Save measurements with the associated sensor
+                db_measurements = []
+                for measurement_data in measurement_data_list:
+                    measurement_data["sensorid"] = db_sensor.sensorid
+                    db_measurement = Measurement(**measurement_data)
+                    session.add(db_measurement)
+                    db_measurements.append(db_measurement)
 
-            db_sensor = Sensor(**sensor_data)
-            session.add(db_sensor)
-            session.commit()
-            session.refresh(db_sensor)
-            db_sensor = (
-                session.query(Sensor)
-                .filter(Sensor.sensorid == db_sensor.sensorid)
-                .first()
-            )
+                session.commit()  # Single commit for all measurements
 
-            if not db_sensor:
+                # Convert to dictionary representation safely
+                measurements_dict = [
+                    {
+                        key: getattr(measurement, key)
+                        for key in measurement.__table__.columns.keys()
+                    }
+                    for measurement in db_measurements
+                ]
+
+                sensor = {
+                    key: getattr(db_sensor, key)
+                    for key in db_sensor.__table__.columns.keys()
+                }
+
+                return {"sensor": sensor, "measurement": measurements_dict}
+
+            except Exception as e:
+                session.rollback()
                 raise HTTPException(
-                    status_code=500, detail="Failed to retrieve sensor data"
+                    status_code=500,
+                    detail=f"Error creating sensor and measurements: {str(e)}"
                 )
-            # Save measurements with the associated sensor
-            db_measurements = []
-            location_data = {}
-            for measurement_data in measurement_data_list:
-                measurement_data["sensorid"] = db_sensor.sensorid
-                location_data["geometry"] = measurement_data.pop("geometry", None)
-                location_data["geometry"] = WKTElement(
-                    location_data["geometry"], srid=4326
-                )
-                location_data["stationid"] = station_id
-                location_data["collectiontime"] = measurement_data["collectiontime"]
-                db_measurement = Measurement(**measurement_data)
-                session.add(db_measurement)
-                try:
-                    # Try to find an existing location
-                    db_location = (
-                        session.query(Location)
-                        .filter_by(
-                            stationid=location_data["stationid"],
-                            collectiontime=location_data["collectiontime"],
-                            geometry=location_data["geometry"],
-                        )
-                        .one()
-                    )
-
-                except NoResultFound:
-                    # If no existing location is found, create a new one
-                    db_location = Location(**location_data)
-                    session.add(db_location)
-
-                session.commit()
-                session.refresh(db_measurement)
-                db_measurements.append(db_measurement.__dict__)
-
-            sensor = {
-                key: getattr(db_sensor, key)
-                for key in db_sensor.__table__.columns.keys()
-            }
-
-            return {"sensor": sensor, "measurement": db_measurements}
