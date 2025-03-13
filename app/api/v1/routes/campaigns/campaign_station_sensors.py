@@ -9,7 +9,6 @@ from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.sensor import SensorAndMeasurementIn
 from app.api.v1.schemas.user import User
-from app.db.models.location import Location
 from app.db.models.measurement import Measurement
 from app.db.models.sensor import Sensor
 from app.db.session import SessionLocal
