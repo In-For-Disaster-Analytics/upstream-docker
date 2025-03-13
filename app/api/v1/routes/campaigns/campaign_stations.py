@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.station import StationIn, StationOut
 from app.api.v1.schemas.user import User
 from app.db.models.station import Station
-from app.db.session import SessionLocal
+from app.db.session import SessionLocal, get_db
+from app.db.repositories.station_repository import StationRepository
 
 router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["campaign_stations"])
 
@@ -65,3 +67,8 @@ async def patch_station(
             session.refresh(db_station)
             return StationOut(**db_station.__dict__)
 
+@router.get("/stations/{station_id}")
+async def get_station(station_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    station_repository = StationRepository(db)
+    station = station_repository.get_station(station_id)
+    return station
