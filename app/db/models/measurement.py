@@ -18,10 +18,7 @@ class Measurement(Base):
     variabletype: Mapped[Optional[str]] = mapped_column()
     description: Mapped[Optional[str]] = mapped_column()
     measurementvalue: Mapped[Optional[float]] = mapped_column()
-    # locationid: Mapped[int] = mapped_column(ForeignKey("locations.locationid"))
-
     # relationships
     sensor: Mapped["Sensor"] = relationship(
         back_populates="measurements", lazy="joined"
     )
-    # locations: Mapped["Location"] = relationship(back_populates="measurements", lazy="joined")
