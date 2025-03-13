@@ -35,7 +35,6 @@ async def get_campaigns(
     bbox: str | None = None,
     start_date: datetime | None = None,
     end_date: datetime | None = None,
-    sensor_type_ids: str | None = None,
     page: int = 1,
     limit: int = 20,
     current_user: User = Depends(get_current_user),
@@ -44,7 +43,7 @@ async def get_campaigns(
     with SessionLocal() as session:
         campaign_repository = CampaignRepository(session)
         results, total_count = campaign_repository.get_campaigns(
-            allocations, bbox, start_date, end_date, sensor_type_ids, page, limit
+            allocations, bbox, start_date, end_date, page, limit
         )
         # Format response
         response = CampaignResponse(
