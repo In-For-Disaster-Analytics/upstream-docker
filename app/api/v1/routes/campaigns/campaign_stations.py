@@ -64,3 +64,4 @@ async def patch_station(
             session.commit()
             session.refresh(db_station)
             return StationOut(**db_station.__dict__)
+
