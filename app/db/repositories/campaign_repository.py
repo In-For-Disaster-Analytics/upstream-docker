@@ -12,15 +12,23 @@ class CampaignRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_campaign(self, campaign: CampaignsIn) -> Campaign:
-        db_campaign = Campaign(**campaign.dict())
+    def create_campaign(self, request: CampaignsIn) -> Campaign:
+        db_campaign = Campaign(
+            campaignname=request.name,
+            description=request.description,
+            contactname=request.contact_name,
+            contactemail=request.contact_email,
+            allocation=request.allocation,
+            startdate=request.start_date,
+            enddate=request.end_date,
+        )
         self.db.add(db_campaign)
         self.db.commit()
         self.db.refresh(db_campaign)
         return db_campaign
 
-    def get_campaign(self, campaign_id: int) -> Campaign:
-        return self.db.query(Campaign).filter(Campaign.id == campaign_id).first()
+    def get_campaign(self, id: int) -> Campaign | None:
+        return self.db.query(Campaign).get(id)
 
     def get_campaigns(
         self,
@@ -47,18 +55,6 @@ class CampaignRepository:
             query = query.filter(Campaign.enddate <= end_date)
         total_count = query.count()
         return query.offset((page - 1) * limit).limit(limit).all(), total_count
-
-    def get_all_campaigns(self) -> list[Campaign]:
-        return self.db.query(Campaign).all()
-
-    # def update_campaign(self, campaign_id: int, campaign_data: CampaignUpdate) -> Campaign:
-    #     db_campaign = self.get_campaign(campaign_id)
-    #     if db_campaign:
-    #         for key, value in campaign_data.dict(exclude_unset=True).items():
-    #             setattr(db_campaign, key, value)
-    #         self.db.commit()
-    #         self.db.refresh(db_campaign)
-    #     return db_campaign
 
     def delete_campaign(self, campaign_id: int) -> bool:
         db_campaign = self.get_campaign(campaign_id)

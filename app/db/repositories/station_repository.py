@@ -1,0 +1,57 @@
+from datetime import datetime
+from typing import Optional
+
+from sqlalchemy.orm import Session
+
+from app.api.v1.schemas.station import StationIn
+from app.db.models.station import Station
+
+
+class StationRepository:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create_station(self, request: StationIn, campaign_id: int) -> Station:
+        db_station = Station(
+            stationname=request.stationname,
+            description=request.description,
+            contactname=request.contactname,
+            contactemail=request.contactemail,
+            active=request.active,
+            startdate=request.startdate,
+            campaignid=campaign_id,
+        )
+        self.db.add(db_station)
+        self.db.commit()
+        self.db.refresh(db_station)
+        return db_station
+
+    def get_station(self, station_id: int) -> Station | None:
+        return self.db.query(Station).get(station_id)
+
+    def get_stations(
+        self,
+        campaign_id: Optional[int] = None,
+        active: Optional[bool] = None,
+        start_date: Optional[datetime] = None,
+        page: int = 1,
+        limit: int = 20,
+    ) -> tuple[list[Station], int]:
+        query = self.db.query(Station)
+        if campaign_id:
+            query = query.filter(Station.campaignid == campaign_id)
+        if active is not None:
+            query = query.filter(Station.active == active)
+        if start_date:
+            query = query.filter(Station.startdate >= start_date)
+
+        total_count = query.count()
+        return query.offset((page - 1) * limit).limit(limit).all(), total_count
+
+    def delete_station(self, station_id: int) -> bool:
+        db_station = self.get_station(station_id)
+        if db_station:
+            self.db.delete(db_station)
+            self.db.commit()
+            return True
+        return False
