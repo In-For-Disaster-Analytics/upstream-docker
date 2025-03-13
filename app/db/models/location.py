@@ -1,18 +1,17 @@
-from geoalchemy2 import Geometry
-from sqlalchemy import Column, DateTime, ForeignKey, Integer
-from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import List, Optional
+from datetime import datetime
 from app.db.base import Base
-
+from geoalchemy2 import Geometry
 
 class Location(Base):
     __tablename__ = "locations"
+    locationid: Mapped[int] = mapped_column(primary_key=True, index=True)
+    stationid: Mapped[Optional[int]] = mapped_column(ForeignKey("stations.stationid"))
+    collectiontime: Mapped[Optional[datetime]] = mapped_column()
+    geometry: Mapped[Geometry] = mapped_column(Geometry("POINT", srid=4326)) 
 
-    locationid = Column(Integer, primary_key=True, index=True)
-    stationid = Column(Integer, ForeignKey("stations.stationid"))
-    collectiontime = Column(DateTime)
-    geometry = Column(Geometry("POINT", srid=4326))
-    # station = relationship("Station", back_populates="locations")
-    measurements = relationship(
-        "Measurement", uselist=False
-    )  # set uselist=False to indicate that this is a 1-to-1 relationship
+    #relationships
+    station: Mapped[Optional["Station"]] = relationship(back_populates="locations", lazy="joined")
+    measurements: Mapped[List["Measurement"]] = relationship(back_populates="location", lazy="joined")
+
