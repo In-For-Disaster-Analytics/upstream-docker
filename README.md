@@ -163,17 +163,8 @@ classDiagram
         +string variabletype
         +string description
         +number measurementvalue
-        +Location location
     }
-
-    class Location {
-        +int stationid
-        +datetime collectiontime
-        +string geometry
-    }
-
     Campaign "1" --> "*" Station : has
     Station "1" --> "*" Sensor : contains
     Sensor "1" --> "*" Measurement : records
-    Measurement "1" --> "1" Location : has
 ```
