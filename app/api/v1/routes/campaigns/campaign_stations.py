@@ -27,6 +27,12 @@ async def read_station(
                 "data": [StationOut(**station.__dict__) for station in stations],
             }
 
+# Route to retrieve a specific station
+@router.get("/stations/{station_id}")
+async def get_station(station_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    station_repository = StationRepository(db)
+    station = station_repository.get_station(station_id)
+    return station
 
 # Route to create a new station associated with a specific campaign
 @router.post("/stations", response_model=StationOut)
@@ -67,8 +73,3 @@ async def patch_station(
             session.refresh(db_station)
             return StationOut(**db_station.__dict__)
 
-@router.get("/stations/{station_id}")
-async def get_station(station_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    station_repository = StationRepository(db)
-    station = station_repository.get_station(station_id)
-    return station
