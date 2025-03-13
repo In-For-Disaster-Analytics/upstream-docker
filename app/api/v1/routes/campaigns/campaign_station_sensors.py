@@ -2,9 +2,6 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from geoalchemy2 import WKTElement
-from sqlalchemy.orm.exc import NoResultFound
-
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.sensor import SensorAndMeasurementIn
@@ -12,7 +9,7 @@ from app.api.v1.schemas.user import User
 from app.db.models.measurement import Measurement
 from app.db.models.sensor import Sensor
 from app.db.session import SessionLocal
-
+from fastapi.encoders import jsonable_encoder
 router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}",
     tags=["campaign_station_sensors"],
@@ -28,29 +25,31 @@ async def get_sensors(
     end_date: Optional[datetime] = None,
     min_measurement_value: Optional[float] = None,
     current_user: User = Depends(get_current_user),
+    limit: int = 1000,
+    page: int = 1,
 ):
     if check_allocation_permission(current_user, campaign_id):
         with SessionLocal() as session:
-            db_sensor = (
-                session.query(Sensor)
-                .filter(Sensor.sensorid == sensor_id)
-                .join(Sensor.measurements)
-            )
+            sensor = session.query(Sensor).get(sensor_id)
+            if not sensor:
+                raise HTTPException(status_code=404, detail="Sensor not found")
+
+            measurement_query = sensor.measurements.order_by(Measurement.collectiontime)
 
             if start_date:
-                db_sensor = db_sensor.filter(
-                    Sensor.measurements.any(Measurement.collectiontime >= start_date)
-                )
+                measurement_query = measurement_query.filter(Measurement.collectiontime >= start_date)
             if end_date:
-                db_sensor = db_sensor.filter(
-                    Sensor.measurements.any(Measurement.collectiontime <= end_date)
-                )
+                measurement_query = measurement_query.filter(Measurement.collectiontime <= end_date)
             if min_measurement_value is not None:
-                db_sensor = db_sensor.filter(
-                    Measurement.measurementvalue > min_measurement_value
-                )
-            return db_sensor.all()
+                measurement_query = measurement_query.filter(Measurement.measurementvalue > min_measurement_value)
 
+            measurements = measurement_query.limit(limit).offset((page - 1) * limit).all()
+
+            # Convert measurements to dictionaries
+            return [
+                Measurement(measurementvalue=m.measurementvalue, collectiontime=m.collectiontime)
+                for m in measurements
+            ]
 
 @router.post("/sensor/", response_model=dict)
 async def post_sensor_and_measurement(
