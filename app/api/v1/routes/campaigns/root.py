@@ -55,3 +55,10 @@ async def get_campaigns(
         )
 
     return jsonable_encoder(response)
+
+@router.get("/{campaign_id}")
+async def get_campaign(campaign_id: int, current_user: User = Depends(get_current_user)):
+    with SessionLocal() as session:
+        campaign_repository = CampaignRepository(session)
+        campaign = campaign_repository.get_campaign(campaign_id)
+        return campaign
