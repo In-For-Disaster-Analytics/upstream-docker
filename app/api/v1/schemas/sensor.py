@@ -38,3 +38,11 @@ class SensorAndMeasurementIn(BaseModel):
 class SensorAndMeasurementout(BaseModel):
     sensor: SensorOut
     measurement: List[MeasurementOut]
+
+
+class SensorPagination(BaseModel):
+    items: List[SensorOut]
+    total: int
+    page: int
+    size: int
+    pages: int

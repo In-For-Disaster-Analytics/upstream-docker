@@ -2,32 +2,37 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.schemas.campaign import CampaignResponse, CampaignsIn, CampaignsOut
+from app.api.v1.schemas.campaign import CampaignPagination, CampaignsIn, CampaignsOut
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
-from app.db.models.campaign import Campaign
 from app.db.repositories.campaign_repository import CampaignRepository
-from app.db.session import SessionLocal
+from app.db.session import get_db
+
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 
 @router.post("", response_model=CampaignsOut)
 async def post_campaign(
-    campaign: CampaignsIn, current_user: User = Depends(get_current_user)
+    campaign: CampaignsIn, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
-    if campaign.dict()["allocation"] in get_allocations(current_user):
-        with SessionLocal() as session:
-            db_campaign = Campaign(**campaign.dict())
-            session.add(db_campaign)
-            session.commit()
-            session.refresh(db_campaign)
-            return CampaignsOut(**db_campaign.__dict__)
-    else:
+    if campaign.allocation not in get_allocations(current_user):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
+
+    db_campaign = CampaignRepository(db).create_campaign(campaign)
+    return CampaignsOut(
+        id=db_campaign.campaignid,
+        name=db_campaign.campaignname,
+        description=db_campaign.description,
+        start_date=db_campaign.startdate,
+        end_date=db_campaign.enddate,
+        contact_name=db_campaign.contactname,
+        contact_email=db_campaign.contactemail,
+    )
 
 
 @router.get("")
@@ -38,21 +43,20 @@ async def get_campaigns(
     page: int = 1,
     limit: int = 20,
     current_user: User = Depends(get_current_user),
-) -> CampaignResponse:
+    db: Session = Depends(get_db)
+) -> CampaignPagination:
     allocations = get_allocations(current_user)
-    with SessionLocal() as session:
-        campaign_repository = CampaignRepository(session)
-        results, total_count = campaign_repository.get_campaigns(
-            allocations, bbox, start_date, end_date, page, limit
-        )
-        # Format response
-        response = CampaignResponse(
-            items=[format_campaign(c) for c in results],
-            total=total_count,
-            page=page,
-            size=limit,
-            pages=(total_count + limit - 1) // limit,
-        )
+    campaign_repository = CampaignRepository(db)
+    results, total_count = campaign_repository.get_campaigns(
+        allocations, bbox, start_date, end_date, page, limit
+    )
+    response = CampaignPagination(
+        items=[format_campaign(c) for c in results],
+        total=total_count,
+        page=page,
+        size=limit,
+        pages=(total_count + limit - 1) // limit,
+    )
 
     return jsonable_encoder(response)
 
