@@ -21,17 +21,6 @@ class Campaign(Base):
     bbox_east: Mapped[Optional[float]] = mapped_column()
     bbox_south: Mapped[Optional[float]] = mapped_column()
     bbox_north: Mapped[Optional[float]] = mapped_column()
-
-    @property
-    def location(self) -> dict:
-        if all(coord is not None for coord in [self.bbox_west, self.bbox_east, self.bbox_south, self.bbox_north]):
-            return {
-                "west": self.bbox_west,
-                "east": self.bbox_east,
-                "south": self.bbox_south,
-                "north": self.bbox_north
-            }
-        return {}
     
     # relationships
     stations: Mapped[List["Station"]] = relationship(
