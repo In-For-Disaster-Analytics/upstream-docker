@@ -33,7 +33,6 @@ class SensorSummaryForStations(BaseModel):
     variable_name: str | None = None
     measurement_unit: str | None = None
     
-
 class StationsListResponseItem(BaseModel):
     id: int 
     name: str
@@ -43,3 +42,10 @@ class StationsListResponseItem(BaseModel):
     active: bool | None = None
     start_date: datetime
     sensors: SensorSummaryForStations
+
+class StationsPagination(BaseModel):
+    items: List[StationsListResponseItem]
+    total: int
+    page: int
+    size: int
+    pages: int
