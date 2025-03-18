@@ -29,9 +29,14 @@ class StationPagination(BaseModel):
     pages: int
 
 #__________________________MIO__________________________
-class StationsListSummary(BaseModel):
+class StationsListResponseItem(BaseModel):
     id: int 
     name: str
+    description: str | None = None
+    contact_name: str | None = None
+    contact_email: str | None = None
+    active: Optional[bool] = True
+    start_date: datetime
     sensors: List[dict] = Field(
         description="List of sensors in the station", 
         default=[],
