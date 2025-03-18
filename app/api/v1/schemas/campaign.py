@@ -32,26 +32,20 @@ class CampaignPagination(BaseModel):
     pages: int
 
 #__________________________MIO__________________________
-class CampaignListSummary(BaseModel):
+class CampaignsListSummary(BaseModel):
     id: int
     name: str
     start_date: datetime | None = None
     end_date: datetime | None = None
     location: dict | None = None
     summary: dict = Field(description="Summary information about the campaigns", default={
-        "sensor_types": [],
-        "variable_names": []
+        "sensor_types": List[str],
+        "variable_names": List[str]
     })
 
-class CampaignListSummary(BaseModel):
-    id: int
-    name: str
-    start_date: datetime | None = None
-    end_date: datetime | None = None
-    location: dict | None = None
-    summary: dict = Field(description="Summary information about the campaigns", default={
-        "sensor_types": [],
-        "variable_names": []
+class CampaignSummary(CampaignsOut):
+    summary: dict = Field(description="Summary information about the campaign", default={
+        "station_count": int,
+        "sensor_count": int,
+        "sensor_types": List[str]
     })
-
-    
