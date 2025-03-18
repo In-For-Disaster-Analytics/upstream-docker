@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CampaignsIn(BaseModel):
@@ -22,7 +22,7 @@ class CampaignsOut(BaseModel):
     end_date: datetime | None = None
     contact_name: str | None = None
     contact_email: str | None = None
-
+    
 
 class CampaignPagination(BaseModel):
     items: list[CampaignsOut]
@@ -31,3 +31,27 @@ class CampaignPagination(BaseModel):
     size: int
     pages: int
 
+#__________________________MIO__________________________
+class CampaignListSummary(BaseModel):
+    id: int
+    name: str
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    location: dict | None = None
+    summary: dict = Field(description="Summary information about the campaigns", default={
+        "sensor_types": [],
+        "variable_names": []
+    })
+
+class CampaignListSummary(BaseModel):
+    id: int
+    name: str
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    location: dict | None = None
+    summary: dict = Field(description="Summary information about the campaigns", default={
+        "sensor_types": [],
+        "variable_names": []
+    })
+
+    

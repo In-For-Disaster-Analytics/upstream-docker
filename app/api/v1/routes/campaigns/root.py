@@ -36,7 +36,7 @@ async def post_campaign(
 
 
 @router.get("")
-async def get_campaigns(
+async def list_campaigns(
     bbox: str | None = None,
     start_date: datetime | None = None,
     end_date: datetime | None = None,
