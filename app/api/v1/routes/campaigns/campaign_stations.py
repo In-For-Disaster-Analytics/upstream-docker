@@ -14,7 +14,7 @@ router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["campaign_stations"]
 
 # Route to retrieve all stations associated with a specific campaign
 @router.get("/stations")
-async def read_station(
+async def list_stations(
     campaign_id: int, current_user: User = Depends(get_current_user)
 ):
     if check_allocation_permission(current_user, campaign_id):

@@ -27,3 +27,19 @@ class StationPagination(BaseModel):
     page: int
     size: int
     pages: int
+
+#__________________________MIO__________________________
+class StationsListSummary(BaseModel):
+    id: int 
+    name: str
+    sensors: List[dict] = Field(
+        description="List of sensors in the station", 
+        default=[],
+        example=[
+            {
+                "id": 1,
+                "variable_name": "Temperature",
+                "measurement_unit": "Celsius"
+            }
+        ]
+    )
