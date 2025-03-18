@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class StationIn(BaseModel):
@@ -28,23 +28,18 @@ class StationPagination(BaseModel):
     size: int
     pages: int
 
-#__________________________MIO__________________________
+class SensorSummaryForStations(BaseModel):
+    id: int
+    variable_name: str | None = None
+    measurement_unit: str | None = None
+    
+
 class StationsListResponseItem(BaseModel):
     id: int 
     name: str
     description: str | None = None
     contact_name: str | None = None
     contact_email: str | None = None
-    active: Optional[bool] = True
+    active: bool | None = None
     start_date: datetime
-    sensors: List[dict] = Field(
-        description="List of sensors in the station", 
-        default=[],
-        example=[
-            {
-                "id": 1,
-                "variable_name": "Temperature",
-                "measurement_unit": "Celsius"
-            }
-        ]
-    )
+    sensors: SensorSummaryForStations
