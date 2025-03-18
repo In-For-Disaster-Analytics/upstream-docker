@@ -13,39 +13,48 @@ class CampaignsIn(BaseModel):
     end_date: Optional[datetime]
     allocation: str
 
+class Location(BaseModel):
+    bbox_west: float | None = None
+    bbox_east: float | None = None
+    bbox_south: float | None = None
+    bbox_north: float | None = None
 
-class CampaignsOut(BaseModel):
-    id: int
+class SummaryListCampaigns(BaseModel):
+    sensor_types: List[str] | None = None
+    variable_names: List[str] | None = None
+
+class ListCampaignsResponseItem(BaseModel):
+    id: int 
     name: str
+    location: Location | None = None
     description: str | None = None
-    start_date: datetime | None = None
-    end_date: datetime | None = None
     contact_name: str | None = None
     contact_email: str | None = None
-    
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    allocation: str | None = None
+    summary: SummaryListCampaigns
 
 class CampaignPagination(BaseModel):
-    items: list[CampaignsOut]
+    items: list[ListCampaignsResponseItem]
     total: int
     page: int
     size: int
     pages: int
 
-#__________________________MIO__________________________
-class CampaignsListSummary(BaseModel):
+class SummaryGetCampaign(BaseModel):
+    station_count: int
+    sensor_count: int
+    sensor_types: List[str]
+
+class GetCampaignResponse(BaseModel):
     id: int
     name: str
+    description: str | None = None
+    contact_name: str | None = None
+    contact_email: str | None = None
     start_date: datetime | None = None
     end_date: datetime | None = None
-    location: dict | None = None
-    summary: dict = Field(description="Summary information about the campaigns", default={
-        "sensor_types": List[str],
-        "variable_names": List[str]
-    })
-
-class CampaignSummary(CampaignsOut):
-    summary: dict = Field(description="Summary information about the campaign", default={
-        "station_count": int,
-        "sensor_count": int,
-        "sensor_types": List[str]
-    })
+    allocation: str
+    location: Location | None = None
+    summary: SummaryGetCampaign

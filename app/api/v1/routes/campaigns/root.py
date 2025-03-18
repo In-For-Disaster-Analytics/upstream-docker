@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.schemas.campaign import CampaignPagination, CampaignsIn, CampaignsOut
+from app.api.v1.schemas.campaign import CampaignPagination, CampaignsIn, ListCampaignsResponseItem
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
 from app.db.repositories.campaign_repository import CampaignRepository
@@ -16,7 +16,7 @@ from app.db.session import get_db
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 
-@router.post("", response_model=CampaignsOut)
+@router.post("", response_model=ListCampaignsResponseItem)
 async def post_campaign(
     campaign: CampaignsIn, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
@@ -24,7 +24,7 @@ async def post_campaign(
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
 
     db_campaign = CampaignRepository(db).create_campaign(campaign)
-    return CampaignsOut(
+    return ListCampaignsResponseItem(
         id=db_campaign.campaignid,
         name=db_campaign.campaignname,
         description=db_campaign.description,
