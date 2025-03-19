@@ -1,4 +1,4 @@
-from app.api.v1.schemas.campaign import ListCampaignsResponseItem, SummaryListCampaigns
+from app.api.v1.schemas.campaign import ListCampaignsResponseItem, Location, SummaryListCampaigns
 from app.db.models.campaign import Campaign
 
 
@@ -25,5 +25,11 @@ def format_campaign(campaign: Campaign) -> ListCampaignsResponseItem:
         summary=SummaryListCampaigns(
             sensor_types=None,
             variable_names=None,
-        )
+        ),
+        location=Location(
+            bbox_west=campaign.bbox_west,
+            bbox_east=campaign.bbox_east,
+            bbox_south=campaign.bbox_south,
+            bbox_north=campaign.bbox_north,
+        ),
     )

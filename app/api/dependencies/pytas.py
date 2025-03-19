@@ -11,7 +11,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 def get_allocations(username):
     if ENVIRONMENT == "dev":
-        return ["test"]
+        return ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123"]
     else:
         client = TASClient(
             baseURL=os.getenv("tasURL"),
