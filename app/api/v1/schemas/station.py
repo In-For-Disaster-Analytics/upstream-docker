@@ -49,3 +49,4 @@ class StationsPagination(BaseModel):
     page: int
     size: int
     pages: int
+
