@@ -28,6 +28,9 @@ class SensorRepository:
     def get_sensor(self, sensor_id: int) -> Sensor | None:
         return self.db.query(Sensor).get(sensor_id)
 
+    def get_sensors_by_station_id(self, station_id: int, page: int = 1, limit: int = 20) -> list[Sensor]:
+        return self.db.query(Sensor).filter(Sensor.stationid == station_id).offset((page - 1) * limit).limit(limit).all()
+
     def get_sensors(
         self,
         station_id: Optional[int] = None,

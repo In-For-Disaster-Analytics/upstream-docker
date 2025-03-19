@@ -3,6 +3,9 @@ from fastapi import APIRouter
 from app.api.v1.routes.campaigns.campaign_station_sensors import (
     router as campaign_station_sensors_router,
 )
+from app.api.v1.routes.campaigns.campaign_station_sensor_measurements import (
+    router as campaign_station_sensor_measurements_router,
+)
 from app.api.v1.routes.campaigns.campaign_stations import (
     router as stations_router,
 )
@@ -15,4 +18,5 @@ api_router.include_router(root_router)
 api_router.include_router(campaigns_router)
 api_router.include_router(stations_router)
 api_router.include_router(campaign_station_sensors_router)
+api_router.include_router(campaign_station_sensor_measurements_router)
 api_router.include_router(upload_file_router)

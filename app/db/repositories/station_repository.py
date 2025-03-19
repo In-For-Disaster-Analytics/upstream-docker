@@ -29,6 +29,9 @@ class StationRepository:
     def get_station(self, station_id: int) -> Station | None:
         return self.db.query(Station).get(station_id)
 
+    def get_stations_by_campaign_id(self, campaign_id: int, page: int = 1, limit: int = 20) -> list[Station]:
+        return self.db.query(Station).filter(Station.campaignid == campaign_id).offset((page - 1) * limit).limit(limit).all()
+
     def get_stations(
         self,
         campaign_id: Optional[int] = None,
