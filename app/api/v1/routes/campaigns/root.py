@@ -17,25 +17,6 @@ from app.db.session import get_db
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 
-@router.post("", response_model=ListCampaignsResponseItem)
-async def post_campaign(
-    campaign: CampaignsIn, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
-):
-    if check_allocation_permission(current_user, campaign.allocation):
-        raise HTTPException(status_code=404, detail="Allocation is incorrect")
-
-    db_campaign = CampaignRepository(db).create_campaign(campaign)
-    return ListCampaignsResponseItem(
-        id=db_campaign.campaignid,
-        name=db_campaign.campaignname,
-        description=db_campaign.description,
-        start_date=db_campaign.startdate,
-        end_date=db_campaign.enddate,
-        contact_name=db_campaign.contactname,
-        contact_email=db_campaign.contactemail,
-    )
-
-
 @router.get("")
 async def list_campaigns(
     page: int = 1,
