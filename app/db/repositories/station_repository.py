@@ -3,7 +3,9 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
+from sqlalchemy import func
 from app.api.v1.schemas.station import StationIn
+from app.db.models.sensor import Sensor
 from app.db.models.station import Station
 
 
@@ -31,6 +33,15 @@ class StationRepository:
 
     def get_stations_by_campaign_id(self, campaign_id: int, page: int = 1, limit: int = 20) -> list[Station]:
         return self.db.query(Station).filter(Station.campaignid == campaign_id).offset((page - 1) * limit).limit(limit).all()
+
+    def list_stations_and_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[tuple[Station, int, list[str], list[str]]], int]:
+        query = self.db.query(Station,
+            func.count(Sensor.sensorid.distinct()).label('sensor_count'),
+            func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
+        ).select_from(Station).outerjoin(Sensor).filter(Station.campaignid == campaign_id).group_by(Station.stationid)
+        total_count = query.count()
+        return query.offset((page - 1) * limit).limit(limit).all(), total_count
 
     def get_stations(
         self,

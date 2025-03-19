@@ -68,7 +68,6 @@ class CampaignRepository:
             query = query.filter(Campaign.enddate <= end_date)
 
         total_count = self.db.query(Campaign).count()
-        print(total_count)  # Count without joins for total
 
         # Get paginated results
         results = query.offset((page - 1) * limit).limit(limit).all()
