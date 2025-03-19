@@ -41,7 +41,7 @@ class StationsListResponseItem(BaseModel):
     contact_email: str | None = None
     active: bool | None = None
     start_date: datetime
-    sensors: SensorSummaryForStations
+    sensors: List[SensorSummaryForStations]
 
 class StationsPagination(BaseModel):
     items: List[StationsListResponseItem]
