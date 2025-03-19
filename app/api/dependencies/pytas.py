@@ -8,10 +8,11 @@ from app.pytas.http import TASClient
 
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
+dev_allocations = ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123"]
 
 def get_allocations(username):
     if ENVIRONMENT == "dev":
-        return ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123"]
+        return dev_allocations
     else:
         client = TASClient(
             baseURL=os.getenv("tasURL"),
