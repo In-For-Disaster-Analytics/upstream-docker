@@ -5,56 +5,36 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.sensor import SensorAndMeasurementIn
 from app.api.v1.schemas.user import User
-from app.db.models.measurement import Measurement
-from app.db.models.sensor import Sensor
 from app.db.session import SessionLocal, get_db
 from app.db.repositories.sensor_repository import SensorRepository
 
 
 router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}",
-    tags=["campaign_station_sensors"],
+    tags=["sensors"],
 )
 
+@router.get("/sensors")
+async def get_sensors(
+    campaign_id: int,
+    station_id: int,
+    page: int = 1,
+    limit: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    sensor_repository = SensorRepository(db)
+    sensors = sensor_repository.get_sensors_by_station_id(station_id, page, limit)
+    return sensors
+
 @router.get("/sensors/{sensor_id}")
-async def get_sensor(sensor_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_sensor(sensor_id: int, campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
     sensor = sensor_repository.get_sensor(sensor_id)
     return sensor
 
-@router.get("/sensors/{sensor_id}/measurements")
-async def get_sensor_measurements(
-    campaign_id: int,
-    station_id: int,
-    sensor_id: int = None,
-    start_date: Optional[datetime] = None,
-    end_date: Optional[datetime] = None,
-    min_measurement_value: Optional[float] = None,
-    current_user: User = Depends(get_current_user),
-    limit: int = 1000,
-    page: int = 1,
-):
-    if check_allocation_permission(current_user, campaign_id):
-        with SessionLocal() as session:
-            sensor = session.query(Sensor).get(sensor_id)
-            if not sensor:
-                raise HTTPException(status_code=404, detail="Sensor not found")
-
-            measurement_query = sensor.measurements.order_by(Measurement.collectiontime)
-
-            if start_date:
-                measurement_query = measurement_query.filter(Measurement.collectiontime >= start_date)
-            if end_date:
-                measurement_query = measurement_query.filter(Measurement.collectiontime <= end_date)
-            if min_measurement_value is not None:
-                measurement_query = measurement_query.filter(Measurement.measurementvalue > min_measurement_value)
-
-            measurements = measurement_query.limit(limit).offset((page - 1) * limit).all()
-
-            # Convert measurements to dictionaries
-            return [
-                Measurement(measurementvalue=m.measurementvalue, collectiontime=m.collectiontime)
-                for m in measurements
-            ]
