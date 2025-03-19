@@ -24,7 +24,7 @@ class SummaryListCampaigns(BaseModel):
     variable_names: List[str] | None = None
 
 class ListCampaignsResponseItem(BaseModel):
-    id: int 
+    id: int
     name: str
     location: Location | None = None
     description: str | None = None
@@ -46,6 +46,7 @@ class SummaryGetCampaign(BaseModel):
     station_count: int
     sensor_count: int
     sensor_types: List[str]
+    sensor_variables: List[str]
 
 class GetCampaignResponse(BaseModel):
     id: int

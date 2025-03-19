@@ -6,12 +6,12 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
-from app.api.dependencies.pytas import check_allocation_permission, get_allocations
-from app.api.v1.schemas.campaign import CampaignPagination, CampaignsIn, ListCampaignsResponseItem
+from app.api.dependencies.pytas import get_allocations
+from app.api.v1.schemas.campaign import CampaignPagination,  GetCampaignResponse
 from app.api.v1.schemas.user import User
-from app.api.v1.utils.formatters import format_campaign
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.db.session import get_db
+from app.services.campaign_service import CampaignService
 
 
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
@@ -28,12 +28,12 @@ async def list_campaigns(
     db: Session = Depends(get_db)
 ) -> CampaignPagination:
     allocations = get_allocations(current_user)
-    campaign_repository = CampaignRepository(db)
-    results, total_count = campaign_repository.get_campaigns(
+    campaign_service = CampaignService(CampaignRepository(db))
+    results, total_count = campaign_service.get_campaigns_with_summary(
         allocations, bbox, start_date, end_date, page, limit
     )
     response = CampaignPagination(
-        items=[format_campaign(c) for c in results],
+        items=results,
         total=total_count,
         page=page,
         size=limit,
@@ -43,7 +43,9 @@ async def list_campaigns(
     return jsonable_encoder(response)
 
 @router.get("/{campaign_id}")
-async def get_campaign(campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    campaign_repository = CampaignRepository(db)
-    campaign = campaign_repository.get_campaign(campaign_id)
-    return campaign
+async def get_campaign(campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> GetCampaignResponse:
+    campaign_service = CampaignService(CampaignRepository(db))
+    campaign = campaign_service.get_campaign_with_summary(campaign_id)
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return jsonable_encoder(campaign)

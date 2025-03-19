@@ -1,11 +1,14 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from app.api.v1.schemas.campaign import CampaignsIn
 from app.db.models.campaign import (  # Adjust the import based on your model's location
     Campaign,
 )
+from app.db.models.station import Station
+from app.db.models.sensor import Sensor
 
 
 class CampaignRepository:
@@ -30,7 +33,7 @@ class CampaignRepository:
     def get_campaign(self, id: int) -> Campaign | None:
         return self.db.query(Campaign).get(id)
 
-    def get_campaigns(
+    def get_campaigns_and_summary(
         self,
         allocations: list[str] | None,
         bbox: str | None,
@@ -38,13 +41,21 @@ class CampaignRepository:
         end_date: datetime | None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[Campaign], int]:
-        query = self.db.query(Campaign)
+    ) -> tuple[list[tuple[Campaign, int, int, list[str], list[str]]], int]:
+        # Base campaign query
+        query = self.db.query(
+            Campaign,
+            func.count(Station.stationid.distinct()).label('station_count'),
+            func.count(Sensor.sensorid.distinct()).label('sensor_count'),
+            func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
+        ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
+
+        # Apply filters
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
         if bbox:
             bbox_west,bbox_south, bbox_east, bbox_north = bbox.split(",")
-            print(bbox_west, bbox_east, bbox_south, bbox_north)
             query = query.filter(
                 Campaign.bbox_west >= float(bbox_west),
                 Campaign.bbox_east <= float(bbox_east),
@@ -55,8 +66,14 @@ class CampaignRepository:
             query = query.filter(Campaign.startdate >= start_date)
         if end_date:
             query = query.filter(Campaign.enddate <= end_date)
-        total_count = query.count()
-        return query.offset((page - 1) * limit).limit(limit).all(), total_count
+
+        total_count = self.db.query(Campaign).count()
+        print(total_count)  # Count without joins for total
+
+        # Get paginated results
+        results = query.offset((page - 1) * limit).limit(limit).all()
+
+        return results, total_count
 
     def delete_campaign(self, campaign_id: int) -> bool:
         db_campaign = self.get_campaign(campaign_id)
@@ -65,3 +82,18 @@ class CampaignRepository:
             self.db.commit()
             return True
         return False
+
+    def count_stations(self, campaign_id: int) -> int:
+        return self.db.query(Station).filter(Station.campaignid == campaign_id).count()
+
+    def count_sensors(self, campaign_id: int) -> int:
+        stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
+        return sum(len(station.sensors) for station in stations)
+
+    def get_sensor_types(self, campaign_id: int) -> list[str]:
+        stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
+        return list(set(sensor.alias for station in stations for sensor in station.sensors))
+
+    def get_sensor_variables(self, campaign_id: int) -> list[str]:
+        stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
+        return list(set(sensor.variablename for station in stations for sensor in station.sensors))

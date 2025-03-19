@@ -1,0 +1,72 @@
+from datetime import datetime
+from app.db.repositories.campaign_repository import CampaignRepository
+from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
+
+class CampaignService:
+    def __init__(self, campaign_repository: CampaignRepository):
+        self.campaign_repository = campaign_repository
+
+    def get_campaigns_with_summary(
+        self,
+        allocations: list[str] | None = None,
+        bbox: str | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        page: int = 1,
+        limit: int = 20,
+    ) -> tuple[list[ListCampaignsResponseItem], int]:
+        rows, total_count = self.campaign_repository.get_campaigns_and_summary(
+            allocations, bbox, start_date, end_date, page, limit
+        )
+        items: list[ListCampaignsResponseItem] = []
+        for row in rows:
+            item = ListCampaignsResponseItem(
+                id=row[0].campaignid,
+                name=row[0].campaignname,
+                description=row[0].description,
+                contact_name=row[0].contactname,
+                contact_email=row[0].contactemail,
+                start_date=row[0].startdate,
+                end_date=row[0].enddate,
+                allocation=row[0].allocation,
+                location=Location(
+                    bbox_west=row[0].bbox_west,
+                    bbox_east=row[0].bbox_east,
+                    bbox_south=row[0].bbox_south,
+                    bbox_north=row[0].bbox_north,
+                ),
+                summary=SummaryListCampaigns(
+                    sensor_types=row[3] or [],
+                    variable_names=row[4] or []
+                )
+            )
+            items.append(item)
+        return items, total_count
+
+    def get_campaign_with_summary(self, campaign_id: int) -> GetCampaignResponse | None:
+        campaign = self.campaign_repository.get_campaign(campaign_id)
+        if not campaign:
+            return None
+        return GetCampaignResponse(
+            id=campaign.campaignid,
+            name=campaign.campaignname,
+            description=campaign.description,
+            contact_name=campaign.contactname,
+            contact_email=campaign.contactemail,
+            start_date=campaign.startdate,
+            end_date=campaign.enddate,
+            allocation=campaign.allocation,
+            location=Location(
+                bbox_west=campaign.bbox_west,
+                bbox_east=campaign.bbox_east,
+                bbox_south=campaign.bbox_south,
+                bbox_north=campaign.bbox_north,
+            ),
+            summary=SummaryGetCampaign(
+                station_count=self.campaign_repository.count_stations(campaign_id),
+                sensor_count=self.campaign_repository.count_sensors(campaign_id),
+                sensor_types=self.campaign_repository.get_sensor_types(campaign_id),
+                sensor_variables=self.campaign_repository.get_sensor_variables(campaign_id),
+            ),
+        )
+
