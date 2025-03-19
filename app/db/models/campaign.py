@@ -21,7 +21,7 @@ class Campaign(Base):
     bbox_east: Mapped[Optional[float]] = mapped_column()
     bbox_south: Mapped[Optional[float]] = mapped_column()
     bbox_north: Mapped[Optional[float]] = mapped_column()
-
+    
     # relationships
     stations: Mapped[List["Station"]] = relationship(
         back_populates="campaign"

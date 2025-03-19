@@ -1,23 +1,31 @@
 from datetime import datetime
 from typing import Optional
-
+from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
+
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.sensor import SensorAndMeasurementIn
 from app.api.v1.schemas.user import User
 from app.db.models.measurement import Measurement
 from app.db.models.sensor import Sensor
-from app.db.session import SessionLocal
-from fastapi.encoders import jsonable_encoder
+from app.db.session import SessionLocal, get_db
+from app.db.repositories.sensor_repository import SensorRepository
+
+
 router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}",
     tags=["campaign_station_sensors"],
 )
 
+@router.get("/sensors/{sensor_id}")
+async def get_sensor(sensor_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    sensor_repository = SensorRepository(db)
+    sensor = sensor_repository.get_sensor(sensor_id)
+    return sensor
 
-@router.get("/sensor/{sensor_id}")
-async def get_sensors(
+@router.get("/sensors/{sensor_id}/measurements")
+async def get_sensor_measurements(
     campaign_id: int,
     station_id: int,
     sensor_id: int = None,

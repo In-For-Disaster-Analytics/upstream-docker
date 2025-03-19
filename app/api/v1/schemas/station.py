@@ -27,3 +27,26 @@ class StationPagination(BaseModel):
     page: int
     size: int
     pages: int
+
+class SensorSummaryForStations(BaseModel):
+    id: int
+    variable_name: str | None = None
+    measurement_unit: str | None = None
+    
+class StationsListResponseItem(BaseModel):
+    id: int 
+    name: str
+    description: str | None = None
+    contact_name: str | None = None
+    contact_email: str | None = None
+    active: bool | None = None
+    start_date: datetime
+    sensors: List[SensorSummaryForStations]
+
+class StationsPagination(BaseModel):
+    items: List[StationsListResponseItem]
+    total: int
+    page: int
+    size: int
+    pages: int
+
