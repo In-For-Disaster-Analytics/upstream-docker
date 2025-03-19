@@ -43,11 +43,13 @@ class CampaignRepository:
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
         if bbox:
+            bbox_west,bbox_south, bbox_east, bbox_north = bbox.split(",")
+            print(bbox_west, bbox_east, bbox_south, bbox_north)
             query = query.filter(
-                Campaign.bbox_west <= bbox[0],
-                Campaign.bbox_east >= bbox[1],
-                Campaign.bbox_south <= bbox[2],
-                Campaign.bbox_north >= bbox[3],
+                Campaign.bbox_west >= float(bbox_west),
+                Campaign.bbox_east <= float(bbox_east),
+                Campaign.bbox_south >= float(bbox_south),
+                Campaign.bbox_north <= float(bbox_north),
             )
         if start_date:
             query = query.filter(Campaign.startdate >= start_date)

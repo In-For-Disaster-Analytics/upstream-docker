@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
-from app.api.dependencies.pytas import get_allocations
+from app.api.dependencies.pytas import check_allocation_permission, get_allocations
 from app.api.v1.schemas.campaign import CampaignPagination, CampaignsIn, ListCampaignsResponseItem
 from app.api.v1.schemas.user import User
 from app.api.v1.utils.formatters import format_campaign
@@ -20,7 +21,7 @@ router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 async def post_campaign(
     campaign: CampaignsIn, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
 ):
-    if campaign.allocation not in get_allocations(current_user):
+    if check_allocation_permission(current_user, campaign.allocation):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
 
     db_campaign = CampaignRepository(db).create_campaign(campaign)
@@ -37,11 +38,11 @@ async def post_campaign(
 
 @router.get("")
 async def list_campaigns(
-    bbox: str | None = None,
-    start_date: datetime | None = None,
-    end_date: datetime | None = None,
     page: int = 1,
     limit: int = 20,
+    bbox: Annotated[str , Query(description="Bounding box of the campaign west,south,east,north")] = '-180,-90,180,90',
+    start_date: Annotated[datetime | None, Query(description="Start date of the campaign", example="2024-01-01")] = None,
+    end_date: Annotated[datetime | None, Query(description="End date of the campaign", example="2025-01-01")] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> CampaignPagination:
