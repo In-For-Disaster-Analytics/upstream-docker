@@ -1,3 +1,5 @@
+from app.api.v1.schemas.sensor import SensorItem
+from app.api.v1.schemas.station import GetStationResponse, ListStationPagination, SensorSummaryForStations, StationItem
 from app.db.repositories.station_repository import StationRepository
 
 
@@ -21,12 +23,23 @@ class StationService:
         return stations, total_count
 
 
-    def get_station_with_summary(self, station_id: int) -> dict | None:
+    def get_station(self, station_id: int) -> GetStationResponse | None:
         row = self.station_repository.get_station(station_id)
         if not row:
             return None
-        return {
-            "id": row.stationid,
-            "name": row.stationname,
-            "description": row.description,
-        }
+        return GetStationResponse(
+            id=row.stationid,
+            name=row.stationname,
+            description=row.description,
+            contact_name=row.contactname,
+            contact_email=row.contactemail,
+            active=row.active,
+            start_date=row.startdate,
+            sensors=[SensorItem(
+                id=sensor.sensorid,
+                alias=sensor.alias,
+                description=sensor.description,
+                postprocess=sensor.postprocess,
+                variablename=sensor.variablename,
+            ) for sensor in row.sensors]
+        )

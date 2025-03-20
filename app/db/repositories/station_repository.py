@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 from app.api.v1.schemas.station import StationIn
 from app.db.models.sensor import Sensor
 from app.db.models.station import Station
@@ -29,7 +30,7 @@ class StationRepository:
         return db_station
 
     def get_station(self, station_id: int) -> Station | None:
-        return self.db.query(Station).get(station_id)
+        return self.db.query(Station).options(joinedload(Station.sensors)).get(station_id)
 
     def get_stations_by_campaign_id(self, campaign_id: int, page: int = 1, limit: int = 20) -> list[Station]:
         return self.db.query(Station).filter(Station.campaignid == campaign_id).offset((page - 1) * limit).limit(limit).all()
