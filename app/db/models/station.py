@@ -22,6 +22,19 @@ class Station(Base):
     active: Mapped[Optional[bool]] = mapped_column()
     startdate: Mapped[Optional[datetime]] = mapped_column()
 
+    # Station type
+    station_type: Mapped[str] = mapped_column()  # 'static' or 'mobile'
+
+    # Location for static stations
+    static_latitude: Mapped[Optional[float]] = mapped_column()
+    static_longitude: Mapped[Optional[float]] = mapped_column()
+
+    # Bounding box coordinates for mobile stations
+    mobile_bbox_west: Mapped[Optional[float]] = mapped_column()
+    mobile_bbox_east: Mapped[Optional[float]] = mapped_column()
+    mobile_bbox_south: Mapped[Optional[float]] = mapped_column()
+    mobile_bbox_north: Mapped[Optional[float]] = mapped_column()
+
     # relationships
     campaign: Mapped["Campaign"] = relationship(
         back_populates="stations"
