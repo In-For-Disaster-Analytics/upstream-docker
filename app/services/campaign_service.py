@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.api.v1.schemas.station import StationsListResponseItem
+from app.api.v1.schemas.station import SensorSummaryForStations, StationsListResponseItem
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
 
@@ -56,6 +56,11 @@ class CampaignService:
             contact_email=station.contactemail,
             active=station.active,
             start_date=station.startdate,
+            sensors=[SensorSummaryForStations(
+                id=sensor.sensorid,
+                variable_name=sensor.variablename,
+                measurement_unit=sensor.units,
+            ) for sensor in station.sensors]
         ) for station in campaign.stations]
         return GetCampaignResponse(
             id=campaign.campaignid,

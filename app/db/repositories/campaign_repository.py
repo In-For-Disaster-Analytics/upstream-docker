@@ -31,7 +31,7 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        return self.db.query(Campaign).options(joinedload(Campaign.stations)).filter(Campaign.campaignid == id).first()
+        return self.db.query(Campaign).options(joinedload(Campaign.stations).joinedload(Station.sensors)).filter(Campaign.campaignid == id).first()
 
     def get_campaigns_and_summary(
         self,
