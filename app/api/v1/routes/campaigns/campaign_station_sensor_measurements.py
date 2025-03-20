@@ -18,6 +18,7 @@ router = APIRouter(
 @router.get("/measurements")
 async def get_sensor_measurements(
     campaign_id: int,
+    station_id: int,
     sensor_id: int = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,

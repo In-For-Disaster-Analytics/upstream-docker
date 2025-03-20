@@ -32,9 +32,9 @@ class SensorSummaryForStations(BaseModel):
     id: int
     variable_name: str | None = None
     measurement_unit: str | None = None
-    
+
 class StationsListResponseItem(BaseModel):
-    id: int 
+    id: int
     name: str
     description: str | None = None
     contact_name: str | None = None

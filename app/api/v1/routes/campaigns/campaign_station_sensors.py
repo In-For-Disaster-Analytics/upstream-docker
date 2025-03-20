@@ -31,7 +31,7 @@ async def get_sensors(
     return sensors
 
 @router.get("/sensors/{sensor_id}")
-async def get_sensor(sensor_id: int, campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_sensor(station_id: int, sensor_id: int, campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
