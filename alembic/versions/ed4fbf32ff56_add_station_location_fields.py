@@ -20,7 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Add station type
-    op.add_column('stations', sa.Column('station_type', sa.String(), nullable=True))
+    op.add_column('stations', sa.Column('station_type', sa.String(), nullable=False))
 
     # Add static station location fields
     op.add_column('stations', sa.Column('static_latitude', sa.Float(), nullable=True))
