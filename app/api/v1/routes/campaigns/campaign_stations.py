@@ -26,6 +26,8 @@ async def list_stations(
 async def get_station(station_id: int, campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
-    station_repository = StationRepository(db)
-    station = station_repository.get_station(station_id)
+    station_service = StationService(StationRepository(db))
+    station = station_service.get_station(station_id)
+    if not station:
+        raise HTTPException(status_code=404, detail="Station not found")
     return station

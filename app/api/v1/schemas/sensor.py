@@ -27,6 +27,15 @@ class SensorOut(BaseModel):
     measurements: List[MeasurementOut]
     variablename: str
 
+class SensorItem(BaseModel):
+    id: int
+    alias: str
+    description: Optional[str] = None
+    postprocess: Optional[bool] = True
+    postprocessscript: Optional[str] = None
+    units: Optional[str] = None
+    variablename: str
+    measurements: List[MeasurementOut] | None = None
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):
