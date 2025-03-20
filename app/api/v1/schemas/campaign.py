@@ -3,6 +3,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from app.api.v1.schemas.station import StationsListResponseItem
+
 
 class CampaignsIn(BaseModel):
     name: str
@@ -59,3 +61,4 @@ class GetCampaignResponse(BaseModel):
     allocation: str
     location: Location | None = None
     summary: SummaryGetCampaign
+    stations: list[StationsListResponseItem] = []

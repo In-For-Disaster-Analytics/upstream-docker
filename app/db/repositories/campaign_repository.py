@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 
 from app.api.v1.schemas.campaign import CampaignsIn
@@ -31,7 +31,7 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        return self.db.query(Campaign).get(id)
+        return self.db.query(Campaign).options(joinedload(Campaign.stations)).filter(Campaign.campaignid == id).first()
 
     def get_campaigns_and_summary(
         self,

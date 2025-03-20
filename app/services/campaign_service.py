@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.api.v1.schemas.station import StationsListResponseItem
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
 
@@ -47,6 +48,15 @@ class CampaignService:
         campaign = self.campaign_repository.get_campaign(campaign_id)
         if not campaign:
             return None
+        stations = [StationsListResponseItem(
+            id=station.stationid,
+            name=station.stationname,
+            description=station.description,
+            contact_name=station.contactname,
+            contact_email=station.contactemail,
+            active=station.active,
+            start_date=station.startdate,
+        ) for station in campaign.stations]
         return GetCampaignResponse(
             id=campaign.campaignid,
             name=campaign.campaignname,
@@ -62,6 +72,7 @@ class CampaignService:
                 bbox_south=campaign.bbox_south,
                 bbox_north=campaign.bbox_north,
             ),
+            stations=stations,
             summary=SummaryGetCampaign(
                 station_count=self.campaign_repository.count_stations(campaign_id),
                 sensor_count=self.campaign_repository.count_sensors(campaign_id),
