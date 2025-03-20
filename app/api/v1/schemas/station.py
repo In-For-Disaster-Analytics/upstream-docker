@@ -21,7 +21,7 @@ class StationItem(BaseModel):
     contact_name: str | None = None
     contact_email: str | None = None
     active: bool | None = None
-    start_date: datetime
+    start_date: datetime | None = None
 
 class GetStationResponse(StationItem):
     sensors: List[SensorItem] | None = None
