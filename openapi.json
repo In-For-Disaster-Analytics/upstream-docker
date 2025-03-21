@@ -8,7 +8,9 @@
   "paths": {
     "/api/v1/token": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Login",
         "operationId": "login_api_v1_token_post",
         "requestBody": {
@@ -45,7 +47,9 @@
     },
     "/api/v1/campaigns": {
       "get": {
-        "tags": ["campaigns"],
+        "tags": [
+          "campaigns"
+        ],
         "summary": "List Campaigns",
         "operationId": "list_campaigns_api_v1_campaigns_get",
         "security": [
@@ -153,7 +157,9 @@
     },
     "/api/v1/campaigns/{campaign_id}": {
       "get": {
-        "tags": ["campaigns"],
+        "tags": [
+          "campaigns"
+        ],
         "summary": "Get Campaign",
         "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
         "security": [
@@ -198,7 +204,9 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations": {
       "get": {
-        "tags": ["stations"],
+        "tags": [
+          "stations"
+        ],
         "summary": "List Stations",
         "operationId": "list_stations_api_v1_campaigns__campaign_id__stations_get",
         "security": [
@@ -261,7 +269,9 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}": {
       "get": {
-        "tags": ["stations"],
+        "tags": [
+          "stations"
+        ],
         "summary": "Get Station",
         "operationId": "get_station_api_v1_campaigns__campaign_id__stations__station_id__get",
         "security": [
@@ -315,7 +325,9 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors": {
       "get": {
-        "tags": ["sensors"],
+        "tags": [
+          "sensors"
+        ],
         "summary": "Get Sensors",
         "operationId": "get_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
         "security": [
@@ -387,7 +399,9 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}": {
       "get": {
-        "tags": ["sensors"],
+        "tags": [
+          "sensors"
+        ],
         "summary": "Get Sensor",
         "operationId": "get_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__get",
         "security": [
@@ -448,7 +462,9 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements": {
       "get": {
-        "tags": ["measurements"],
+        "tags": [
+          "measurements"
+        ],
         "summary": "Get Sensor Measurements",
         "operationId": "get_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_get",
         "security": [
@@ -579,7 +595,9 @@
     },
     "/api/v1/uploadfile/campaign/{campaign_id}/station/{station_id}/sensor/": {
       "post": {
-        "tags": ["uploadfile"],
+        "tags": [
+          "uploadfile"
+        ],
         "summary": "Post Sensor And Measurement",
         "operationId": "post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post",
         "security": [
@@ -693,7 +711,10 @@
           }
         },
         "type": "object",
-        "required": ["username", "password"],
+        "required": [
+          "username",
+          "password"
+        ],
         "title": "Body_login_api_v1_token_post"
       },
       "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post": {
@@ -705,7 +726,9 @@
           }
         },
         "type": "object",
-        "required": ["uploaded_file"],
+        "required": [
+          "uploaded_file"
+        ],
         "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
       },
       "CampaignPagination": {
@@ -735,7 +758,13 @@
           }
         },
         "type": "object",
-        "required": ["items", "total", "page", "size", "pages"],
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
         "title": "CampaignPagination"
       },
       "GeometryCollection": {
@@ -840,7 +869,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "geometries"],
+        "required": [
+          "type",
+          "geometries"
+        ],
         "title": "GeometryCollection",
         "description": "GeometryCollection Model"
       },
@@ -938,7 +970,12 @@
           }
         },
         "type": "object",
-        "required": ["id", "name", "allocation", "summary"],
+        "required": [
+          "id",
+          "name",
+          "allocation",
+          "summary"
+        ],
         "title": "GetCampaignResponse"
       },
       "GetStationResponse": {
@@ -1068,7 +1105,10 @@
           }
         },
         "type": "object",
-        "required": ["id", "name"],
+        "required": [
+          "id",
+          "name"
+        ],
         "title": "GetStationResponse"
       },
       "HTTPValidationError": {
@@ -1160,7 +1200,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "LineString",
         "description": "LineString Model"
       },
@@ -1257,7 +1300,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "name", "summary"],
+        "required": [
+          "id",
+          "name",
+          "summary"
+        ],
         "title": "ListCampaignsResponseItem"
       },
       "Location": {
@@ -1378,7 +1425,10 @@
           }
         },
         "type": "object",
-        "required": ["measurementid", "collectiontime"],
+        "required": [
+          "measurementid",
+          "collectiontime"
+        ],
         "title": "MeasurementOut"
       },
       "MultiLineString": {
@@ -1460,7 +1510,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "MultiLineString",
         "description": "MultiLineString Model"
       },
@@ -1539,7 +1592,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "MultiPoint",
         "description": "MultiPoint Model"
       },
@@ -1625,7 +1681,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "MultiPolygon",
         "description": "MultiPolygon Model"
       },
@@ -1701,7 +1760,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "Point",
         "description": "Point Model"
       },
@@ -1784,7 +1846,10 @@
           }
         },
         "type": "object",
-        "required": ["type", "coordinates"],
+        "required": [
+          "type",
+          "coordinates"
+        ],
         "title": "Polygon",
         "description": "Polygon Model"
       },
@@ -1897,7 +1962,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "alias", "variablename"],
+        "required": [
+          "id",
+          "alias",
+          "variablename"
+        ],
         "title": "SensorItem"
       },
       "SensorSummaryForStations": {
@@ -1930,7 +1999,9 @@
           }
         },
         "type": "object",
-        "required": ["id"],
+        "required": [
+          "id"
+        ],
         "title": "SensorSummaryForStations"
       },
       "StationsListResponseItem": {
@@ -2047,7 +2118,11 @@
           }
         },
         "type": "object",
-        "required": ["id", "name", "start_date"],
+        "required": [
+          "id",
+          "name",
+          "start_date"
+        ],
         "title": "StationsListResponseItem"
       },
       "SummaryGetCampaign": {
@@ -2144,7 +2219,11 @@
           }
         },
         "type": "object",
-        "required": ["loc", "msg", "type"],
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
         "title": "ValidationError"
       }
     },
