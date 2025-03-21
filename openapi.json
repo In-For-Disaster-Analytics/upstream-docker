@@ -1,1 +1,881 @@
-{"openapi": "3.1.0", "info": {"title": "Upstream Sensor Storage", "description": "Sensor Storage for Upstream data", "version": "0.0.1"}, "paths": {"/api/v1/token": {"post": {"tags": ["auth"], "summary": "Login", "operationId": "login_api_v1_token_post", "requestBody": {"content": {"application/x-www-form-urlencoded": {"schema": {"$ref": "#/components/schemas/Body_login_api_v1_token_post"}}}, "required": true}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns": {"get": {"tags": ["campaigns"], "summary": "List Campaigns", "operationId": "list_campaigns_api_v1_campaigns_get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "default": 1, "title": "Page"}}, {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 20, "title": "Limit"}}, {"name": "bbox", "in": "query", "required": false, "schema": {"type": "string", "description": "Bounding box of the campaign west,south,east,north", "default": "-180,-90,180,90", "title": "Bbox"}, "description": "Bounding box of the campaign west,south,east,north"}, {"name": "start_date", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "description": "Start date of the campaign", "title": "Start Date"}, "description": "Start date of the campaign", "example": "2024-01-01"}, {"name": "end_date", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "description": "End date of the campaign", "title": "End Date"}, "description": "End date of the campaign", "example": "2025-01-01"}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/CampaignPagination"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}": {"get": {"tags": ["campaigns"], "summary": "Get Campaign", "operationId": "get_campaign_api_v1_campaigns__campaign_id__get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetCampaignResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}/stations": {"get": {"tags": ["stations"], "summary": "List Stations", "operationId": "list_stations_api_v1_campaigns__campaign_id__stations_get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}, {"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "default": 1, "title": "Page"}}, {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 20, "title": "Limit"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}/stations/{station_id}": {"get": {"tags": ["stations"], "summary": "Get Station", "operationId": "get_station_api_v1_campaigns__campaign_id__stations__station_id__get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "station_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Station Id"}}, {"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/GetStationResponse"}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors": {"get": {"tags": ["sensors"], "summary": "Get Sensors", "operationId": "get_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}, {"name": "station_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Station Id"}}, {"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "default": 1, "title": "Page"}}, {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 20, "title": "Limit"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}": {"get": {"tags": ["sensors"], "summary": "Get Sensor", "operationId": "get_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "station_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Station Id"}}, {"name": "sensor_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Sensor Id"}}, {"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements": {"get": {"tags": ["measurements"], "summary": "Get Sensor Measurements", "operationId": "get_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_get", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}, {"name": "station_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Station Id"}}, {"name": "sensor_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Sensor Id"}}, {"name": "start_date", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "Start Date"}}, {"name": "end_date", "in": "query", "required": false, "schema": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "End Date"}}, {"name": "min_measurement_value", "in": "query", "required": false, "schema": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Min Measurement Value"}}, {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer", "default": 1000, "title": "Limit"}}, {"name": "page", "in": "query", "required": false, "schema": {"type": "integer", "default": 1, "title": "Page"}}], "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}, "/api/v1/uploadfile/campaign/{campaign_id}/station/{station_id}/sensor/": {"post": {"tags": ["uploadfile"], "summary": "Post Sensor And Measurement", "operationId": "post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post", "security": [{"OAuth2PasswordBearer": []}], "parameters": [{"name": "campaign_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Campaign Id"}}, {"name": "station_id", "in": "path", "required": true, "schema": {"type": "integer", "title": "Station Id"}}], "requestBody": {"required": true, "content": {"multipart/form-data": {"schema": {"$ref": "#/components/schemas/Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"}}}}, "responses": {"200": {"description": "Successful Response", "content": {"application/json": {"schema": {}}}}, "422": {"description": "Validation Error", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/HTTPValidationError"}}}}}}}}, "components": {"schemas": {"Body_login_api_v1_token_post": {"properties": {"grant_type": {"anyOf": [{"type": "string", "pattern": "^password$"}, {"type": "null"}], "title": "Grant Type"}, "username": {"type": "string", "title": "Username"}, "password": {"type": "string", "title": "Password"}, "scope": {"type": "string", "title": "Scope", "default": ""}, "client_id": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Client Id"}, "client_secret": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Client Secret"}}, "type": "object", "required": ["username", "password"], "title": "Body_login_api_v1_token_post"}, "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post": {"properties": {"uploaded_file": {"type": "string", "format": "binary", "title": "Uploaded File"}}, "type": "object", "required": ["uploaded_file"], "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"}, "CampaignPagination": {"properties": {"items": {"items": {"$ref": "#/components/schemas/ListCampaignsResponseItem"}, "type": "array", "title": "Items"}, "total": {"type": "integer", "title": "Total"}, "page": {"type": "integer", "title": "Page"}, "size": {"type": "integer", "title": "Size"}, "pages": {"type": "integer", "title": "Pages"}}, "type": "object", "required": ["items", "total", "page", "size", "pages"], "title": "CampaignPagination"}, "GetCampaignResponse": {"properties": {"id": {"type": "integer", "title": "Id"}, "name": {"type": "string", "title": "Name"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "contact_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Name"}, "contact_email": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Email"}, "start_date": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "Start Date"}, "end_date": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "End Date"}, "allocation": {"type": "string", "title": "Allocation"}, "location": {"anyOf": [{"$ref": "#/components/schemas/Location"}, {"type": "null"}]}, "summary": {"$ref": "#/components/schemas/SummaryGetCampaign"}, "stations": {"items": {"$ref": "#/components/schemas/StationsListResponseItem"}, "type": "array", "title": "Stations", "default": []}}, "type": "object", "required": ["id", "name", "allocation", "summary"], "title": "GetCampaignResponse"}, "GetStationResponse": {"properties": {"id": {"type": "integer", "title": "Id"}, "name": {"type": "string", "title": "Name"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "contact_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Name"}, "contact_email": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Email"}, "active": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "title": "Active"}, "start_date": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "Start Date"}, "sensors": {"anyOf": [{"items": {"$ref": "#/components/schemas/SensorItem"}, "type": "array"}, {"type": "null"}], "title": "Sensors"}}, "type": "object", "required": ["id", "name"], "title": "GetStationResponse"}, "HTTPValidationError": {"properties": {"detail": {"items": {"$ref": "#/components/schemas/ValidationError"}, "type": "array", "title": "Detail"}}, "type": "object", "title": "HTTPValidationError"}, "ListCampaignsResponseItem": {"properties": {"id": {"type": "integer", "title": "Id"}, "name": {"type": "string", "title": "Name"}, "location": {"anyOf": [{"$ref": "#/components/schemas/Location"}, {"type": "null"}]}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "contact_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Name"}, "contact_email": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Email"}, "start_date": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "Start Date"}, "end_date": {"anyOf": [{"type": "string", "format": "date-time"}, {"type": "null"}], "title": "End Date"}, "allocation": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Allocation"}, "summary": {"$ref": "#/components/schemas/SummaryListCampaigns"}}, "type": "object", "required": ["id", "name", "summary"], "title": "ListCampaignsResponseItem"}, "Location": {"properties": {"bbox_west": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Bbox West"}, "bbox_east": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Bbox East"}, "bbox_south": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Bbox South"}, "bbox_north": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Bbox North"}}, "type": "object", "title": "Location"}, "MeasurementOut": {"properties": {"measurementid": {"type": "integer", "title": "Measurementid"}, "sensorid": {"anyOf": [{"type": "integer"}, {"type": "null"}], "title": "Sensorid"}, "variablename": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Variablename"}, "collectiontime": {"type": "string", "format": "date-time", "title": "Collectiontime"}, "variabletype": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Variabletype"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "measurementvalue": {"anyOf": [{"type": "number"}, {"type": "null"}], "title": "Measurementvalue"}}, "type": "object", "required": ["measurementid", "collectiontime"], "title": "MeasurementOut"}, "SensorItem": {"properties": {"id": {"type": "integer", "title": "Id"}, "alias": {"type": "string", "title": "Alias"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "postprocess": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "title": "Postprocess", "default": true}, "postprocessscript": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Postprocessscript"}, "units": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Units"}, "variablename": {"type": "string", "title": "Variablename"}, "measurements": {"anyOf": [{"items": {"$ref": "#/components/schemas/MeasurementOut"}, "type": "array"}, {"type": "null"}], "title": "Measurements"}}, "type": "object", "required": ["id", "alias", "variablename"], "title": "SensorItem"}, "SensorSummaryForStations": {"properties": {"id": {"type": "integer", "title": "Id"}, "variable_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Variable Name"}, "measurement_unit": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Measurement Unit"}}, "type": "object", "required": ["id"], "title": "SensorSummaryForStations"}, "StationsListResponseItem": {"properties": {"id": {"type": "integer", "title": "Id"}, "name": {"type": "string", "title": "Name"}, "description": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Description"}, "contact_name": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Name"}, "contact_email": {"anyOf": [{"type": "string"}, {"type": "null"}], "title": "Contact Email"}, "active": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "title": "Active"}, "start_date": {"type": "string", "format": "date-time", "title": "Start Date"}, "sensors": {"items": {"$ref": "#/components/schemas/SensorSummaryForStations"}, "type": "array", "title": "Sensors", "default": []}}, "type": "object", "required": ["id", "name", "start_date"], "title": "StationsListResponseItem"}, "SummaryGetCampaign": {"properties": {"station_count": {"type": "integer", "title": "Station Count"}, "sensor_count": {"type": "integer", "title": "Sensor Count"}, "sensor_types": {"items": {"type": "string"}, "type": "array", "title": "Sensor Types"}, "sensor_variables": {"items": {"type": "string"}, "type": "array", "title": "Sensor Variables"}}, "type": "object", "required": ["station_count", "sensor_count", "sensor_types", "sensor_variables"], "title": "SummaryGetCampaign"}, "SummaryListCampaigns": {"properties": {"sensor_types": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "title": "Sensor Types"}, "variable_names": {"anyOf": [{"items": {"type": "string"}, "type": "array"}, {"type": "null"}], "title": "Variable Names"}}, "type": "object", "title": "SummaryListCampaigns"}, "ValidationError": {"properties": {"loc": {"items": {"anyOf": [{"type": "string"}, {"type": "integer"}]}, "type": "array", "title": "Location"}, "msg": {"type": "string", "title": "Message"}, "type": {"type": "string", "title": "Error Type"}}, "type": "object", "required": ["loc", "msg", "type"], "title": "ValidationError"}}, "securitySchemes": {"OAuth2PasswordBearer": {"type": "oauth2", "flows": {"password": {"scopes": {}, "tokenUrl": "/api/v1/token"}}}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Upstream Sensor Storage",
+    "description": "Sensor Storage for Upstream data",
+    "version": "0.0.1"
+  },
+  "paths": {
+    "/api/v1/token": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Login",
+        "operationId": "login_api_v1_token_post",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_api_v1_token_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns": {
+      "get": {
+        "tags": ["campaigns"],
+        "summary": "List Campaigns",
+        "operationId": "list_campaigns_api_v1_campaigns_get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
+          },
+          {
+            "name": "bbox",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Bounding box of the campaign west,south,east,north",
+              "default": "-180,-90,180,90",
+              "title": "Bbox"
+            },
+            "description": "Bounding box of the campaign west,south,east,north"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
+              ],
+              "description": "Start date of the campaign",
+              "title": "Start Date"
+            },
+            "description": "Start date of the campaign",
+            "example": "2024-01-01"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
+              ],
+              "description": "End date of the campaign",
+              "title": "End Date"
+            },
+            "description": "End date of the campaign",
+            "example": "2025-01-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CampaignPagination" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}": {
+      "get": {
+        "tags": ["campaigns"],
+        "summary": "Get Campaign",
+        "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetCampaignResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stations": {
+      "get": {
+        "tags": ["stations"],
+        "summary": "List Stations",
+        "operationId": "list_stations_api_v1_campaigns__campaign_id__stations_get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stations/{station_id}": {
+      "get": {
+        "tags": ["stations"],
+        "summary": "Get Station",
+        "operationId": "get_station_api_v1_campaigns__campaign_id__stations__station_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Station Id" }
+          },
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetStationResponse" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors": {
+      "get": {
+        "tags": ["sensors"],
+        "summary": "Get Sensors",
+        "operationId": "get_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          },
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Station Id" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}": {
+      "get": {
+        "tags": ["sensors"],
+        "summary": "Get Sensor",
+        "operationId": "get_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Station Id" }
+          },
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Sensor Id" }
+          },
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements": {
+      "get": {
+        "tags": ["measurements"],
+        "summary": "Get Sensor Measurements",
+        "operationId": "get_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_get",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          },
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Station Id" }
+          },
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Sensor Id" }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
+              ],
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
+              ],
+              "title": "End Date"
+            }
+          },
+          {
+            "name": "min_measurement_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [{ "type": "number" }, { "type": "null" }],
+              "title": "Min Measurement Value"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1000, "title": "Limit" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/uploadfile/campaign/{campaign_id}/station/{station_id}/sensor/": {
+      "post": {
+        "tags": ["uploadfile"],
+        "summary": "Post Sensor And Measurement",
+        "operationId": "post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post",
+        "security": [{ "OAuth2PasswordBearer": [] }],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Campaign Id" }
+          },
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "title": "Station Id" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": { "application/json": { "schema": {} } }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_login_api_v1_token_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              { "type": "string", "pattern": "^password$" },
+              { "type": "null" }
+            ],
+            "title": "Grant Type"
+          },
+          "username": { "type": "string", "title": "Username" },
+          "password": { "type": "string", "title": "Password" },
+          "scope": { "type": "string", "title": "Scope", "default": "" },
+          "client_id": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": ["username", "password"],
+        "title": "Body_login_api_v1_token_post"
+      },
+      "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post": {
+        "properties": {
+          "uploaded_file": {
+            "type": "string",
+            "format": "binary",
+            "title": "Uploaded File"
+          }
+        },
+        "type": "object",
+        "required": ["uploaded_file"],
+        "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
+      },
+      "CampaignPagination": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ListCampaignsResponseItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": { "type": "integer", "title": "Total" },
+          "page": { "type": "integer", "title": "Page" },
+          "size": { "type": "integer", "title": "Size" },
+          "pages": { "type": "integer", "title": "Pages" }
+        },
+        "type": "object",
+        "required": ["items", "total", "page", "size", "pages"],
+        "title": "CampaignPagination"
+      },
+      "GetCampaignResponse": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Email"
+          },
+          "start_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "End Date"
+          },
+          "allocation": { "type": "string", "title": "Allocation" },
+          "location": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Location" },
+              { "type": "null" }
+            ]
+          },
+          "summary": { "$ref": "#/components/schemas/SummaryGetCampaign" },
+          "stations": {
+            "items": {
+              "$ref": "#/components/schemas/StationsListResponseItem"
+            },
+            "type": "array",
+            "title": "Stations",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "allocation", "summary"],
+        "title": "GetCampaignResponse"
+      },
+      "GetStationResponse": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Email"
+          },
+          "active": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Active"
+          },
+          "start_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Start Date"
+          },
+          "sensors": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/SensorItem" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Sensors"
+          }
+        },
+        "type": "object",
+        "required": ["id", "name"],
+        "title": "GetStationResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": { "$ref": "#/components/schemas/ValidationError" },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ListCampaignsResponseItem": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
+          "location": {
+            "anyOf": [
+              { "$ref": "#/components/schemas/Location" },
+              { "type": "null" }
+            ]
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Email"
+          },
+          "start_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
+            ],
+            "title": "End Date"
+          },
+          "allocation": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Allocation"
+          },
+          "summary": { "$ref": "#/components/schemas/SummaryListCampaigns" }
+        },
+        "type": "object",
+        "required": ["id", "name", "summary"],
+        "title": "ListCampaignsResponseItem"
+      },
+      "Location": {
+        "properties": {
+          "bbox_west": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Bbox West"
+          },
+          "bbox_east": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Bbox East"
+          },
+          "bbox_south": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Bbox South"
+          },
+          "bbox_north": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Bbox North"
+          }
+        },
+        "type": "object",
+        "title": "Location"
+      },
+      "MeasurementOut": {
+        "properties": {
+          "measurementid": { "type": "integer", "title": "Measurementid" },
+          "sensorid": {
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
+            "title": "Sensorid"
+          },
+          "variablename": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Variablename"
+          },
+          "collectiontime": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Collectiontime"
+          },
+          "variabletype": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Variabletype"
+          },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "measurementvalue": {
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
+            "title": "Measurementvalue"
+          }
+        },
+        "type": "object",
+        "required": ["measurementid", "collectiontime"],
+        "title": "MeasurementOut"
+      },
+      "SensorItem": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "alias": { "type": "string", "title": "Alias" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "postprocess": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Postprocess",
+            "default": true
+          },
+          "postprocessscript": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Postprocessscript"
+          },
+          "units": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Units"
+          },
+          "variablename": { "type": "string", "title": "Variablename" },
+          "measurements": {
+            "anyOf": [
+              {
+                "items": { "$ref": "#/components/schemas/MeasurementOut" },
+                "type": "array"
+              },
+              { "type": "null" }
+            ],
+            "title": "Measurements"
+          }
+        },
+        "type": "object",
+        "required": ["id", "alias", "variablename"],
+        "title": "SensorItem"
+      },
+      "SensorSummaryForStations": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "variable_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Variable Name"
+          },
+          "measurement_unit": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Measurement Unit"
+          }
+        },
+        "type": "object",
+        "required": ["id"],
+        "title": "SensorSummaryForStations"
+      },
+      "StationsListResponseItem": {
+        "properties": {
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
+          "description": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
+            "title": "Contact Email"
+          },
+          "active": {
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
+            "title": "Active"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Date"
+          },
+          "sensors": {
+            "items": {
+              "$ref": "#/components/schemas/SensorSummaryForStations"
+            },
+            "type": "array",
+            "title": "Sensors",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": ["id", "name", "start_date"],
+        "title": "StationsListResponseItem"
+      },
+      "SummaryGetCampaign": {
+        "properties": {
+          "station_count": { "type": "integer", "title": "Station Count" },
+          "sensor_count": { "type": "integer", "title": "Sensor Count" },
+          "sensor_types": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Sensor Types"
+          },
+          "sensor_variables": {
+            "items": { "type": "string" },
+            "type": "array",
+            "title": "Sensor Variables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "station_count",
+          "sensor_count",
+          "sensor_types",
+          "sensor_variables"
+        ],
+        "title": "SummaryGetCampaign"
+      },
+      "SummaryListCampaigns": {
+        "properties": {
+          "sensor_types": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Sensor Types"
+          },
+          "variable_names": {
+            "anyOf": [
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
+            ],
+            "title": "Variable Names"
+          }
+        },
+        "type": "object",
+        "title": "SummaryListCampaigns"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": { "password": { "scopes": {}, "tokenUrl": "/api/v1/token" } }
+      }
+    }
+  }
+}
