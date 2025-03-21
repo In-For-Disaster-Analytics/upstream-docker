@@ -6,9 +6,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.user import User
+from app.api.v1.schemas.measurement import MeasurementPagination
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.session import get_db
-
+from app.services.measurement_service import MeasurementService
 
 router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}",
@@ -23,13 +24,14 @@ async def get_sensor_measurements(
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
     min_measurement_value: Optional[float] = None,
+    max_measurement_value: Optional[float] = None,
     current_user: User = Depends(get_current_user),
     limit: int = 1000,
     page: int = 1,
     db: Session = Depends(get_db),
-):
+) -> MeasurementPagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     measurement_repository = MeasurementRepository(db)
-    measurements, total_count = measurement_repository.get_measurements(sensor_id, start_date, end_date, min_measurement_value, page, limit)
-    return measurements
+    measurement_service = MeasurementService(measurement_repository)
+    return measurement_service.list_measurements(sensor_id=sensor_id, start_date=start_date, end_date=end_date, min_value=min_measurement_value, max_value=max_measurement_value, page=page, limit=limit)

@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from app.api.v1.schemas.measurement import MeasurementIn, MeasurementOut
+from app.api.v1.schemas.measurement import MeasurementIn, MeasurementItem
 
 
 # Pydantic model for incoming sensor data
@@ -24,7 +24,7 @@ class SensorOut(BaseModel):
     postprocess: Optional[bool] = True
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
-    measurements: List[MeasurementOut]
+    measurements: List[MeasurementItem]
     variablename: str
 
 class SensorItem(BaseModel):
@@ -35,7 +35,7 @@ class SensorItem(BaseModel):
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
     variablename: str
-    measurements: List[MeasurementOut] | None = None
+    measurements: List[MeasurementItem] | None = None
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):
@@ -46,7 +46,7 @@ class SensorAndMeasurementIn(BaseModel):
 # Pydantic model for outgoing sensor and measurement data
 class SensorAndMeasurementout(BaseModel):
     sensor: SensorOut
-    measurement: List[MeasurementOut]
+    measurement: List[MeasurementItem]
 
 
 class SensorPagination(BaseModel):

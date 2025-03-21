@@ -31,10 +31,7 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        campaign = self.db.query(Campaign).options(joinedload(Campaign.stations).joinedload(Station.sensors)).filter(Campaign.campaignid == id).first()
-        for station in campaign.stations:
-            station.geometry = self.db.scalar(func.ST_AsGeoJSON(station.geometry))
-        return campaign
+        return self.db.query(Campaign).options(joinedload(Campaign.stations).joinedload(Station.sensors)).filter(Campaign.campaignid == id).first()
 
     def get_campaigns_and_summary(
         self,
@@ -44,9 +41,16 @@ class CampaignRepository:
         end_date: datetime | None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[Campaign], int, int, list[str], list[str]]:
+    ) -> tuple[list[tuple[Campaign, int, int, list[str], list[str]]], int]:
         # Base campaign query
-        query = self.db.query(Campaign).options(joinedload(Campaign.stations).joinedload(Station.sensors))
+        query = self.db.query(
+            Campaign,
+            func.count(Station.stationid.distinct()).label('station_count'),
+            func.count(Sensor.sensorid.distinct()).label('sensor_count'),
+            func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
+        ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
+
         # Apply filters
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
@@ -66,20 +70,9 @@ class CampaignRepository:
         total_count = self.db.query(Campaign).count()
 
         # Get paginated results
-        campaings = query.offset((page - 1) * limit).limit(limit).all()
+        results = query.offset((page - 1) * limit).limit(limit).all()
 
-        sensor_types = []
-        sensor_variables = []
-        station_count = 0
-        for campaign in campaings:
-            station_count += len(campaign.stations)
-            for station in campaign.stations:
-                station.geometry = self.db.scalar(func.ST_AsGeoJSON(station.geometry))
-                sensor_types.extend([sensor.alias for sensor in station.sensors])
-                sensor_variables.extend([sensor.variablename for sensor in station.sensors])
-
-
-        return campaings, total_count, station_count, sensor_types, sensor_variables
+        return results, total_count
 
     def delete_campaign(self, campaign_id: int) -> bool:
         db_campaign = self.get_campaign(campaign_id)

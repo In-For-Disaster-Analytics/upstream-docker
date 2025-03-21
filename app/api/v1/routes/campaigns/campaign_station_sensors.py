@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 @router.get("/sensors")
-async def get_sensors(
+async def list_sensors(
     campaign_id: int,
     station_id: int,
     page: int = 1,
