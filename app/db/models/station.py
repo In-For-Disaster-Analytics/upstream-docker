@@ -22,6 +22,7 @@ class Station(Base):
     active: Mapped[Optional[bool]] = mapped_column()
     startdate: Mapped[Optional[datetime]] = mapped_column()
 
+
     # Station type
     station_type: Mapped[str] = mapped_column()  # 'static' or 'mobile'
 

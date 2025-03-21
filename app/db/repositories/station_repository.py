@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from app.api.v1.schemas.station import StationIn
+from app.api.v1.schemas.station import StationCreate
 from app.db.models.sensor import Sensor
 from app.db.models.station import Station
 
@@ -14,15 +14,16 @@ class StationRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_station(self, request: StationIn, campaign_id: int) -> Station:
+    def create_station(self, request: StationCreate, campaign_id: int) -> Station:
         db_station = Station(
-            stationname=request.stationname,
+            stationname=request.name,
             description=request.description,
-            contactname=request.contactname,
-            contactemail=request.contactemail,
+            contactname=request.contact_name,
+            contactemail=request.contact_email,
             active=request.active,
-            startdate=request.startdate,
+            startdate=request.start_date,
             campaignid=campaign_id,
+            station_type=request.station_type.value
         )
         self.db.add(db_station)
         self.db.commit()

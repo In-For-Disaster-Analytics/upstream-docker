@@ -75,6 +75,7 @@ def generate_realistic_measurement(sensor_type: str, timestamp: datetime, base_v
     return base_value + random.uniform(-1, 1)  # Default variation
 
 def upgrade() -> None:
+    return
     """Add seed data for measurements."""
     measurements_table = table('measurements',
         column('measurementid', sa.Integer),

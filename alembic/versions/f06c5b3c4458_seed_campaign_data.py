@@ -20,6 +20,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    return
     """Add seed data for campaigns."""
     campaigns_table = sa.table('campaigns',
         sa.column('campaignid', sa.Integer),

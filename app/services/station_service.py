@@ -1,12 +1,15 @@
 import json
 from app.api.v1.schemas.sensor import SensorItem
-from app.api.v1.schemas.station import GetStationResponse,  StationItemWithSummary
+from app.api.v1.schemas.station import GetStationResponse,  StationItemWithSummary, StationCreate, StationCreateResponse
 from app.db.repositories.station_repository import StationRepository
 
 
 class StationService:
     def __init__(self, station_repository: StationRepository):
         self.station_repository = station_repository
+
+    def create_station(self, station: StationCreate, campaign_id: int) -> StationCreateResponse:
+        return StationCreateResponse(id=self.station_repository.create_station(station, campaign_id).stationid)
 
     def get_stations_with_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[StationItemWithSummary], int]:
         rows, total_count = self.station_repository.list_stations_and_summary(campaign_id, page, limit)

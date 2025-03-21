@@ -15,6 +15,9 @@ class CampaignsIn(BaseModel):
     end_date: datetime | None = None
     allocation: str
 
+class CampaignCreateResponse(BaseModel):
+    id: int
+
 class Location(BaseModel):
     bbox_west: float | None = None
     bbox_east: float | None = None

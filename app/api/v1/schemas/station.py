@@ -1,18 +1,26 @@
 from datetime import datetime
+from enum import Enum
 from typing import Optional, List
 from pydantic import BaseModel
 
 from app.api.v1.schemas.sensor import SensorItem
 from geojson_pydantic.geometries import Geometry
 
-class StationIn(BaseModel):
-    stationname: str
-    description: Optional[str] = None
-    contactname: Optional[str] = None
-    contactemail: Optional[str] = None
-    active: Optional[bool] = True
-    startdate: datetime
+class StationCreateResponse(BaseModel):
+    id: int
 
+class StationType(str, Enum):
+    MOBILE = "mobile"
+    STATIC = "static"
+
+class StationCreate(BaseModel):
+    name: str
+    description: str | None = None
+    contact_name: str | None = None
+    contact_email: str | None = None
+    active: bool | None = True
+    start_date: datetime
+    station_type: StationType  = StationType.STATIC
 
 class StationItem(BaseModel):
     id: int

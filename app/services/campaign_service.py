@@ -2,11 +2,17 @@ from datetime import datetime
 import json
 from app.api.v1.schemas.station import SensorSummaryForStations, StationsListResponseItem
 from app.db.repositories.campaign_repository import CampaignRepository
-from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
+from app.api.v1.schemas.campaign import CampaignsIn, CampaignCreateResponse, GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
 
 class CampaignService:
     def __init__(self, campaign_repository: CampaignRepository):
         self.campaign_repository = campaign_repository
+
+    def create_campaign(self, campaign: CampaignsIn) -> CampaignCreateResponse:
+        campaign = self.campaign_repository.create_campaign(campaign)
+        return CampaignCreateResponse(
+            id=campaign.campaignid,
+        )
 
     def get_campaigns_with_summary(
         self,
@@ -17,7 +23,7 @@ class CampaignService:
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[ListCampaignsResponseItem], int]:
-        rows, total_count, station_count, sensor_types, sensor_variables = self.campaign_repository.get_campaigns_and_summary(
+        rows, total_count = self.campaign_repository.get_campaigns_and_summary(
             allocations, bbox, start_date, end_date, page, limit
         )
         items: list[ListCampaignsResponseItem] = []

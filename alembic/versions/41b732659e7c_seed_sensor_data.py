@@ -18,6 +18,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    return
     """Add seed data for sensors."""
     sensors_table = table('sensors',
         column('sensorid', sa.Integer),
