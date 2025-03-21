@@ -24,11 +24,16 @@ class StationItem(BaseModel):
     start_date: datetime | None = None
     geometry: Geometry | None = None
 
+class StationItemWithSummary(StationItem):
+    sensor_count: int
+    sensor_types: List[str]
+    sensor_variables: List[str]
+
 class GetStationResponse(StationItem):
     sensors: List[SensorItem] | None = None
 
-class ListStationPagination(BaseModel):
-    items: List[StationItem]
+class ListStationsResponsePagination(BaseModel):
+    items: List[StationItemWithSummary]
     total: int
     page: int
     size: int
@@ -43,10 +48,4 @@ class StationsListResponseItem(StationItem):
     start_date: datetime
     sensors: List[SensorSummaryForStations] = []
 
-class StationsPagination(BaseModel):
-    items: List[StationsListResponseItem]
-    total: int
-    page: int
-    size: int
-    pages: int
 

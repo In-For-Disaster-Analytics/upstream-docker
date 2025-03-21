@@ -15,27 +15,21 @@ class SensorIn(BaseModel):
     variablename: str
 
 
-# Pydantic model for outgoing sensor data
-class SensorOut(BaseModel):
-    sensorid: int
-    stationid: int
-    alias: str
-    description: Optional[str] = None
-    postprocess: Optional[bool] = True
-    postprocessscript: Optional[str] = None
-    units: Optional[str] = None
-    measurements: List[MeasurementItem]
-    variablename: str
-
 class SensorItem(BaseModel):
     id: int
-    alias: str
-    description: Optional[str] = None
-    postprocess: Optional[bool] = True
-    postprocessscript: Optional[str] = None
-    units: Optional[str] = None
-    variablename: str
-    measurements: List[MeasurementItem] | None = None
+    alias: str | None = None
+    description: str | None = None
+    postprocess: bool | None = True
+    postprocessscript: str | None = None
+    units: str | None = None
+    variablename: str | None = None
+
+
+class ListSensorsResponse(SensorItem):
+    pass
+
+class GetSensorResponse(SensorItem):
+    pass
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):
@@ -43,14 +37,8 @@ class SensorAndMeasurementIn(BaseModel):
     measurement: List[MeasurementIn]
 
 
-# Pydantic model for outgoing sensor and measurement data
-class SensorAndMeasurementout(BaseModel):
-    sensor: SensorOut
-    measurement: List[MeasurementItem]
-
-
-class SensorPagination(BaseModel):
-    items: List[SensorOut]
+class ListSensorsResponsePagination(BaseModel):
+    items: list[SensorItem]
     total: int
     page: int
     size: int

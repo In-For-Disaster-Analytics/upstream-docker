@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.station import GetStationResponse
+from app.api.v1.schemas.station import GetStationResponse, ListStationsResponsePagination
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.station_repository import StationRepository
@@ -15,12 +14,18 @@ router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["stations"])
 @router.get("/stations")
 async def list_stations(
     campaign_id: int, page: int = 1, limit: int = 20, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)
-):
+) -> ListStationsResponsePagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     station_service = StationService(StationRepository(db))
     stations, total_count = station_service.get_stations_with_summary(campaign_id, page, limit)
-    return jsonable_encoder(stations)
+    return ListStationsResponsePagination(
+        items=stations,
+        total=total_count,
+        page=page,
+        size=limit,
+        pages=total_count // limit + 1
+    )
 
 # Route to retrieve a specific station
 @router.get("/stations/{station_id}")

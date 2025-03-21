@@ -1,6 +1,6 @@
 import json
 from app.api.v1.schemas.sensor import SensorItem
-from app.api.v1.schemas.station import GetStationResponse
+from app.api.v1.schemas.station import GetStationResponse,  StationItemWithSummary
 from app.db.repositories.station_repository import StationRepository
 
 
@@ -8,18 +8,18 @@ class StationService:
     def __init__(self, station_repository: StationRepository):
         self.station_repository = station_repository
 
-    def get_stations_with_summary(self, campaign_id: int, page: int = 1, limit: int = 20) :
+    def get_stations_with_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[StationItemWithSummary], int]:
         rows, total_count = self.station_repository.list_stations_and_summary(campaign_id, page, limit)
-        stations = []
+        stations : list[StationItemWithSummary] = []
         for row in rows:
-            station = {
-                "id": row[0].stationid,
-                "name": row[0].stationname,
-                "description": row[0].description,
-                "sensor_types": row[2] or [],
-                "sensor_variables": row[3] or [],
-                "sensor_count": row[1]
-            }
+            station = StationItemWithSummary(
+                id=row[0].stationid,
+                name=row[0].stationname,
+                description=row[0].description,
+                sensor_types=row[2] or [],
+                sensor_variables=row[3] or [],
+                sensor_count=row[1]
+            )
             stations.append(station)
         return stations, total_count
 

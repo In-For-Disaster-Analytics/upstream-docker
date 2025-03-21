@@ -50,6 +50,7 @@ class StationRepository:
             func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
             func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
         ).select_from(Station).outerjoin(Sensor).filter(Station.campaignid == campaign_id).group_by(Station.stationid)
+
         total_count = query.count()
         return query.offset((page - 1) * limit).limit(limit).all(), total_count
 
