@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from app.api.v1.schemas.station import SensorSummaryForStations, StationsListResponseItem
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
@@ -16,29 +17,29 @@ class CampaignService:
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[ListCampaignsResponseItem], int]:
-        rows, total_count = self.campaign_repository.get_campaigns_and_summary(
+        rows, total_count, station_count, sensor_types, sensor_variables = self.campaign_repository.get_campaigns_and_summary(
             allocations, bbox, start_date, end_date, page, limit
         )
         items: list[ListCampaignsResponseItem] = []
         for row in rows:
             item = ListCampaignsResponseItem(
-                id=row[0].campaignid,
-                name=row[0].campaignname,
-                description=row[0].description,
-                contact_name=row[0].contactname,
-                contact_email=row[0].contactemail,
-                start_date=row[0].startdate,
-                end_date=row[0].enddate,
-                allocation=row[0].allocation,
+                id=row.campaignid,
+                name=row.campaignname,
+                description=row.description,
+                contact_name=row.contactname,
+                contact_email=row.contactemail,
+                start_date=row.startdate,
+                end_date=row.enddate,
+                allocation=row.allocation,
                 location=Location(
-                    bbox_west=row[0].bbox_west,
-                    bbox_east=row[0].bbox_east,
-                    bbox_south=row[0].bbox_south,
-                    bbox_north=row[0].bbox_north,
+                    bbox_west=row.bbox_west,
+                    bbox_east=row.bbox_east,
+                    bbox_south=row.bbox_south,
+                    bbox_north=row.bbox_north,
                 ),
                 summary=SummaryListCampaigns(
-                    sensor_types=row[3] or [],
-                    variable_names=row[4] or []
+                    sensor_types=sensor_types,
+                    variable_names=sensor_variables
                 )
             )
             items.append(item)
@@ -56,6 +57,7 @@ class CampaignService:
             contact_email=station.contactemail,
             active=station.active,
             start_date=station.startdate,
+            geometry=json.loads(station.geometry) if station.geometry else None,
             sensors=[SensorSummaryForStations(
                 id=sensor.sensorid,
                 variable_name=sensor.variablename,

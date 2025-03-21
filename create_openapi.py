@@ -10,4 +10,4 @@ with open('openapi.json', 'w') as f:
         openapi_version=app.openapi_version,
         description=app.description,
         routes=app.routes,
-    ), f)
+    ), f, indent=2)

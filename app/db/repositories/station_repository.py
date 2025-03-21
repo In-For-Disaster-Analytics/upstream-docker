@@ -30,7 +30,16 @@ class StationRepository:
         return db_station
 
     def get_station(self, station_id: int) -> Station | None:
-        return self.db.query(Station).options(joinedload(Station.sensors)).get(station_id)
+        station = self.db.query(Station)\
+            .options(joinedload(Station.sensors))\
+            .add_columns(func.ST_AsGeoJSON(Station.geometry).label('geometry_str'))\
+            .filter(Station.stationid == station_id)\
+            .first()
+
+        if station:
+            station[0].geometry = station[1]  # Replace geometry with string version
+            return station[0]
+        return None
 
     def get_stations_by_campaign_id(self, campaign_id: int, page: int = 1, limit: int = 20) -> list[Station]:
         return self.db.query(Station).filter(Station.campaignid == campaign_id).offset((page - 1) * limit).limit(limit).all()
