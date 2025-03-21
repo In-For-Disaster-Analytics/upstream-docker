@@ -56,6 +56,7 @@ class CampaignService:
             contact_email=station.contactemail,
             active=station.active,
             start_date=station.startdate,
+            geometry=station.geometry,
             sensors=[SensorSummaryForStations(
                 id=sensor.sensorid,
                 variable_name=sensor.variablename,

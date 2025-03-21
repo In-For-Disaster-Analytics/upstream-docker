@@ -3,7 +3,7 @@ from typing import Optional, List
 from pydantic import BaseModel
 
 from app.api.v1.schemas.sensor import SensorItem
-
+from geojson_pydantic.geometries import Geometry
 
 class StationIn(BaseModel):
     stationname: str
@@ -22,6 +22,7 @@ class StationItem(BaseModel):
     contact_email: str | None = None
     active: bool | None = None
     start_date: datetime | None = None
+    geometry: Geometry | None = None
 
 class GetStationResponse(StationItem):
     sensors: List[SensorItem] | None = None

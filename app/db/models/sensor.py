@@ -18,6 +18,7 @@ class Sensor(Base):
     units: Mapped[Optional[str]] = mapped_column()
     variablename: Mapped[Optional[str]] = mapped_column()
 
+
     # relationships
     station: Mapped["Station"] = relationship(back_populates="sensors")
     measurements: Mapped[List["Measurement"]] = relationship(back_populates="sensor", lazy="dynamic")

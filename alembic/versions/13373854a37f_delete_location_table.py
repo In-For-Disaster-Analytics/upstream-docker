@@ -9,6 +9,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+import geoalchemy2
 
 
 # revision identifiers, used by Alembic.
@@ -30,5 +31,5 @@ def downgrade() -> None:
         sa.Column('locationid', sa.Integer, primary_key=True),
         sa.Column('stationid', sa.Integer, nullable=True),
         sa.Column('collectiontime', sa.DateTime, nullable=True),
-        sa.Column('geometry', sa.Geometry('POINT', srid=4326), nullable=True),
+        sa.Column('geometry', geoalchemy2.types.Geometry('POINT', srid=4326), nullable=True),
     )

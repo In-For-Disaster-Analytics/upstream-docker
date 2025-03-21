@@ -8,6 +8,7 @@ Create Date: 2025-03-20 16:14:56.149913
 from typing import Sequence, Union
 
 from alembic import op
+import geoalchemy2
 import sqlalchemy as sa
 
 
@@ -20,25 +21,24 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Add station type
-    op.add_column('stations', sa.Column('station_type', sa.String(), nullable=False))
-
-    # Add static station location fields
-    op.add_column('stations', sa.Column('static_latitude', sa.Float(), nullable=True))
-    op.add_column('stations', sa.Column('static_longitude', sa.Float(), nullable=True))
-
-    # Add mobile station bounding box fields
-    op.add_column('stations', sa.Column('mobile_bbox_west', sa.Float(), nullable=True))
-    op.add_column('stations', sa.Column('mobile_bbox_east', sa.Float(), nullable=True))
-    op.add_column('stations', sa.Column('mobile_bbox_south', sa.Float(), nullable=True))
-    op.add_column('stations', sa.Column('mobile_bbox_north', sa.Float(), nullable=True))
+    op.add_column('stations', sa.Column('station_type', sa.String(), nullable=True))
+    op.execute("UPDATE stations SET station_type = 'static'")
+    op.alter_column('stations', 'station_type',
+                    existing_type=sa.VARCHAR(),
+                    nullable=False)
+    op.add_column('stations', sa.Column(
+        "geometry",
+        geoalchemy2.types.Geometry(
+            geometry_type="POLYGON",
+            srid=4326,
+            from_text="ST_GeomFromEWKT",
+            name="geometry",
+        ),
+        nullable=True,
+    ))
 
 
 def downgrade() -> None:
     # Remove all new columns
-    op.drop_column('stations', 'mobile_bbox_north')
-    op.drop_column('stations', 'mobile_bbox_south')
-    op.drop_column('stations', 'mobile_bbox_east')
-    op.drop_column('stations', 'mobile_bbox_west')
-    op.drop_column('stations', 'static_longitude')
-    op.drop_column('stations', 'static_latitude')
+    op.drop_column('stations', 'geometry')
     op.drop_column('stations', 'station_type')

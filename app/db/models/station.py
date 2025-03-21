@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+import geoalchemy2
 from app.db.base import Base
 
 
@@ -26,14 +26,7 @@ class Station(Base):
     station_type: Mapped[str] = mapped_column()  # 'static' or 'mobile'
 
     # Location for static stations
-    static_latitude: Mapped[Optional[float]] = mapped_column()
-    static_longitude: Mapped[Optional[float]] = mapped_column()
-
-    # Bounding box coordinates for mobile stations
-    mobile_bbox_west: Mapped[Optional[float]] = mapped_column()
-    mobile_bbox_east: Mapped[Optional[float]] = mapped_column()
-    mobile_bbox_south: Mapped[Optional[float]] = mapped_column()
-    mobile_bbox_north: Mapped[Optional[float]] = mapped_column()
+    geometry: Mapped[geoalchemy2.types.Geometry] = mapped_column(geoalchemy2.types.Geometry("GEOMETRY", srid=4326))
 
     # relationships
     campaign: Mapped["Campaign"] = relationship(

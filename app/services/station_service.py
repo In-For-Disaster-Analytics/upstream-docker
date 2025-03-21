@@ -1,3 +1,4 @@
+import json
 from app.api.v1.schemas.sensor import SensorItem
 from app.api.v1.schemas.station import GetStationResponse
 from app.db.repositories.station_repository import StationRepository
@@ -25,6 +26,14 @@ class StationService:
 
     def get_station(self, station_id: int) -> GetStationResponse | None:
         row = self.station_repository.get_station(station_id)
+        geometry = None
+        if row:
+            try:
+                geometry = json.loads(row.geometry)
+            except Exception as e:
+                print(e)
+
+
         if not row:
             return None
         return GetStationResponse(
@@ -35,6 +44,7 @@ class StationService:
             contact_email=row.contactemail,
             active=row.active,
             start_date=row.startdate,
+            geometry=geometry,
             sensors=[SensorItem(
                 id=sensor.sensorid,
                 alias=sensor.alias,
