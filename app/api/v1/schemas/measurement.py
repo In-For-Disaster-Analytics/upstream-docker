@@ -16,18 +16,18 @@ class MeasurementIn(BaseModel):
 
 
 # Pydantic model for outgoing measurement data
-class MeasurementOut(BaseModel):
-    measurementid: int
+class MeasurementItem(BaseModel):
+    id: int
     sensorid: Optional[int] = None
     variablename: Optional[str] = None  # modified
     collectiontime: datetime
     variabletype: Optional[str] = None
     description: Optional[str] = None
-    measurementvalue: Optional[float] = None
+    value: Optional[float] = None
 
 
 class MeasurementPagination(BaseModel):
-    items: List[MeasurementOut]
+    items: list[MeasurementItem]
     total: int
     page: int
     size: int

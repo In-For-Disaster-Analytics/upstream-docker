@@ -33,7 +33,7 @@ class MeasurementRepository:
     def get_measurement(self, measurement_id: int) -> Measurement | None:
         return self.db.query(Measurement).get(measurement_id)
 
-    def get_measurements(
+    def list_measurements(
         self,
         sensor_id: Optional[int] = None,
         start_date: Optional[datetime] = None,
@@ -48,9 +48,13 @@ class MeasurementRepository:
 
         if sensor_id:
             query = query.filter(Measurement.sensorid == sensor_id)
-        if start_date:
+        if start_date is not None:
+            if isinstance(start_date, int):
+                start_date = datetime.fromtimestamp(start_date)
             query = query.filter(Measurement.collectiontime >= start_date)
-        if end_date:
+        if end_date is not None:
+            if isinstance(end_date, int):
+                end_date = datetime.fromtimestamp(end_date)
             query = query.filter(Measurement.collectiontime <= end_date)
         if min_value is not None:
             query = query.filter(Measurement.measurementvalue >= min_value)
@@ -60,9 +64,10 @@ class MeasurementRepository:
             query = query.filter(Measurement.variablename == variable_name)
 
         # Order by collection time for time series data
-        query = query.order_by(Measurement.collectiontime)
+        query = query.order_by(Measurement.collectiontime.desc())
 
         total_count = query.count()
+
         return query.offset((page - 1) * limit).limit(limit).all(), total_count
 
     def delete_measurement(self, measurement_id: int) -> bool:
