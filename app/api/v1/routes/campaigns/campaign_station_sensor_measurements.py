@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.user import User
-from app.api.v1.schemas.measurement import MeasurementPagination
+from app.api.v1.schemas.measurement import ListMeasurementsResponsePagination
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.session import get_db
 from app.services.measurement_service import MeasurementService
@@ -29,7 +29,7 @@ async def get_sensor_measurements(
     limit: int = 1000,
     page: int = 1,
     db: Session = Depends(get_db),
-) -> MeasurementPagination:
+) -> ListMeasurementsResponsePagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     measurement_repository = MeasurementRepository(db)

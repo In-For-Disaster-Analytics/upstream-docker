@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.schemas.campaign import CampaignPagination,  GetCampaignResponse
+from app.api.v1.schemas.campaign import GetCampaignResponse, ListCampaignsResponsePagination
 from app.api.v1.schemas.user import User
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.db.session import get_db
@@ -26,20 +26,19 @@ async def list_campaigns(
     end_date: Annotated[datetime | None, Query(description="End date of the campaign", example="2025-01-01")] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
-) -> CampaignPagination:
+) -> ListCampaignsResponsePagination:
     allocations = get_allocations(current_user)
     campaign_service = CampaignService(CampaignRepository(db))
     results, total_count = campaign_service.get_campaigns_with_summary(
         allocations, bbox, start_date, end_date, page, limit
     )
-    response = CampaignPagination(
+    response = ListCampaignsResponsePagination(
         items=results,
         total=total_count,
         page=page,
         size=limit,
         pages=(total_count + limit - 1) // limit,
     )
-
     return jsonable_encoder(response)
 
 @router.get("/{campaign_id}")

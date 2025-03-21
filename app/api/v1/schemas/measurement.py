@@ -26,7 +26,7 @@ class MeasurementItem(BaseModel):
     value: Optional[float] = None
 
 
-class MeasurementPagination(BaseModel):
+class ListMeasurementsResponsePagination(BaseModel):
     items: list[MeasurementItem]
     total: int
     page: int

@@ -37,7 +37,7 @@ class ListCampaignsResponseItem(BaseModel):
     allocation: str | None = None
     summary: SummaryListCampaigns
 
-class CampaignPagination(BaseModel):
+class ListCampaignsResponsePagination(BaseModel):
     items: list[ListCampaignsResponseItem]
     total: int
     page: int
