@@ -7,7 +7,7 @@ BEGIN
     SET geometry = subquery.bbox
     FROM (
         SELECT
-            ST_Envelope(ST_Collect(geometry)) AS bbox
+            ST_Envelope(ST_Collect(geometry))::geometry AS bbox
         FROM
             measurements
         WHERE
