@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func
+from sqlalchemy import func, select
+from geoalchemy2.functions import ST_AsGeoJSON # Add this import at the top
 
 from app.api.v1.schemas.campaign import CampaignsIn
 from app.db.models.campaign import (  # Adjust the import based on your model's location
@@ -31,7 +32,24 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        return self.db.query(Campaign).options(joinedload(Campaign.stations).joinedload(Station.sensors)).filter(Campaign.campaignid == id).first()
+        campaign = (
+            self.db.query(Campaign)
+            .options(
+                joinedload(Campaign.stations).joinedload(Station.sensors)
+            )
+            .filter(Campaign.campaignid == id)
+            .first()
+        )
+
+        if campaign:
+            for station in campaign.stations:
+                if station.geometry:
+                    # Convert each station's geometry to string
+                    station.geometry = self.db.scalar(
+                        ST_AsGeoJSON(Station.geometry)
+                    )
+
+        return campaign
 
     def get_campaigns_and_summary(
         self,

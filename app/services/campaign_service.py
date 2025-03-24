@@ -27,25 +27,27 @@ class CampaignService:
             allocations, bbox, start_date, end_date, page, limit
         )
         items: list[ListCampaignsResponseItem] = []
+        print(rows)
         for row in rows:
+            print(row)
             item = ListCampaignsResponseItem(
-                id=row.campaignid,
-                name=row.campaignname,
-                description=row.description,
-                contact_name=row.contactname,
-                contact_email=row.contactemail,
-                start_date=row.startdate,
-                end_date=row.enddate,
-                allocation=row.allocation,
+                id=row[0].campaignid,
+                name=row[0].campaignname,
+                description=row[0].description,
+                contact_name=row[0].contactname,
+                contact_email=row[0].contactemail,
+                start_date=row[0].startdate,
+                end_date=row[0].enddate,
+                allocation=row[0].allocation,
                 location=Location(
-                    bbox_west=row.bbox_west,
-                    bbox_east=row.bbox_east,
-                    bbox_south=row.bbox_south,
-                    bbox_north=row.bbox_north,
+                    bbox_west=row[0].bbox_west,
+                    bbox_east=row[0].bbox_east,
+                    bbox_south=row[0].bbox_south,
+                    bbox_north=row[0].bbox_north,
                 ),
                 summary=SummaryListCampaigns(
-                    sensor_types=sensor_types,
-                    variable_names=sensor_variables
+                    sensor_types=row[3],
+                    variable_names=row[4]
                 )
             )
             items.append(item)

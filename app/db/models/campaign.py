@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from geoalchemy2 import Geometry
 from app.db.base import Base
 
 
@@ -21,7 +21,6 @@ class Campaign(Base):
     bbox_east: Mapped[Optional[float]] = mapped_column()
     bbox_south: Mapped[Optional[float]] = mapped_column()
     bbox_north: Mapped[Optional[float]] = mapped_column()
-    
     # relationships
     stations: Mapped[List["Station"]] = relationship(
         back_populates="campaign"
