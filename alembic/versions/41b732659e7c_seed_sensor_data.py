@@ -5,10 +5,13 @@ Revises: ad29f393da25
 Create Date: 2025-03-19 16:30:39.556710
 
 """
+import os
 from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy import table, column
+from dotenv import load_dotenv
+
 
 # revision identifiers, used by Alembic.
 revision: str = '41b732659e7c'
@@ -16,9 +19,13 @@ down_revision: Union[str, None] = 'ad29f393da25'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+def is_dev_environment():
+    return os.getenv('ENVIRONMENT') == 'development' or os.getenv('ENVIRONMENT') == 'dev'
+
 
 def upgrade() -> None:
-    return
+    if not is_dev_environment():
+        return
     """Add seed data for sensors."""
     sensors_table = table('sensors',
         column('sensorid', sa.Integer),

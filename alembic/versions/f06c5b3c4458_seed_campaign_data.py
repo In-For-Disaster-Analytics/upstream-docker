@@ -6,6 +6,7 @@ Create Date: 2025-03-19 16:24:39.556710
 
 """
 import datetime
+import os
 from typing import Sequence, Union
 
 from alembic import op
@@ -18,9 +19,12 @@ down_revision: Union[str, None] = 'a2513e262c96'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+def is_dev_environment():
+    return os.getenv('ENVIRONMENT') == 'development' or os.getenv('ENVIRONMENT') == 'dev'
 
 def upgrade() -> None:
-    return
+    if not is_dev_environment():
+        return
     """Add seed data for campaigns."""
     campaigns_table = sa.table('campaigns',
         sa.column('campaignid', sa.Integer),

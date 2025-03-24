@@ -29,7 +29,7 @@ def upgrade() -> None:
     op.add_column('stations', sa.Column(
         "geometry",
         geoalchemy2.types.Geometry(
-            geometry_type="POLYGON",
+            geometry_type="GEOMETRY",
             srid=4326,
             from_text="ST_GeomFromEWKT",
             name="geometry",

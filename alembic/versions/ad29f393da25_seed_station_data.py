@@ -5,6 +5,7 @@ Revises: f06c5b3c4458
 Create Date: 2025-03-19 16:24:39.556710
 
 """
+import os
 from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
@@ -16,9 +17,11 @@ down_revision: Union[str, None] = 'f06c5b3c4458'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-
+def is_dev_environment():
+    return os.getenv('ENVIRONMENT') == 'development' or os.getenv('ENVIRONMENT') == 'dev'
 def upgrade() -> None:
-    return
+    if not is_dev_environment():
+        return
     """Add seed data for stations."""
     stations_table = sa.table('stations',
         sa.column('stationid', sa.Integer),

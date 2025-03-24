@@ -5,6 +5,7 @@ Revises: 41b732659e7c
 Create Date: 2025-03-19 16:35:39.556710
 
 """
+import os
 from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
@@ -19,6 +20,9 @@ revision: str = '987aaf2c48d2'
 down_revision: Union[str, None] = '41b732659e7c'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+
+def is_dev_environment():
+    return os.getenv('ENVIRONMENT') == 'development' or os.getenv('ENVIRONMENT') == 'dev'
 
 # Station coordinates (longitude, latitude)
 STATION_LOCATIONS = {
@@ -75,7 +79,8 @@ def generate_realistic_measurement(sensor_type: str, timestamp: datetime, base_v
     return base_value + random.uniform(-1, 1)  # Default variation
 
 def upgrade() -> None:
-    return
+    if not is_dev_environment():
+        return
     """Add seed data for measurements."""
     measurements_table = table('measurements',
         column('measurementid', sa.Integer),
