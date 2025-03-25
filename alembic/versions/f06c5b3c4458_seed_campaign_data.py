@@ -43,7 +43,6 @@ def upgrade() -> None:
 
     op.bulk_insert(campaigns_table, [
         {
-            'campaignid': 1,
             'campaignname': 'Test Campaign 2024',
             'description': 'A test campaign for development purposes',
             'contactname': 'John Doe',
@@ -57,7 +56,6 @@ def upgrade() -> None:
             'bbox_north': 31.0
         },
         {
-            'campaignid': 2,
             'campaignname': 'Weather Station Network',
             'description': 'Network of weather stations across Texas',
             'contactname': 'Jane Smith',

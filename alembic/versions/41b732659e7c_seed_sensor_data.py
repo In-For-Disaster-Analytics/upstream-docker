@@ -107,19 +107,15 @@ def upgrade() -> None:
 
     # Add sensors for each weather station (stations 1-5)
     sensor_records = []
-    sensor_id = 1
     for station_id in range(1, 6):  # Weather Network stations
         for sensor in weather_sensors:
             sensor_record = sensor.copy()
-            sensor_record['sensorid'] = sensor_id
             sensor_record['stationid'] = station_id
             sensor_records.append(sensor_record)
-            sensor_id += 1
 
     # Add basic sensors for test station (station 6)
     test_sensors = [
         {
-            'sensorid': sensor_id,
             'stationid': 6,
             'alias': 'TEST-TEMP',
             'description': 'Test temperature sensor',
@@ -129,7 +125,6 @@ def upgrade() -> None:
             'variablename': 'temperature'
         },
         {
-            'sensorid': sensor_id + 1,
             'stationid': 6,
             'alias': 'TEST-HUM',
             'description': 'Test humidity sensor',
