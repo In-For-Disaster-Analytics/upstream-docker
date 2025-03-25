@@ -27,9 +27,9 @@ class CampaignService:
             allocations, bbox, start_date, end_date, page, limit
         )
         items: list[ListCampaignsResponseItem] = []
-        print(rows)
         for row in rows:
-            print(row)
+            sensor_types : list[str | None] = row[3]
+            variable_names : list[str | None] = row[4]
             item = ListCampaignsResponseItem(
                 id=row[0].campaignid,
                 name=row[0].campaignname,
@@ -46,8 +46,8 @@ class CampaignService:
                     bbox_north=row[0].bbox_north,
                 ),
                 summary=SummaryListCampaigns(
-                    sensor_types=row[3],
-                    variable_names=row[4]
+                    sensor_types=list(filter(lambda x: x is not None, sensor_types)),
+                    variable_names=list(filter(lambda x: x is not None, variable_names))
                 )
             )
             items.append(item)
