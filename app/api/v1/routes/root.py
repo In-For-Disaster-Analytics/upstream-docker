@@ -1,11 +1,18 @@
 import jwt
+import os
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-
+from dotenv import load_dotenv
 from app.api.dependencies.auth import authenticate_user
 
 router = APIRouter()
 
+load_dotenv()
+
+JWT_SECRET = os.getenv("JWT_SECRET")
+
+if not JWT_SECRET:
+    raise ValueError("JWT_SECRET is not set")
 
 # Route for user authentication and token generation
 @router.post("/token", tags=["auth"])
@@ -21,4 +28,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 def create_token(username: str):
-    return jwt.encode({"username": username}, "secret", algorithm="HS256")
+    return jwt.encode({"username": username}, JWT_SECRET, algorithm="HS256")
