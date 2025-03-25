@@ -9,7 +9,7 @@ router = APIRouter()
 
 load_dotenv()
 
-JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_SECRET = os.getenv("jwtSecret")
 
 if not JWT_SECRET:
     raise ValueError("JWT_SECRET is not set")
