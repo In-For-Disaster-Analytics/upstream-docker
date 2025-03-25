@@ -31,14 +31,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             "username": "test",
         }
 
-    user_dict = unhash(token)
-
-    if not authenticate_user(user_dict["username"], user_dict["password"]):
+    try:
+        user_dict = unhash(token)
+    except jwt.InvalidTokenError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     return user_dict["username"]
 
 
