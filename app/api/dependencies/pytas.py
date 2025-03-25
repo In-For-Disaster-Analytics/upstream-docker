@@ -8,7 +8,7 @@ from app.pytas.http import TASClient
 
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
-dev_allocations = ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123"]
+dev_allocations = ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123", "string"]
 
 def get_allocations(username):
     if ENVIRONMENT == "dev":

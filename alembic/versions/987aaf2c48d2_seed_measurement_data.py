@@ -138,7 +138,6 @@ def upgrade() -> None:
                 value = generate_realistic_measurement(sensor_type, current_time, base_value)
 
                 measurement_records.append({
-                    'measurementid': measurement_id,
                     'sensorid': sensor_id,
                     'stationid': station_id,
                     'variablename': sensor_type,

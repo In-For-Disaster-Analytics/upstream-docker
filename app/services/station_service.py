@@ -15,12 +15,14 @@ class StationService:
         rows, total_count = self.station_repository.list_stations_and_summary(campaign_id, page, limit)
         stations : list[StationItemWithSummary] = []
         for row in rows:
+            sensor_types : list[str | None] = row[2]
+            sensor_variables : list[str | None] = row[3]
             station = StationItemWithSummary(
                 id=row[0].stationid,
                 name=row[0].stationname,
                 description=row[0].description,
-                sensor_types=row[2] or [],
-                sensor_variables=row[3] or [],
+                sensor_types=list(filter(lambda x: x is not None, sensor_types)),
+                sensor_variables=list(filter(lambda x: x is not None, sensor_variables)),
                 sensor_count=row[1]
             )
             stations.append(station)

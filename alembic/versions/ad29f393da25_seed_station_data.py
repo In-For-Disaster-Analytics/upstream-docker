@@ -38,7 +38,6 @@ def upgrade() -> None:
     # Adding stations for the Weather Station Network campaign (campaign_id: 2)
     op.bulk_insert(stations_table, [
         {
-            'stationid': 1,
             'campaignid': 2,
             'stationname': 'Austin Downtown',
             'projectid': 'ATX-001',
@@ -49,7 +48,6 @@ def upgrade() -> None:
             'startdate': datetime(2024, 3, 1)
         },
         {
-            'stationid': 2,
             'campaignid': 2,
             'stationname': 'Houston Medical Center',
             'projectid': 'HOU-001',
@@ -60,7 +58,6 @@ def upgrade() -> None:
             'startdate': datetime(2024, 3, 1)
         },
         {
-            'stationid': 3,
             'campaignid': 2,
             'stationname': 'Dallas North',
             'projectid': 'DFW-001',
@@ -71,7 +68,6 @@ def upgrade() -> None:
             'startdate': datetime(2024, 3, 1)
         },
         {
-            'stationid': 4,
             'campaignid': 2,
             'stationname': 'San Antonio River Walk',
             'projectid': 'SAT-001',
@@ -82,7 +78,6 @@ def upgrade() -> None:
             'startdate': datetime(2024, 3, 1)
         },
         {
-            'stationid': 5,
             'campaignid': 2,
             'stationname': 'El Paso Desert',
             'projectid': 'ELP-001',
@@ -94,7 +89,6 @@ def upgrade() -> None:
         },
         # Test station for Test Campaign 2024 (campaign_id: 1)
         {
-            'stationid': 6,
             'campaignid': 1,
             'stationname': 'Test Station Alpha',
             'projectid': 'TEST-001',

@@ -69,6 +69,7 @@ class CampaignRepository:
             func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
         ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
 
+        print("query", allocations, bbox, start_date, end_date)
         # Apply filters
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))

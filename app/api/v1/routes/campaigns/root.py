@@ -25,7 +25,7 @@ async def create_campaign(campaign: CampaignsIn, current_user: User = Depends(ge
 async def list_campaigns(
     page: int = 1,
     limit: int = 20,
-    bbox: Annotated[str , Query(description="Bounding box of the campaign west,south,east,north")] = '-180,-90,180,90',
+    bbox: Annotated[str | None, Query(description="Bounding box of the campaign west,south,east,north")] = None,
     start_date: Annotated[datetime | None, Query(description="Start date of the campaign", example="2024-01-01")] = None,
     end_date: Annotated[datetime | None, Query(description="End date of the campaign", example="2025-01-01")] = None,
     current_user: User = Depends(get_current_user),
