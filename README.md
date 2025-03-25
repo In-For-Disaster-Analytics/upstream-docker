@@ -37,7 +37,7 @@ A RESTful API service for managing environmental sensor data and campaigns.
 
 ## On-premise Environment
 
-### Setting up Dev Instance
+### Setting up environments
 
 1. SSH to the VM with your TACC credentials:
 
@@ -51,56 +51,31 @@ A RESTful API service for managing environmental sensor data and campaigns.
    sudo su
    ```
 
-3. Navigate to dev source code directory:
-
-   ```bash
-   cd ~/upstream-docker-original-branch
-   ```
-
-4. Verify you're on the correct branch (Original):
-
-   ```bash
-   git branch
-   ```
-
-5. Pull latest changes:
-
-   ```bash
-   git pull
-   ```
-
-6. Build Docker container (increment version_id):
-
-   ```bash
-   docker build -t app-mpackard-dev:<version_id> .
-   ```
-
-7. Navigate to dev instance directory:
+3. Enter to the prod directory or dev directory depending on what you want to do:
 
    ```bash
    cd ~/upstream-dev
+   cd ~/upstream-prod
    ```
 
-8. Update docker-compose.yml with new version_id:
+4. Change the IMAGE_TAG (commit hash, e.g. sha-a0fe1e7) in the .env file. You can find [here](https://github.com/In-For-Disaster-Analytics/upstream-docker/pkgs/container/upstream-docker) the latest commit hash.
 
    ```bash
-   vim docker-compose.yml
+   vim .env
    ```
 
-9. Restart containers:
+5. Restart the containers:
 
    ```bash
-   ./burndown && ./burnup
+   docker-compose up -d
    ```
-
-10. Verify the updates at https://upstream-dso.tacc.utexas.edu/dev/
 
 ## Deployment
 
 There are two instances running on upstream-dso.tacc.utexas.edu:
 
-- **Production**: https://upstream-dso.tacc.utexas.edu
-- **Development**: https://upstream-dso.tacc.utexas.edu/dev/
+- **Production**: https://upstream-dso.tacc.utexas.edu/docs/
+- **Development**: https://upstream-dso.tacc.utexas.edu/dev/docs/
 
 ## Database Migrations
 
