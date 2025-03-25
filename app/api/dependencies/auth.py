@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.pytas.http import TASClient
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
 ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 
