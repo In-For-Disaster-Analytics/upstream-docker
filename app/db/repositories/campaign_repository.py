@@ -82,9 +82,9 @@ class CampaignRepository:
                 Campaign.bbox_north <= float(bbox_north),
             )
         if start_date:
-            query = query.filter(Campaign.startdate >= start_date)
+            query = query.filter(Campaign.startdate >= start_date or Campaign.startdate == None)
         if end_date:
-            query = query.filter(Campaign.enddate <= end_date)
+            query = query.filter(Campaign.enddate <= end_date or Campaign.enddate == None)
 
         total_count = self.db.query(Campaign).count()
 
