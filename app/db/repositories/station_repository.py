@@ -45,11 +45,12 @@ class StationRepository:
     def get_stations_by_campaign_id(self, campaign_id: int, page: int = 1, limit: int = 20) -> list[Station]:
         return self.db.query(Station).filter(Station.campaignid == campaign_id).offset((page - 1) * limit).limit(limit).all()
 
-    def list_stations_and_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[tuple[Station, int, list[str], list[str]]], int]:
+    def list_stations_and_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[tuple[Station, int, list[str], list[str], str]], int]:
         query = self.db.query(Station,
             func.count(Sensor.sensorid.distinct()).label('sensor_count'),
             func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
-            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables'),
+            func.ST_AsGeoJSON(Station.geometry).label('geometry')
         ).select_from(Station).outerjoin(Sensor).filter(Station.campaignid == campaign_id).group_by(Station.stationid)
 
         total_count = query.count()

@@ -45,6 +45,7 @@ class CampaignService:
                     bbox_south=row[0].bbox_south,
                     bbox_north=row[0].bbox_north,
                 ),
+                geometry=json.loads(row[5]) if row[5] else None,
                 summary=SummaryListCampaigns(
                     sensor_types=list(filter(lambda x: x is not None, sensor_types)),
                     variable_names=list(filter(lambda x: x is not None, variable_names))
@@ -87,6 +88,7 @@ class CampaignService:
                 bbox_south=campaign.bbox_south,
                 bbox_north=campaign.bbox_north,
             ),
+            geometry=json.loads(campaign.geometry) if campaign.geometry else None,
             stations=stations,
             summary=SummaryGetCampaign(
                 station_count=self.campaign_repository.count_stations(campaign_id),

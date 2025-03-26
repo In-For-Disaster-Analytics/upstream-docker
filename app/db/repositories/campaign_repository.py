@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func, select
+from sqlalchemy import func, select, or_
 from geoalchemy2.functions import ST_AsGeoJSON # Add this import at the top
 
 from app.api.v1.schemas.campaign import CampaignsIn
@@ -32,16 +32,19 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        campaign = (
-            self.db.query(Campaign)
+        result = (
+            self.db.query(Campaign, ST_AsGeoJSON(Campaign.geometry).label('geometry'))
             .options(
-                joinedload(Campaign.stations).joinedload(Station.sensors)
+                joinedload(Campaign.stations).joinedload(Station.sensors),
             )
             .filter(Campaign.campaignid == id)
             .first()
         )
-
+        campaign = result[0]
+        geometry = result[1]
         if campaign:
+            campaign.geometry = geometry
+            print("campaign", campaign.geometry)
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
@@ -66,7 +69,8 @@ class CampaignRepository:
             func.count(Station.stationid.distinct()).label('station_count'),
             func.count(Sensor.sensorid.distinct()).label('sensor_count'),
             func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
-            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables')
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables'),
+            ST_AsGeoJSON(Campaign.geometry).label('geometry')
         ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
 
         print("query", allocations, bbox, start_date, end_date)
@@ -74,17 +78,34 @@ class CampaignRepository:
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
         if bbox:
-            bbox_west,bbox_south, bbox_east, bbox_north = bbox.split(",")
+            print("bbox", bbox)
+            bbox_north, bbox_east, bbox_south, bbox_west = bbox.split(",")
             query = query.filter(
-                Campaign.bbox_west >= float(bbox_west),
-                Campaign.bbox_east <= float(bbox_east),
-                Campaign.bbox_south >= float(bbox_south),
-                Campaign.bbox_north <= float(bbox_north),
+                func.ST_Intersects(
+                    Campaign.geometry,
+                    func.ST_MakeEnvelope(
+                        float(bbox_west),
+                        float(bbox_south),
+                        float(bbox_east),
+                        float(bbox_north),
+                        4326  # SRID for WGS84
+                    )
+                )
             )
         if start_date:
-            query = query.filter(Campaign.startdate >= start_date or Campaign.startdate == None)
+            query = query.filter(
+                or_(
+                    Campaign.startdate.is_(None),
+                    Campaign.startdate >= start_date
+                )
+            )
         if end_date:
-            query = query.filter(Campaign.enddate <= end_date or Campaign.enddate == None)
+            query = query.filter(
+                or_(
+                    Campaign.enddate.is_(None),
+                    Campaign.enddate <= end_date
+                )
+            )
 
         total_count = self.db.query(Campaign).count()
 
