@@ -17,10 +17,12 @@ class StationService:
         for row in rows:
             sensor_types : list[str | None] = row[2]
             sensor_variables : list[str | None] = row[3]
+            geometry = json.loads(row[4]) if row[4] else None
             station = StationItemWithSummary(
                 id=row[0].stationid,
                 name=row[0].stationname,
                 description=row[0].description,
+                geometry=geometry,
                 sensor_types=list(filter(lambda x: x is not None, sensor_types)),
                 sensor_variables=list(filter(lambda x: x is not None, sensor_variables)),
                 sensor_count=row[1]

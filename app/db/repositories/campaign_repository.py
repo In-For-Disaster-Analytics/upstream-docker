@@ -32,16 +32,19 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        campaign = (
-            self.db.query(Campaign)
+        result = (
+            self.db.query(Campaign, ST_AsGeoJSON(Campaign.geometry).label('geometry'))
             .options(
-                joinedload(Campaign.stations).joinedload(Station.sensors)
+                joinedload(Campaign.stations).joinedload(Station.sensors),
             )
             .filter(Campaign.campaignid == id)
             .first()
         )
-
+        campaign = result[0]
+        geometry = result[1]
         if campaign:
+            campaign.geometry = geometry
+            print("campaign", campaign.geometry)
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
@@ -75,12 +78,19 @@ class CampaignRepository:
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
         if bbox:
-            bbox_west,bbox_south, bbox_east, bbox_north = bbox.split(",")
+            print("bbox", bbox)
+            bbox_north, bbox_east, bbox_south, bbox_west = bbox.split(",")
             query = query.filter(
-                Campaign.bbox_west >= float(bbox_west),
-                Campaign.bbox_east <= float(bbox_east),
-                Campaign.bbox_south >= float(bbox_south),
-                Campaign.bbox_north <= float(bbox_north),
+                func.ST_Intersects(
+                    Campaign.geometry,
+                    func.ST_MakeEnvelope(
+                        float(bbox_west),
+                        float(bbox_south),
+                        float(bbox_east),
+                        float(bbox_north),
+                        4326  # SRID for WGS84
+                    )
+                )
             )
         if start_date:
             query = query.filter(
@@ -126,3 +136,17 @@ class CampaignRepository:
     def get_sensor_variables(self, campaign_id: int) -> list[str]:
         stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
         return list(set(sensor.variablename for station in stations for sensor in station.sensors))
+
+    def list_stations_and_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[tuple[Station, int, list[str], list[str]]], int]:
+        query = self.db.query(
+            Station,
+            func.count(Sensor.sensorid.distinct()).label('sensor_count'),
+            func.array_agg(func.distinct(Sensor.alias)).label('sensor_types'),
+            func.array_agg(func.distinct(Sensor.variablename)).label('sensor_variables'),
+            ST_AsGeoJSON(Station.geometry).label('geometry')
+        ).select_from(Station).outerjoin(Sensor).filter(
+            Station.campaignid == campaign_id
+        ).group_by(Station.stationid)
+
+        total_count = query.count()
+        return query.offset((page - 1) * limit).limit(limit).all(), total_count
