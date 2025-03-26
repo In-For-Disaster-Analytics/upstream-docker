@@ -60,6 +60,7 @@ class CampaignRepository:
         bbox: str | None,
         start_date: datetime | None,
         end_date: datetime | None,
+        sensor_variables: list[str] | None,
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[tuple[Campaign, int, int, list[str], list[str]]], int]:
@@ -73,7 +74,7 @@ class CampaignRepository:
             ST_AsGeoJSON(Campaign.geometry).label('geometry')
         ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
 
-        print("query", allocations, bbox, start_date, end_date)
+        print("query", allocations, bbox, start_date, end_date, sensor_variables)
         # Apply filters
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
@@ -106,8 +107,10 @@ class CampaignRepository:
                     Campaign.enddate <= end_date
                 )
             )
+        if sensor_variables:
+            query = query.filter(Sensor.variablename.in_(sensor_variables))
 
-        total_count = self.db.query(Campaign).count()
+        total_count = query.count()
 
         # Get paginated results
         results = query.offset((page - 1) * limit).limit(limit).all()
