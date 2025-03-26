@@ -3,6 +3,7 @@ from typing import List
 
 from pydantic import BaseModel
 
+from geojson_pydantic.geometries import Geometry
 from app.api.v1.schemas.station import StationsListResponseItem
 
 
@@ -39,6 +40,7 @@ class ListCampaignsResponseItem(BaseModel):
     end_date: datetime | None = None
     allocation: str | None = None
     summary: SummaryListCampaigns
+    geometry: Geometry | None = None
 
 class ListCampaignsResponsePagination(BaseModel):
     items: list[ListCampaignsResponseItem]
@@ -64,4 +66,5 @@ class GetCampaignResponse(BaseModel):
     allocation: str
     location: Location | None = None
     summary: SummaryGetCampaign
+    geometry: Geometry | None = None
     stations: list[StationsListResponseItem] = []

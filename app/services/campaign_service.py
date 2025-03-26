@@ -45,6 +45,7 @@ class CampaignService:
                     bbox_south=row[0].bbox_south,
                     bbox_north=row[0].bbox_north,
                 ),
+                geometry=json.loads(row[5]) if row[5] else None,
                 summary=SummaryListCampaigns(
                     sensor_types=list(filter(lambda x: x is not None, sensor_types)),
                     variable_names=list(filter(lambda x: x is not None, variable_names))
