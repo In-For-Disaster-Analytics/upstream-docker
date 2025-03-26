@@ -46,6 +46,50 @@
       }
     },
     "/api/v1/campaigns": {
+      "post": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Create Campaign",
+        "operationId": "create_campaign_api_v1_campaigns_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignsIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "campaigns"
@@ -83,9 +127,15 @@
             "in": "query",
             "required": false,
             "schema": {
-              "type": "string",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
               "description": "Bounding box of the campaign west,south,east,north",
-              "default": "-180,-90,180,90",
               "title": "Bbox"
             },
             "description": "Bounding box of the campaign west,south,east,north"
@@ -137,7 +187,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CampaignPagination"
+                  "$ref": "#/components/schemas/ListCampaignsResponsePagination"
                 }
               }
             }
@@ -203,6 +253,61 @@
       }
     },
     "/api/v1/campaigns/{campaign_id}/stations": {
+      "post": {
+        "tags": [
+          "stations"
+        ],
+        "summary": "Create Station",
+        "operationId": "create_station_api_v1_campaigns__campaign_id__stations_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StationCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "get": {
         "tags": [
           "stations"
@@ -250,7 +355,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ListStationsResponsePagination"
+                }
               }
             }
           },
@@ -328,8 +435,8 @@
         "tags": [
           "sensors"
         ],
-        "summary": "Get Sensors",
-        "operationId": "get_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
+        "summary": "List Sensors",
+        "operationId": "list_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
         "security": [
           {
             "OAuth2PasswordBearer": []
@@ -380,7 +487,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ListSensorsResponsePagination"
+                }
               }
             }
           },
@@ -443,7 +552,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/GetSensorResponse"
+                }
               }
             }
           },
@@ -551,6 +662,22 @@
             }
           },
           {
+            "name": "max_measurement_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Measurement Value"
+            }
+          },
+          {
             "name": "limit",
             "in": "query",
             "required": false,
@@ -576,7 +703,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ListMeasurementsResponsePagination"
+                }
               }
             }
           },
@@ -731,41 +860,93 @@
         ],
         "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
       },
-      "CampaignPagination": {
+      "CampaignCreateResponse": {
         "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/ListCampaignsResponseItem"
-            },
-            "type": "array",
-            "title": "Items"
-          },
-          "total": {
+          "id": {
             "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "title": "Pages"
+            "title": "Id"
           }
         },
         "type": "object",
         "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
+          "id"
         ],
-        "title": "CampaignPagination"
+        "title": "CampaignCreateResponse"
+      },
+      "CampaignsIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "allocation": {
+            "type": "string",
+            "title": "Allocation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "allocation"
+        ],
+        "title": "CampaignsIn"
       },
       "GeometryCollection": {
         "properties": {
@@ -977,6 +1158,86 @@
           "summary"
         ],
         "title": "GetCampaignResponse"
+      },
+      "GetSensorResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alias"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "postprocess": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postprocess",
+            "default": true
+          },
+          "postprocessscript": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postprocessscript"
+          },
+          "units": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Units"
+          },
+          "variablename": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variablename"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "GetSensorResponse"
       },
       "GetStationResponse": {
         "properties": {
@@ -1307,6 +1568,150 @@
         ],
         "title": "ListCampaignsResponseItem"
       },
+      "ListCampaignsResponsePagination": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ListCampaignsResponseItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "ListCampaignsResponsePagination"
+      },
+      "ListMeasurementsResponsePagination": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MeasurementItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "ListMeasurementsResponsePagination"
+      },
+      "ListSensorsResponsePagination": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SensorItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "ListSensorsResponsePagination"
+      },
+      "ListStationsResponsePagination": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StationItemWithSummary"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "size",
+          "pages"
+        ],
+        "title": "ListStationsResponsePagination"
+      },
       "Location": {
         "properties": {
           "bbox_west": {
@@ -1357,11 +1762,11 @@
         "type": "object",
         "title": "Location"
       },
-      "MeasurementOut": {
+      "MeasurementItem": {
         "properties": {
-          "measurementid": {
+          "id": {
             "type": "integer",
-            "title": "Measurementid"
+            "title": "Id"
           },
           "sensorid": {
             "anyOf": [
@@ -1412,7 +1817,7 @@
             ],
             "title": "Description"
           },
-          "measurementvalue": {
+          "value": {
             "anyOf": [
               {
                 "type": "number"
@@ -1421,15 +1826,15 @@
                 "type": "null"
               }
             ],
-            "title": "Measurementvalue"
+            "title": "Value"
           }
         },
         "type": "object",
         "required": [
-          "measurementid",
+          "id",
           "collectiontime"
         ],
-        "title": "MeasurementOut"
+        "title": "MeasurementItem"
       },
       "MultiLineString": {
         "properties": {
@@ -1894,7 +2299,14 @@
             "title": "Id"
           },
           "alias": {
-            "type": "string",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Alias"
           },
           "description": {
@@ -1943,29 +2355,20 @@
             "title": "Units"
           },
           "variablename": {
-            "type": "string",
-            "title": "Variablename"
-          },
-          "measurements": {
             "anyOf": [
               {
-                "items": {
-                  "$ref": "#/components/schemas/MeasurementOut"
-                },
-                "type": "array"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Measurements"
+            "title": "Variablename"
           }
         },
         "type": "object",
         "required": [
-          "id",
-          "alias",
-          "variablename"
+          "id"
         ],
         "title": "SensorItem"
       },
@@ -2003,6 +2406,235 @@
           "id"
         ],
         "title": "SensorSummaryForStations"
+      },
+      "StationCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active",
+            "default": true
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Date"
+          },
+          "station_type": {
+            "$ref": "#/components/schemas/StationType",
+            "default": "static"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "start_date"
+        ],
+        "title": "StationCreate"
+      },
+      "StationCreateResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "StationCreateResponse"
+      },
+      "StationItemWithSummary": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "contact_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Name"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Active"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Point"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MultiPoint"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LineString"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MultiLineString"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Polygon"
+                  },
+                  {
+                    "$ref": "#/components/schemas/MultiPolygon"
+                  },
+                  {
+                    "$ref": "#/components/schemas/GeometryCollection"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "type",
+                  "mapping": {
+                    "GeometryCollection": "#/components/schemas/GeometryCollection",
+                    "LineString": "#/components/schemas/LineString",
+                    "MultiLineString": "#/components/schemas/MultiLineString",
+                    "MultiPoint": "#/components/schemas/MultiPoint",
+                    "MultiPolygon": "#/components/schemas/MultiPolygon",
+                    "Point": "#/components/schemas/Point",
+                    "Polygon": "#/components/schemas/Polygon"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry"
+          },
+          "sensor_count": {
+            "type": "integer",
+            "title": "Sensor Count"
+          },
+          "sensor_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensor Types"
+          },
+          "sensor_variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sensor Variables"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "sensor_count",
+          "sensor_types",
+          "sensor_variables"
+        ],
+        "title": "StationItemWithSummary"
+      },
+      "StationType": {
+        "type": "string",
+        "enum": [
+          "mobile",
+          "static"
+        ],
+        "title": "StationType"
       },
       "StationsListResponseItem": {
         "properties": {
@@ -2233,7 +2865,7 @@
         "flows": {
           "password": {
             "scopes": {},
-            "tokenUrl": "/api/v1/token"
+            "tokenUrl": "api/v1/token"
           }
         }
       }

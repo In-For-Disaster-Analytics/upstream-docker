@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List, Optional
 
+import geoalchemy2
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from geoalchemy2 import Geometry
 from app.db.base import Base
 
 
@@ -21,6 +21,7 @@ class Campaign(Base):
     bbox_east: Mapped[Optional[float]] = mapped_column()
     bbox_south: Mapped[Optional[float]] = mapped_column()
     bbox_north: Mapped[Optional[float]] = mapped_column()
+    geometry: Mapped[geoalchemy2.types.Geometry] = mapped_column(geoalchemy2.types.Geometry("GEOMETRY", srid=4326))
     # relationships
     stations: Mapped[List["Station"]] = relationship(
         back_populates="campaign"
