@@ -20,11 +20,12 @@ class CampaignService:
         bbox: str | None = None,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        sensor_variables: list[str] | None = None,
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[ListCampaignsResponseItem], int]:
         rows, total_count = self.campaign_repository.get_campaigns_and_summary(
-            allocations, bbox, start_date, end_date, page, limit
+            allocations, bbox, start_date, end_date, sensor_variables, page, limit
         )
         items: list[ListCampaignsResponseItem] = []
         for row in rows:

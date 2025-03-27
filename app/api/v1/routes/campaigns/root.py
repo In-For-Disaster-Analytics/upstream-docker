@@ -28,13 +28,14 @@ async def list_campaigns(
     bbox: Annotated[str | None, Query(description="Bounding box of the campaign west,south,east,north")] = None,
     start_date: Annotated[datetime | None, Query(description="Start date of the campaign", example="2024-01-01")] = None,
     end_date: Annotated[datetime | None, Query(description="End date of the campaign", example="2025-01-01")] = None,
+    sensor_variables: Annotated[list[str] | None, Query(description="List of sensor variables to filter by")] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> ListCampaignsResponsePagination:
     allocations = get_allocations(current_user)
     campaign_service = CampaignService(CampaignRepository(db))
     results, total_count = campaign_service.get_campaigns_with_summary(
-        allocations, bbox, start_date, end_date, page, limit
+        allocations, bbox, start_date, end_date, sensor_variables, page, limit
     )
     response = ListCampaignsResponsePagination(
         items=results,

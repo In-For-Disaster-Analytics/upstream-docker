@@ -57,3 +57,6 @@ class SensorRepository:
             self.db.commit()
             return True
         return False
+
+    def list_sensor_variables(self) -> list[str]:
+        return [row[0] for row in self.db.query(Sensor.variablename).distinct().all()]
