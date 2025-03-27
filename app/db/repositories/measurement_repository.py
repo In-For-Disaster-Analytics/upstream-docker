@@ -43,8 +43,8 @@ class MeasurementRepository:
         variable_name: Optional[str] = None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[Measurement], int]:
-        query = self.db.query(Measurement)
+    ) -> tuple[list[Measurement, str], int]:
+        query = self.db.query(Measurement, func.ST_AsGeoJSON(Measurement.geometry).label("geometry"))
 
         if sensor_id:
             query = query.filter(Measurement.sensorid == sensor_id)
