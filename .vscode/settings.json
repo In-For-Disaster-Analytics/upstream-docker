@@ -18,5 +18,8 @@
     "**/*.pyzwzwzw": true,
     "**/*__pycache__": true,
     "**/.venv": true
-  }
+  },
+  "python.testing.pytestArgs": ["."],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }
