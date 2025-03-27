@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional, List
 
+from geoalchemy2 import Geometry
+from geojson_pydantic import Point
 from pydantic import BaseModel
 
 
@@ -18,13 +20,13 @@ class MeasurementIn(BaseModel):
 # Pydantic model for outgoing measurement data
 class MeasurementItem(BaseModel):
     id: int
-    sensorid: Optional[int] = None
-    variablename: Optional[str] = None  # modified
+    sensorid: int | None = None
+    variablename: str | None = None  # modified
     collectiontime: datetime
-    variabletype: Optional[str] = None
-    description: Optional[str] = None
-    value: Optional[float] = None
-
+    variabletype: str | None = None
+    description: str | None = None
+    value: float | None = None
+    geometry: Point | None = None
 
 class ListMeasurementsResponsePagination(BaseModel):
     items: list[MeasurementItem]

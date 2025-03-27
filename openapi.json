@@ -1983,6 +1983,16 @@
               }
             ],
             "title": "Value"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",
