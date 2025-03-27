@@ -32,3 +32,6 @@ class ListMeasurementsResponsePagination(BaseModel):
     page: int
     size: int
     pages: int
+    min_value: float
+    max_value: float
+    average_value: float

@@ -1769,6 +1769,18 @@
           "pages": {
             "type": "integer",
             "title": "Pages"
+          },
+          "min_value": {
+            "type": "number",
+            "title": "Min Value"
+          },
+          "max_value": {
+            "type": "number",
+            "title": "Max Value"
+          },
+          "average_value": {
+            "type": "number",
+            "title": "Average Value"
           }
         },
         "type": "object",
@@ -1777,7 +1789,10 @@
           "total",
           "page",
           "size",
-          "pages"
+          "pages",
+          "min_value",
+          "max_value",
+          "average_value"
         ],
         "title": "ListMeasurementsResponsePagination"
       },

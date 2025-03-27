@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
-
+from sqlalchemy import func
 from app.api.v1.schemas.measurement import MeasurementIn
 from app.db.models.measurement import Measurement
 
@@ -68,7 +68,32 @@ class MeasurementRepository:
 
         total_count = query.count()
 
-        return query.offset((page - 1) * limit).limit(limit).all(), total_count
+        results_paginated = query.offset((page - 1) * limit).limit(limit).all()
+
+        # Create a separate query for stats without ordering
+        stats_query = self.db.query(Measurement)
+        if sensor_id:
+            stats_query = stats_query.filter(Measurement.sensorid == sensor_id)
+        if start_date is not None:
+            if isinstance(start_date, int):
+                start_date = datetime.fromtimestamp(start_date)
+            stats_query = stats_query.filter(Measurement.collectiontime >= start_date)
+        if end_date is not None:
+            if isinstance(end_date, int):
+                end_date = datetime.fromtimestamp(end_date)
+            stats_query = stats_query.filter(Measurement.collectiontime <= end_date)
+        if min_value is not None:
+            stats_query = stats_query.filter(Measurement.measurementvalue >= min_value)
+        if max_value is not None:
+            stats_query = stats_query.filter(Measurement.measurementvalue <= max_value)
+        if variable_name:
+            stats_query = stats_query.filter(Measurement.variablename == variable_name)
+
+        stats_min_value = stats_query.with_entities(func.min(Measurement.measurementvalue)).scalar()
+        stats_max_value = stats_query.with_entities(func.max(Measurement.measurementvalue)).scalar()
+        stats_average_value = stats_query.with_entities(func.avg(Measurement.measurementvalue)).scalar()
+
+        return results_paginated, total_count, stats_min_value, stats_max_value, stats_average_value
 
     def delete_measurement(self, measurement_id: int) -> bool:
         db_measurement = self.get_measurement(measurement_id)
