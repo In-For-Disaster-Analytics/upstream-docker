@@ -179,6 +179,27 @@
             },
             "description": "End date of the campaign",
             "example": "2025-01-01"
+          },
+          {
+            "name": "sensor_variables",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "List of sensor variables to filter by",
+              "title": "Sensor Variables"
+            },
+            "description": "List of sensor variables to filter by"
           }
         ],
         "responses": {
@@ -720,6 +741,36 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/sensor_variables": {
+      "get": {
+        "tags": [
+          "sensor_variables"
+        ],
+        "summary": "List Sensor Variables",
+        "operationId": "list_sensor_variables_api_v1_sensor_variables_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "title": "Response List Sensor Variables Api V1 Sensor Variables Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
       }
     },
     "/api/v1/uploadfile/campaign/{campaign_id}/station/{station_id}/sensor/": {
