@@ -54,8 +54,8 @@ def upgrade() -> None:
     END;
     $$ LANGUAGE plpgsql;
     """)
-     op.execute("""
-        SELECT update_station_bounding_box(stationid) FROM stations;
+    op.execute("""
+        SELECT update_station_geometry(stationid) FROM stations;
     """)
     pass
 
