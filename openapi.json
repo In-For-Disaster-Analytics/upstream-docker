@@ -717,6 +717,22 @@
               "default": 1,
               "title": "Page"
             }
+          },
+          {
+            "name": "downsample_threshold",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Downsample Threshold"
+            }
           }
         ],
         "responses": {
