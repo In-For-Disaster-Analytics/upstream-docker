@@ -28,10 +28,11 @@ async def get_sensor_measurements(
     current_user: User = Depends(get_current_user),
     limit: int = 1000,
     page: int = 1,
+    downsample_threshold: int | None = None,
     db: Session = Depends(get_db),
 ) -> ListMeasurementsResponsePagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     measurement_repository = MeasurementRepository(db)
     measurement_service = MeasurementService(measurement_repository)
-    return measurement_service.list_measurements(sensor_id=sensor_id, start_date=start_date, end_date=end_date, min_value=min_measurement_value, max_value=max_measurement_value, page=page, limit=limit)
+    return measurement_service.list_measurements(sensor_id=sensor_id, start_date=start_date, end_date=end_date, min_value=min_measurement_value, max_value=max_measurement_value, page=page, limit=limit, downsample_threshold=downsample_threshold)
