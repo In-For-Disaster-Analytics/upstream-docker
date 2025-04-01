@@ -1945,14 +1945,7 @@
             "title": "Value"
           },
           "geometry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Point"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "$ref": "#/components/schemas/Point"
           },
           "collectiontime": {
             "type": "string",
@@ -2008,6 +2001,7 @@
         "required": [
           "id",
           "value",
+          "geometry",
           "collectiontime"
         ],
         "title": "MeasurementItem"

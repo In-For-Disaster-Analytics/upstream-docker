@@ -27,7 +27,6 @@ class MeasurementItem(BaseModel):
     variablename: str | None = None  # modified
     variabletype: str | None = None
     description: str | None = None
-    geometry: Point | None = None
 
 class ListMeasurementsResponsePagination(BaseModel):
     items: list[MeasurementItem]
