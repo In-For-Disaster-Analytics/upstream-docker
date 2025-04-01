@@ -58,9 +58,9 @@ def lttb(data: List[MeasurementItem], threshold: int) -> List[MeasurementItem]:
         # Create average point
         avg_point = MeasurementItem(
             id=-1,  # Temporary ID
-            collectiontime=datetime.fromtimestamp(avg_x),
             value=avg_y,
-            geometry=None  # Geometry is not needed for LTTB calculation
+            collectiontime=datetime.fromtimestamp(avg_x),
+            geometry=bucket_data[0].geometry
         )
 
         # Find point with maximum triangle area
