@@ -16,7 +16,6 @@ class MeasurementService:
         measurements = [MeasurementItem(
             id=row[0].measurementid,
             value=row[0].measurementvalue,
-            timestamp=row[0].collectiontime,
             collectiontime=row[0].collectiontime,
             description=row[0].description,
             variabletype=row[0].variabletype,

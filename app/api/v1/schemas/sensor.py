@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from app.api.v1.schemas.measurement import MeasurementIn, MeasurementItem
+from app.api.v1.schemas.measurement import MeasurementIn
 
 
 # Pydantic model for incoming sensor data

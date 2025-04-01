@@ -9,23 +9,24 @@ from pydantic import BaseModel
 # Pydantic model for incoming measurement data
 class MeasurementIn(BaseModel):
     sensorid: Optional[int] = None
-    variablename: Optional[str] = None  # modified
     collectiontime: datetime
+    geometry: str
+    measurementvalue: float
+    variablename: Optional[str] = None  # modified
     variabletype: Optional[str] = None
     description: Optional[str] = None
-    measurementvalue: Optional[float] = None
-    geometry: str
 
 
 # Pydantic model for outgoing measurement data
 class MeasurementItem(BaseModel):
     id: int
+    value: float
+    geometry: Point
+    collectiontime: datetime
     sensorid: int | None = None
     variablename: str | None = None  # modified
-    collectiontime: datetime
     variabletype: str | None = None
     description: str | None = None
-    value: float | None = None
     geometry: Point | None = None
 
 class ListMeasurementsResponsePagination(BaseModel):
