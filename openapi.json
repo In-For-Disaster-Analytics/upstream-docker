@@ -1940,6 +1940,25 @@
             "type": "integer",
             "title": "Id"
           },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Point"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "collectiontime": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Collectiontime"
+          },
           "sensorid": {
             "anyOf": [
               {
@@ -1962,11 +1981,6 @@
             ],
             "title": "Variablename"
           },
-          "collectiontime": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Collectiontime"
-          },
           "variabletype": {
             "anyOf": [
               {
@@ -1988,32 +2002,12 @@
               }
             ],
             "title": "Description"
-          },
-          "value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Value"
-          },
-          "geometry": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/Point"
-              },
-              {
-                "type": "null"
-              }
-            ]
           }
         },
         "type": "object",
         "required": [
           "id",
+          "value",
           "collectiontime"
         ],
         "title": "MeasurementItem"
