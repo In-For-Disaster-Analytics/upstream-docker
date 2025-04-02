@@ -1,11 +1,33 @@
 from datetime import datetime
 from typing import Optional, List
 
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
-from sqlalchemy import func
+from sqlalchemy import func, text
 from app.api.v1.schemas.measurement import MeasurementIn
 from app.db.models.measurement import Measurement
+
+
+class AggregatedMeasurement(BaseModel):
+    measurement_time: datetime
+    value: float
+    median_value: float
+    point_count: int
+    lower_bound: float
+    upper_bound: float
+    parametric_lower_bound: float
+    parametric_upper_bound: float
+    std_dev: float
+    min_value: float
+    max_value: float
+    percentile_25: float
+    percentile_75: float
+    ci_method: str
+    confidence_level: float
+
+    class Config:
+        from_attributes = True
 
 
 class MeasurementRepository:
@@ -121,3 +143,45 @@ class MeasurementRepository:
 
         self.db.commit()
         return db_measurements
+
+
+    def get_sensor_aggregated_measurements(
+        self,
+        sensor_id: int,
+        interval: str = "hour",
+        interval_value: int = 1,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        min_value: Optional[float] = None,
+        max_value: Optional[float] = None
+    ) -> List[AggregatedMeasurement]:
+
+        stmt = text("""
+            SELECT * FROM get_sensor_aggregated_measurements(
+                :sensor_id, :interval, :interval_value,
+                :start_date, :end_date, :min_value, :max_value
+            )
+        """)
+
+        # Execute with named parameters
+        result = self.db.execute(
+            stmt,
+            {
+                "sensor_id": sensor_id,
+                "interval": interval,
+                "interval_value": interval_value,
+                "start_date": start_date,
+                "end_date": end_date,
+                "min_value": min_value,
+                "max_value": max_value
+            }
+        )
+
+        # Process results - in SQLAlchemy v2, the rows are mappings by default
+        measurements = [AggregatedMeasurement.model_validate(dict(row)) for row in result]
+
+        return measurements
+
+
+
+
