@@ -35,11 +35,11 @@ def post_sensor_and_measurement(
     upload_file_measurements: Annotated[UploadFile, File(description="File with sensors")],
     current_user: User = Depends(get_current_user),
 ):
+    t1 = time.time()
     time_file_received = datetime.now()
     print(f'The files are uploaded to the system at {time_file_received}')
     uploadevent = UploadFileEvent(time=time_file_received)
 
-    t1 = time.time()
     # Create an instance of UploadFileEvent
     #uploadevent = UploadFileEvent(time=datetime.now())
 
@@ -48,7 +48,6 @@ def post_sensor_and_measurement(
 
     # Initialize empty dictionaries to store Sensor and Measurement objects
     sensors_objs = dict()
-    #meas_objs = dict()
     meas_objs_all = []
 
     response['uploaded_file_sensors stored in memory'] = upload_file_sensors._in_memory
@@ -58,7 +57,7 @@ def post_sensor_and_measurement(
     text_wrapper = TextIOWrapper(upload_file_sensors.file, encoding='utf-8',)
     sensor_data = csv.DictReader(text_wrapper)
 
-    for i, sd in enumerate(sensor_data):
+    for sd in sensor_data:
         
         try:
             sensor = SensorCSV.model_validate(sd)
@@ -68,7 +67,7 @@ def post_sensor_and_measurement(
         
         sensor_dict = sensor.model_dump()
         if sensor_dict['variablename'] is None:
-            sensor_dict['variablename'] = f'Missing BestGuess Formula {i}'
+            sensor_dict['variablename'] = 'No BestGuess Formula'
         
         sensor_dict['upload_file_event'] = uploadevent
         sensors_objs[sensor.alias] = Sensor(**sensor_dict)
@@ -86,7 +85,7 @@ def post_sensor_and_measurement(
     for md in measurement_data:
         
         counter += 1
-        if counter % 1000 == 0:
+        if counter % 100 == 0:
             print(counter)
         
         # Validate collection_time and location with Pydantic
@@ -101,7 +100,7 @@ def post_sensor_and_measurement(
         loc_geometry = f"Point ({location.long_deg} {location.lat_deg})"
         loc_geometry = WKTElement(loc_geometry, srid=4326)
         # iterate over each alias in sensors_objs
-        for al in sensors_objs.keys(): #meas_objs.keys():
+        for al in sensors_objs.keys():
             
             # Validate measurement_value with Pydantic
             try:
@@ -121,7 +120,6 @@ def post_sensor_and_measurement(
                 upload_file_event=uploadevent
             )
 
-            #meas_objs[al].append(measurement)
             meas_objs_all.append(measurement)
     
     upload_file_measurements.file.close()
@@ -133,12 +131,9 @@ def post_sensor_and_measurement(
 
     with SessionLocal() as session:
                 
-        # for al, measurements in meas_objs.items():
-        #     session.add_all(measurements)
+        session.add_all(meas_objs_all)
 
-        session.bulk_save_objects(meas_objs_all)
-        
-        #session.add_all(sensors_objs.values())
+        #session.bulk_save_objects(meas_objs_all)
                 
         session.commit()
     
