@@ -5,29 +5,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
 from sqlalchemy import func, text
-from app.api.v1.schemas.measurement import MeasurementIn
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementIn
 from app.db.models.measurement import Measurement
 
 
-class AggregatedMeasurement(BaseModel):
-    measurement_time: datetime
-    value: float
-    median_value: float
-    point_count: int
-    lower_bound: float
-    upper_bound: float
-    parametric_lower_bound: float
-    parametric_upper_bound: float
-    std_dev: float
-    min_value: float
-    max_value: float
-    percentile_25: float
-    percentile_75: float
-    ci_method: str
-    confidence_level: float
 
-    class Config:
-        from_attributes = True
 
 
 class MeasurementRepository:
@@ -145,15 +127,15 @@ class MeasurementRepository:
         return db_measurements
 
 
-    def get_sensor_aggregated_measurements(
+    def get_measurements_with_confidence_intervals(
         self,
         sensor_id: int,
         interval: str = "hour",
         interval_value: int = 1,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-        min_value: Optional[float] = None,
-        max_value: Optional[float] = None
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        min_value: float | None = None,
+        max_value: float | None = None
     ) -> List[AggregatedMeasurement]:
 
         stmt = text("""
