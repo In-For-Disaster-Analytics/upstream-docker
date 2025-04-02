@@ -24,4 +24,8 @@ class Measurement(Base):
         back_populates="measurements", lazy="joined"
     )
     geometry: Mapped[Geometry] = mapped_column(Geometry("POINT", srid=4326))
+    upload_file_events_id: Mapped[int] = mapped_column(
+        ForeignKey("upload_file_events.id", ondelete="CASCADE")
+    )
+    upload_file_event: Mapped["UploadFileEvent"] = relationship(lazy="joined") #  back_populates="measurements"
 

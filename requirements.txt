@@ -9,3 +9,4 @@ fastapi[standard]<1.0.0,>=0.114.2
 geoalchemy2
 psycopg2-binary
 geojson-pydantic>=1.2.0
+python-dateutil
