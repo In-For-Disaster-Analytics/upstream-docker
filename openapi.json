@@ -759,6 +759,169 @@
         }
       }
     },
+    "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements/confidence-intervals": {
+      "get": {
+        "tags": [
+          "measurements"
+        ],
+        "summary": "Get Measurements With Confidence Intervals",
+        "description": "Get sensor measurements with confidence intervals for visualization.",
+        "operationId": "get_measurements_with_confidence_intervals_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_confidence_intervals_get",
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Station Id"
+            }
+          },
+          {
+            "name": "sensor_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Sensor Id"
+            }
+          },
+          {
+            "name": "interval",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Time interval for aggregation (minute, hour, day)",
+              "default": "hour",
+              "title": "Interval"
+            },
+            "description": "Time interval for aggregation (minute, hour, day)"
+          },
+          {
+            "name": "interval_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "description": "Multiple of interval (e.g., 15 for 15-minute intervals)",
+              "default": 1,
+              "title": "Interval Value"
+            },
+            "description": "Multiple of interval (e.g., 15 for 15-minute intervals)"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start date for filtering measurements",
+              "title": "Start Date"
+            },
+            "description": "Start date for filtering measurements"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End date for filtering measurements",
+              "title": "End Date"
+            },
+            "description": "End date for filtering measurements"
+          },
+          {
+            "name": "min_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Minimum measurement value to include",
+              "title": "Min Value"
+            },
+            "description": "Minimum measurement value to include"
+          },
+          {
+            "name": "max_value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Maximum measurement value to include",
+              "title": "Max Value"
+            },
+            "description": "Maximum measurement value to include"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AggregatedMeasurement"
+                  },
+                  "title": "Response Get Measurements With Confidence Intervals Api V1 Campaigns  Campaign Id  Stations  Station Id  Sensors  Sensor Id  Measurements Confidence Intervals Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/sensor_variables": {
       "get": {
         "tags": [
@@ -856,6 +1019,90 @@
   },
   "components": {
     "schemas": {
+      "AggregatedMeasurement": {
+        "properties": {
+          "measurement_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Measurement Time"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "median_value": {
+            "type": "number",
+            "title": "Median Value"
+          },
+          "point_count": {
+            "type": "integer",
+            "title": "Point Count"
+          },
+          "lower_bound": {
+            "type": "number",
+            "title": "Lower Bound"
+          },
+          "upper_bound": {
+            "type": "number",
+            "title": "Upper Bound"
+          },
+          "parametric_lower_bound": {
+            "type": "number",
+            "title": "Parametric Lower Bound"
+          },
+          "parametric_upper_bound": {
+            "type": "number",
+            "title": "Parametric Upper Bound"
+          },
+          "std_dev": {
+            "type": "number",
+            "title": "Std Dev"
+          },
+          "min_value": {
+            "type": "number",
+            "title": "Min Value"
+          },
+          "max_value": {
+            "type": "number",
+            "title": "Max Value"
+          },
+          "percentile_25": {
+            "type": "number",
+            "title": "Percentile 25"
+          },
+          "percentile_75": {
+            "type": "number",
+            "title": "Percentile 75"
+          },
+          "ci_method": {
+            "type": "string",
+            "title": "Ci Method"
+          },
+          "confidence_level": {
+            "type": "number",
+            "title": "Confidence Level"
+          }
+        },
+        "type": "object",
+        "required": [
+          "measurement_time",
+          "value",
+          "median_value",
+          "point_count",
+          "lower_bound",
+          "upper_bound",
+          "parametric_lower_bound",
+          "parametric_upper_bound",
+          "std_dev",
+          "min_value",
+          "max_value",
+          "percentile_25",
+          "percentile_75",
+          "ci_method",
+          "confidence_level"
+        ],
+        "title": "AggregatedMeasurement"
+      },
       "Body_login_api_v1_token_post": {
         "properties": {
           "grant_type": {

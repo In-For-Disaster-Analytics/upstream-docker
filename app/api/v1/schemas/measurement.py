@@ -37,3 +37,23 @@ class ListMeasurementsResponsePagination(BaseModel):
     min_value: float
     max_value: float
     average_value: float
+
+class AggregatedMeasurement(BaseModel):
+    measurement_time: datetime
+    value: float
+    median_value: float
+    point_count: int
+    lower_bound: float
+    upper_bound: float
+    parametric_lower_bound: float
+    parametric_upper_bound: float
+    std_dev: float
+    min_value: float
+    max_value: float
+    percentile_25: float
+    percentile_75: float
+    ci_method: str
+    confidence_level: float
+
+    class Config:
+        from_attributes = True

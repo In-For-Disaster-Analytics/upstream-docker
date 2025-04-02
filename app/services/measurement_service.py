@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from app.api.v1.schemas.measurement import MeasurementItem, ListMeasurementsResponsePagination
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementItem, ListMeasurementsResponsePagination
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.utils.lttb import lttb
 
@@ -43,3 +43,6 @@ class MeasurementService:
             max_value=stats_max_value,
             average_value=stats_average_value
         )
+
+    def get_measurements_with_confidence_intervals(self, sensor_id: int, interval: str, interval_value: int, start_date: datetime, end_date: datetime, min_value: float, max_value: float) -> list[AggregatedMeasurement]:
+        return self.measurement_repository.get_measurements_with_confidence_intervals(sensor_id=sensor_id, interval=interval, interval_value=interval_value, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value)

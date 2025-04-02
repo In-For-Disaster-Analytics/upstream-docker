@@ -1,11 +1,15 @@
 from datetime import datetime
 from typing import Optional, List
 
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
-from sqlalchemy import func
-from app.api.v1.schemas.measurement import MeasurementIn
+from sqlalchemy import func, text
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementIn
 from app.db.models.measurement import Measurement
+
+
+
 
 
 class MeasurementRepository:
@@ -121,3 +125,45 @@ class MeasurementRepository:
 
         self.db.commit()
         return db_measurements
+
+
+    def get_measurements_with_confidence_intervals(
+        self,
+        sensor_id: int,
+        interval: str = "hour",
+        interval_value: int = 1,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        min_value: float | None = None,
+        max_value: float | None = None
+    ) -> List[AggregatedMeasurement]:
+
+        stmt = text("""
+            SELECT * FROM get_sensor_aggregated_measurements(
+                :sensor_id, :interval, :interval_value,
+                :start_date, :end_date, :min_value, :max_value
+            )
+        """)
+
+        # Execute with named parameters
+        result = self.db.execute(
+            stmt,
+            {
+                "sensor_id": sensor_id,
+                "interval": interval,
+                "interval_value": interval_value,
+                "start_date": start_date,
+                "end_date": end_date,
+                "min_value": min_value,
+                "max_value": max_value
+            }
+        )
+
+        # Process results - in SQLAlchemy v2, the rows are mappings by default
+        measurements = [AggregatedMeasurement.model_validate(row) for row in result]
+
+        return measurements
+
+
+
+
