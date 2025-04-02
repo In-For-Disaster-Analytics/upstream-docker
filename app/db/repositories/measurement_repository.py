@@ -160,7 +160,7 @@ class MeasurementRepository:
         )
 
         # Process results - in SQLAlchemy v2, the rows are mappings by default
-        measurements = [AggregatedMeasurement.model_validate(dict(row)) for row in result]
+        measurements = [AggregatedMeasurement.model_validate(row) for row in result]
 
         return measurements
 
