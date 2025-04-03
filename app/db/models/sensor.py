@@ -17,8 +17,12 @@ class Sensor(Base):
     postprocessscript: Mapped[Optional[str]] = mapped_column()
     units: Mapped[Optional[str]] = mapped_column()
     variablename: Mapped[Optional[str]] = mapped_column()
+    upload_file_events_id: Mapped[int] = mapped_column(
+        ForeignKey("upload_file_events.id", ondelete="CASCADE")
+    )
 
 
     # relationships
     station: Mapped["Station"] = relationship(back_populates="sensors")
     measurements: Mapped[List["Measurement"]] = relationship(back_populates="sensor", lazy="dynamic")
+    upload_file_event: Mapped["UploadFileEvent"] = relationship(lazy="joined") # back_populates="sensors"
