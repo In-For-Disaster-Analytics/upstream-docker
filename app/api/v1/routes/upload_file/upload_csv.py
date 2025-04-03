@@ -2,10 +2,9 @@ import csv
 import time
 from datetime import datetime
 from io import TextIOWrapper
-from typing import Annotated
+from typing import Annotated, Dict, Any
 from pydantic import ValidationError
 
-#from starlette.datastructures import UploadFile as StarletteUploadFile
 from starlette.formparsers import MultiPartParser
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
@@ -14,7 +13,6 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-#from app.api.v1.schemas.sensor import SensorAndMeasurementIn
 from app.api.v1.schemas.user import User
 from app.api.v1.schemas.upload_csv_validators import *
 from app.db.models.measurement import Measurement
@@ -24,17 +22,16 @@ from app.db.session import SessionLocal
 
 router = APIRouter(prefix="/uploadfile_csv", tags=["uploadfile_csv"])
 
-##StarletteUploadFile.spool_max_size = 500 * 1024 * 1024
 MultiPartParser.spool_max_size = 500 * 1024 * 1024
 
-@router.post("/campaign/{campaign_id}/station/{station_id}/sensor/")
+@router.post("/campaign/{campaign_id}/station/{station_id}/sensor")
 def post_sensor_and_measurement(
     campaign_id: int,
     station_id: int,
     upload_file_sensors: Annotated[UploadFile, File(description="File with sensors.")],
     upload_file_measurements: Annotated[UploadFile, File(description="File with measurements.")],
     current_user: User = Depends(get_current_user),
-):
+) -> Dict[str, bool | float | str ]:
     t1 = time.time()
     time_file_received = datetime.now()
     print(f'The files are uploaded to the system at {time_file_received}')
@@ -74,8 +71,6 @@ def post_sensor_and_measurement(
     # Open and process the second file - upload_file_measurements
     text_wrapper = TextIOWrapper(upload_file_measurements.file, encoding='utf-8-sig', errors='replace')
     measurement_data = csv.DictReader(text_wrapper)
-
-    #meas_objs = {key: [] for key in sensors_objs.keys()}
 
     # iterate over each dictionary(i.e., row) in measurement data
     counter = 0
@@ -124,12 +119,8 @@ def post_sensor_and_measurement(
     t2 = time.time() # Timestamp when the data processing is complete.
     print('Data processing step is complete.')
 
-    with SessionLocal() as session:
-                
+    with SessionLocal() as session:    
         session.add_all(meas_objs_all)
-
-        #session.bulk_save_objects(meas_objs_all)
-                
         session.commit()
     
     t3 = time.time()
