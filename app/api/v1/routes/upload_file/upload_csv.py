@@ -31,8 +31,8 @@ MultiPartParser.spool_max_size = 500 * 1024 * 1024
 def post_sensor_and_measurement(
     campaign_id: int,
     station_id: int,
-    upload_file_sensors: Annotated[UploadFile, File(description="File with sensors")],
-    upload_file_measurements: Annotated[UploadFile, File(description="File with sensors")],
+    upload_file_sensors: Annotated[UploadFile, File(description="File with sensors.")],
+    upload_file_measurements: Annotated[UploadFile, File(description="File with measurements.")],
     current_user: User = Depends(get_current_user),
 ):
     t1 = time.time()
@@ -40,18 +40,15 @@ def post_sensor_and_measurement(
     print(f'The files are uploaded to the system at {time_file_received}')
     uploadevent = UploadFileEvent(time=time_file_received)
 
-    # Create an instance of UploadFileEvent
-    #uploadevent = UploadFileEvent(time=datetime.now())
-
     # Initialiaze a response dictionary
     response = {}
 
-    # Initialize empty dictionaries to store Sensor and Measurement objects
+    # Initialize an empty dictionary and list to store Sensor and Measurement objects
     sensors_objs = dict()
     meas_objs_all = []
 
     response['uploaded_file_sensors stored in memory'] = upload_file_sensors._in_memory
-    #response['uploaded_file_measurements stored in memory'] = upload_file_measurements._in_memory
+    response['uploaded_file_measurements stored in memory'] = upload_file_measurements._in_memory
 
     # Open and process the first file - upload_file_sensors
     text_wrapper = TextIOWrapper(upload_file_sensors.file, encoding='utf-8',)
@@ -126,8 +123,6 @@ def post_sensor_and_measurement(
 
     t2 = time.time() # Timestamp when the data processing is complete.
     print('Data processing step is complete.')
-
-    
 
     with SessionLocal() as session:
                 
