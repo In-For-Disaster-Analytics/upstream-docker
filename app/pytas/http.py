@@ -337,8 +337,13 @@ class TASClient:
             headers=headers,
             auth=self.auth,
         )
-        resp = r.json()
-        return resp["result"]
+        if r.status_code == 200:
+            resp = r.json()
+            print(resp)
+            projects = [PyTASProject(**p) for p in resp["result"]]
+            return projects
+        else:
+            raise Exception("Failed to get projects for user", r.text)
 
     """
     Project is a dict with:
@@ -444,7 +449,7 @@ class TASClient:
         else:
             raise Exception("Failed to remove user from project", resp["message"])
 
-    def get_project_members(self, project_id: str) -> List[PyTASUser]:
+    def get_project_members(self, project_id: str) -> list[PyTASUser]:
         headers = {"Content-Type": "application/json"}
         r = requests.get(
             "{0}/v1/projects/{1}/users".format(self.baseURL, project_id),

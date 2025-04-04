@@ -46,3 +46,4 @@ def check_allocation_permission(current_user, campaign_id):
             )
         else:
             return True
+
