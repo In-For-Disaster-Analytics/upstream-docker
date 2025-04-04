@@ -4,6 +4,7 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
+from app.api.v1.schemas.user import User
 from app.pytas.http import TASClient
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
@@ -25,11 +26,11 @@ def authenticate_user(username, password):
 
 
 # Async function to get the current user based on the provided OAuth2 token
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     if ENVIRONMENT == "dev":
-        return {
-            "username": "test",
-        }
+        return User(
+            username="test",
+        )
 
     try:
         user_dict = unhash(token)
@@ -40,7 +41,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return user_dict["username"]
+    return User(
+        username=user_dict["username"],
+    )
 
 
 # Function to decode a JWT token using the specified secret and algorithm
