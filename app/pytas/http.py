@@ -337,8 +337,11 @@ class TASClient:
             headers=headers,
             auth=self.auth,
         )
-        resp = r.json()
-        return resp["result"]
+        if r.status_code == 200:
+            resp = r.json()
+            return resp["result"]
+        else:
+            raise Exception("Failed to get projects for user", resp["message"])
 
     """
     Project is a dict with:
