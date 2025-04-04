@@ -10,7 +10,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT")
 
 dev_allocations = ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123", "string"]
 
-def get_allocations(username):
+def get_allocations(username: str) -> list[str]:
     if ENVIRONMENT == "dev":
         return dev_allocations
     else:

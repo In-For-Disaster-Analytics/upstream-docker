@@ -330,7 +330,7 @@ class TASClient:
         else:
             r.raise_for_status()
 
-    def projects_for_user(self, username: str) -> List[PyTASProject]:
+    def projects_for_user(self, username: str) -> list[PyTASProject]:
         headers = {"Content-Type": "application/json"}
         r = requests.get(
             "{0}/v1/projects/username/{1}".format(self.baseURL, username),
