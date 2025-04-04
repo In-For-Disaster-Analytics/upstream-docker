@@ -444,7 +444,7 @@ class TASClient:
         else:
             raise Exception("Failed to remove user from project", resp["message"])
 
-    def get_project_members(self, project_id: str) -> List[PyTASUser]:
+    def get_project_members(self, project_id: str) -> list[PyTASUser]:
         headers = {"Content-Type": "application/json"}
         r = requests.get(
             "{0}/v1/projects/{1}/users".format(self.baseURL, project_id),
