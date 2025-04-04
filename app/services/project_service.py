@@ -15,10 +15,10 @@ class ProjectService:
             },
         )
 
-    def get_projects_for_user(self, user: User) -> list[PyTASProject]:
+    def get_projects_for_user(self, username: str) -> list[PyTASProject]:
         active_projects = [
           u
-          for u in self.client.projects_for_user(username=user.username)
+          for u in self.client.projects_for_user(username=username)
           if u["allocations"][0]["status"] != "Inactive"
         ]
         return active_projects
