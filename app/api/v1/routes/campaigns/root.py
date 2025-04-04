@@ -32,7 +32,7 @@ async def list_campaigns(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ) -> ListCampaignsResponsePagination:
-    allocations = get_allocations(current_user)
+    allocations = get_allocations(current_user.username)
     campaign_service = CampaignService(CampaignRepository(db))
     results, total_count = campaign_service.get_campaigns_with_summary(
         allocations, bbox, start_date, end_date, sensor_variables, page, limit
