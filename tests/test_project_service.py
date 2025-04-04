@@ -142,7 +142,7 @@ def test_get_projects_for_user(project_service, username):
     # Arrange
     test_user = username
     with patch.object(project_service.client, 'projects_for_user') as mock_projects:
-        mock_projects.return_value = [proj.dict() for proj in MOCK_PROJECT_DATA]
+        mock_projects.return_value = MOCK_PROJECT_DATA
 
         # Act
         result = project_service.get_projects_for_user(test_user)
@@ -152,27 +152,27 @@ def test_get_projects_for_user(project_service, username):
         assert len(result) == 1  # Only active projects should be returned
 
         active_project = result[0]
-        assert active_project["id"] == 123
-        assert active_project["title"] == "Project Alpha"
-        assert active_project["chargeCode"] == "ABC-123"
-        assert active_project["allocations"][0]["status"] == "Active"
+        assert active_project.id == 123
+        assert active_project.title == "Project Alpha"
+        assert active_project.chargeCode == "ABC-123"
+        assert active_project.allocations[0].status == "Active"
 
         # Verify nested objects
-        allocation = active_project["allocations"][0]
-        assert allocation["computeRequested"] == 100000
-        assert allocation["computeAllocated"] == 100000
-        assert allocation["computeUsed"] == 50000.0
+        allocation = active_project.allocations[0]
+        assert allocation.computeRequested == 100000
+        assert allocation.computeAllocated == 100000
+        assert allocation.computeUsed == 50000.0
 
-        pi = active_project["pi"]
-        assert pi["username"] == "jdoe"
-        assert pi["institution"] == "Test University"
-        assert pi["department"] == "Computer Science"
+        pi = active_project.pi
+        assert pi.username == "jdoe"
+        assert pi.institution == "Test University"
+        assert pi.department == "Computer Science"
 
 def test_get_project_members(project_service):
     # Arrange
     project_id = "test_project"
     with patch.object(project_service.client, 'get_project_members') as mock_members:
-        mock_members.return_value = [member.dict() for member in MOCK_PROJECT_MEMBERS]
+        mock_members.return_value = MOCK_PROJECT_MEMBERS
 
         # Act
         result = project_service.get_project_members(project_id)
@@ -183,15 +183,15 @@ def test_get_project_members(project_service):
 
         # Verify first member
         member1 = result[0]
-        assert member1["username"] == "testuser1"
-        assert member1["role"] == "PI"
-        assert member1["firstName"] == "Test"
-        assert member1["lastName"] == "User1"
+        assert member1.username == "testuser1"
+        assert member1.role == "PI"
+        assert member1.firstName == "Test"
+        assert member1.lastName == "User1"
 
         # Verify second member
         member2 = result[1]
-        assert member2["username"] == "testuser2"
-        assert member2["role"] == "Researcher"
+        assert member2.username == "testuser2"
+        assert member2.role == "Researcher"
 
 def test_get_projects_for_user_no_active_projects(project_service):
     # Arrange
@@ -214,7 +214,7 @@ def test_get_projects_for_user_no_active_projects(project_service):
     )
 
     with patch.object(project_service.client, 'projects_for_user') as mock_projects:
-        mock_projects.return_value = [inactive_project.dict()]
+        mock_projects.return_value = [inactive_project]
 
         # Act
         result = project_service.get_projects_for_user(test_user)
