@@ -341,7 +341,7 @@ class TASClient:
             resp = r.json()
             return resp["result"]
         else:
-            raise Exception("Failed to get projects for user", resp["message"])
+            raise Exception("Failed to get projects for user", r.text)
 
     """
     Project is a dict with:
