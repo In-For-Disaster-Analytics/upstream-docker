@@ -23,9 +23,9 @@ def get_allocations(username: str) -> list[str]:
             },
         )
         return [
-            u["chargeCode"]
+            u.chargeCode
             for u in client.projects_for_user(username=username)
-            if u["allocations"][0]["status"] != "Inactive"
+            if u.allocations[0].status != "Inactive"
         ]
 
 
