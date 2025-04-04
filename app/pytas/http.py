@@ -339,7 +339,9 @@ class TASClient:
         )
         if r.status_code == 200:
             resp = r.json()
-            return resp["result"]
+            print(resp)
+            projects = [PyTASProject(**p) for p in resp["result"]]
+            return projects
         else:
             raise Exception("Failed to get projects for user", r.text)
 

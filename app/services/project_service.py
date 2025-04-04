@@ -1,6 +1,5 @@
 import os
 
-from app.api.v1.schemas.user import User
 from app.pytas.http import TASClient
 from app.pytas.models.schemas import PyTASUser, PyTASProject
 
@@ -16,11 +15,10 @@ class ProjectService:
         )
 
     def get_projects_for_user(self, username: str) -> list[PyTASProject]:
-        active_projects = [
-          u
-          for u in self.client.projects_for_user(username=username)
-          if u["allocations"][0]["status"] != "Inactive"
-        ]
+        active_projects = []
+        for p in self.client.projects_for_user(username=username):
+            if p.allocations[0].status != "Inactive":
+                active_projects.append(p)
         return active_projects
 
 
