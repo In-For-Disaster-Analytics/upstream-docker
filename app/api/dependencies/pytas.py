@@ -2,6 +2,7 @@ import os
 
 from fastapi import HTTPException
 
+from app.api.v1.schemas.user import User
 from app.db.models.campaign import Campaign
 from app.db.session import SessionLocal
 from app.pytas.http import TASClient
@@ -28,11 +29,11 @@ def get_allocations(username: str) -> list[str]:
         ]
 
 
-def check_allocation_permission(current_user, campaign_id):
+def check_allocation_permission(current_user: User, campaign_id: int) -> bool:
     if ENVIRONMENT == "dev":
         return True
     else:
-        allocations = get_allocations(current_user)
+        allocations = get_allocations(current_user.username)
         with SessionLocal() as session:
             db_allcation = (
                 session.query(Campaign)
