@@ -1,6 +1,8 @@
 from typing import Optional, List
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
+from sqlalchemy.sql import text
 
 from app.api.v1.schemas.sensor import SensorIn
 from app.db.models.sensor import Sensor
@@ -28,8 +30,38 @@ class SensorRepository:
     def get_sensor(self, sensor_id: int) -> Sensor | None:
         return self.db.query(Sensor).get(sensor_id)
 
-    def get_sensors_by_station_id(self, station_id: int, page: int = 1, limit: int = 20) -> list[Sensor]:
-        return self.db.query(Sensor).filter(Sensor.stationid == station_id).offset((page - 1) * limit).limit(limit).all()
+    def get_sensors_by_station_id(
+        self,
+        station_id: int,
+        page: int = 1,
+        limit: int = 20,
+        variable_name: str | None = None,
+        units: str | None = None,
+        alias: str | None = None,
+        description_contains: str | None = None,
+        postprocess: bool | None = None,
+    ) -> tuple[list[Sensor], int]:
+        query = self.db.query(Sensor).filter(Sensor.stationid == station_id)
+
+        # Apply filters if provided
+        if variable_name:
+            query = query.filter(Sensor.variablename.ilike(f"%{variable_name}%"))
+        if units:
+            query = query.filter(Sensor.units == units)
+        if alias:
+            query = query.filter(Sensor.alias.ilike(f"%{alias}%"))
+        if description_contains:
+            query = query.filter(Sensor.description.ilike(f"%{description_contains}%"))
+        if postprocess is not None:
+            query = query.filter(Sensor.postprocess == postprocess)
+
+        # Get total count before pagination
+        total_count = query.count()
+
+        # Apply pagination
+        sensors = query.offset((page - 1) * limit).limit(limit).all()
+
+        return sensors, total_count
 
     def get_sensors(
         self,
