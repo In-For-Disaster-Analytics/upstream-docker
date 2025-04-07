@@ -501,6 +501,96 @@
               "default": 20,
               "title": "Limit"
             }
+          },
+          {
+            "name": "variable_name",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sensors by variable name (partial match)",
+              "title": "Variable Name"
+            },
+            "description": "Filter sensors by variable name (partial match)"
+          },
+          {
+            "name": "units",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sensors by units (exact match)",
+              "title": "Units"
+            },
+            "description": "Filter sensors by units (exact match)"
+          },
+          {
+            "name": "alias",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sensors by alias (partial match)",
+              "title": "Alias"
+            },
+            "description": "Filter sensors by alias (partial match)"
+          },
+          {
+            "name": "description_contains",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sensors by text in description (partial match)",
+              "title": "Description Contains"
+            },
+            "description": "Filter sensors by text in description (partial match)"
+          },
+          {
+            "name": "postprocess",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter sensors by postprocess flag",
+              "title": "Postprocess"
+            },
+            "description": "Filter sensors by postprocess flag"
           }
         ],
         "responses": {
@@ -1015,6 +1105,162 @@
           }
         }
       }
+    },
+    "/api/v1/uploadfile_csv/campaign/{campaign_id}/station/{station_id}/sensor": {
+      "post": {
+        "tags": [
+          "uploadfile_csv"
+        ],
+        "summary": "Post Sensor And Measurement",
+        "operationId": "post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          },
+          {
+            "name": "station_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Station Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "title": "Response Post Sensor And Measurement Api V1 Uploadfile Csv Campaign  Campaign Id  Station  Station Id  Sensor Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/projects": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get Projects",
+        "operationId": "get_projects_api_v1_projects_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PyTASProject"
+                  },
+                  "type": "array",
+                  "title": "Response Get Projects Api V1 Projects Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/members": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Get Project Members For User",
+        "operationId": "get_project_members_for_user_api_v1_projects__project_id__members_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PyTASUser"
+                  },
+                  "title": "Response Get Project Members For User Api V1 Projects  Project Id  Members Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1173,6 +1419,28 @@
           "uploaded_file"
         ],
         "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
+      },
+      "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post": {
+        "properties": {
+          "upload_file_sensors": {
+            "type": "string",
+            "format": "binary",
+            "title": "Upload File Sensors",
+            "description": "File with sensors."
+          },
+          "upload_file_measurements": {
+            "type": "string",
+            "format": "binary",
+            "title": "Upload File Measurements",
+            "description": "File with measurements."
+          }
+        },
+        "type": "object",
+        "required": [
+          "upload_file_sensors",
+          "upload_file_measurements"
+        ],
+        "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post"
       },
       "CampaignCreateResponse": {
         "properties": {
@@ -2708,6 +2976,365 @@
         "type": "array",
         "maxItems": 3,
         "minItems": 3
+      },
+      "PyTASAllocation": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "justification": {
+            "type": "string",
+            "title": "Justification"
+          },
+          "decisionSummary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Decisionsummary"
+          },
+          "dateRequested": {
+            "type": "string",
+            "title": "Daterequested"
+          },
+          "dateReviewed": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Datereviewed"
+          },
+          "computeRequested": {
+            "type": "integer",
+            "title": "Computerequested"
+          },
+          "computeAllocated": {
+            "type": "integer",
+            "title": "Computeallocated"
+          },
+          "storageRequested": {
+            "type": "integer",
+            "title": "Storagerequested"
+          },
+          "storageAllocated": {
+            "type": "integer",
+            "title": "Storageallocated"
+          },
+          "memoryRequested": {
+            "type": "integer",
+            "title": "Memoryrequested"
+          },
+          "memoryAllocated": {
+            "type": "integer",
+            "title": "Memoryallocated"
+          },
+          "resourceId": {
+            "type": "integer",
+            "title": "Resourceid"
+          },
+          "resource": {
+            "type": "string",
+            "title": "Resource"
+          },
+          "projectId": {
+            "type": "integer",
+            "title": "Projectid"
+          },
+          "project": {
+            "type": "string",
+            "title": "Project"
+          },
+          "requestorId": {
+            "type": "integer",
+            "title": "Requestorid"
+          },
+          "requestor": {
+            "type": "string",
+            "title": "Requestor"
+          },
+          "reviewerId": {
+            "type": "integer",
+            "title": "Reviewerid"
+          },
+          "reviewer": {
+            "title": "Reviewer"
+          },
+          "computeUsed": {
+            "type": "number",
+            "title": "Computeused"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "start",
+          "end",
+          "status",
+          "justification",
+          "decisionSummary",
+          "dateRequested",
+          "dateReviewed",
+          "computeRequested",
+          "computeAllocated",
+          "storageRequested",
+          "storageAllocated",
+          "memoryRequested",
+          "memoryAllocated",
+          "resourceId",
+          "resource",
+          "projectId",
+          "project",
+          "requestorId",
+          "requestor",
+          "reviewerId",
+          "reviewer",
+          "computeUsed"
+        ],
+        "title": "PyTASAllocation"
+      },
+      "PyTASPi": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "firstName": {
+            "type": "string",
+            "title": "Firstname"
+          },
+          "lastName": {
+            "type": "string",
+            "title": "Lastname"
+          },
+          "institution": {
+            "type": "string",
+            "title": "Institution"
+          },
+          "institutionId": {
+            "type": "integer",
+            "title": "Institutionid"
+          },
+          "department": {
+            "type": "string",
+            "title": "Department"
+          },
+          "departmentId": {
+            "type": "integer",
+            "title": "Departmentid"
+          },
+          "citizenship": {
+            "type": "string",
+            "title": "Citizenship"
+          },
+          "citizenshipId": {
+            "type": "integer",
+            "title": "Citizenshipid"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "uid": {
+            "type": "integer",
+            "title": "Uid"
+          },
+          "homeDirectory": {
+            "type": "string",
+            "title": "Homedirectory"
+          },
+          "gid": {
+            "type": "integer",
+            "title": "Gid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "email",
+          "firstName",
+          "lastName",
+          "institution",
+          "institutionId",
+          "department",
+          "departmentId",
+          "citizenship",
+          "citizenshipId",
+          "source",
+          "uid",
+          "homeDirectory",
+          "gid"
+        ],
+        "title": "PyTASPi"
+      },
+      "PyTASProject": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "chargeCode": {
+            "type": "string",
+            "title": "Chargecode"
+          },
+          "gid": {
+            "type": "integer",
+            "title": "Gid"
+          },
+          "source": {
+            "title": "Source"
+          },
+          "fieldId": {
+            "type": "integer",
+            "title": "Fieldid"
+          },
+          "field": {
+            "type": "string",
+            "title": "Field"
+          },
+          "typeId": {
+            "type": "integer",
+            "title": "Typeid"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "piId": {
+            "type": "integer",
+            "title": "Piid"
+          },
+          "pi": {
+            "$ref": "#/components/schemas/PyTASPi"
+          },
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/PyTASAllocation"
+            },
+            "type": "array",
+            "title": "Allocations"
+          },
+          "nickname": {
+            "title": "Nickname"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "chargeCode",
+          "gid",
+          "source",
+          "fieldId",
+          "field",
+          "typeId",
+          "type",
+          "piId",
+          "pi",
+          "allocations",
+          "nickname"
+        ],
+        "title": "PyTASProject"
+      },
+      "PyTASUser": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Role"
+          },
+          "firstName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firstname"
+          },
+          "lastName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lastname"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "username"
+        ],
+        "title": "PyTASUser"
       },
       "SensorItem": {
         "properties": {
