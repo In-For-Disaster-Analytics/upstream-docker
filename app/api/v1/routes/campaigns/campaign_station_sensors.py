@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
@@ -22,13 +22,27 @@ async def list_sensors(
     station_id: int,
     page: int = 1,
     limit: int = 20,
+    variable_name: str | None = Query(None, description="Filter sensors by variable name (partial match)"),
+    units: str | None = Query(None, description="Filter sensors by units (exact match)"),
+    alias: str | None = Query(None, description="Filter sensors by alias (partial match)"),
+    description_contains: str | None = Query(None, description="Filter sensors by text in description (partial match)"),
+    postprocess: Optional[bool] = Query(None, description="Filter sensors by postprocess flag"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> ListSensorsResponsePagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
-    sensors = sensor_repository.get_sensors_by_station_id(station_id, page, limit)
+    sensors, total_count = sensor_repository.get_sensors_by_station_id(
+        station_id,
+        page,
+        limit,
+        variable_name=variable_name,
+        units=units,
+        alias=alias,
+        description_contains=description_contains,
+        postprocess=postprocess
+    )
 
     return ListSensorsResponsePagination(
         items=[SensorItem(
@@ -40,10 +54,10 @@ async def list_sensors(
             postprocessscript=sensor.postprocessscript,
             units=sensor.units,
         ) for sensor in sensors],
-        total=len(sensors),
+        total=total_count,
         page=page,
         size=limit,
-        pages=len(sensors) // limit + 1,
+        pages=(total_count + limit - 1) // limit,
     )
 
 @router.get("/sensors/{sensor_id}")

@@ -1,13 +1,14 @@
-import os
-
 from fastapi import HTTPException
 
 from app.api.v1.schemas.user import User
 from app.db.models.campaign import Campaign
 from app.db.session import SessionLocal
 from app.pytas.http import TASClient
+from app.core.config import Settings, get_settings
 
-ENVIRONMENT = os.getenv("ENVIRONMENT")
+settings = get_settings()
+
+ENVIRONMENT = settings.ENV
 
 dev_allocations = ["WEATHER-456", "WEATHER-457", "WEATHER-458", "TEST-123", "string"]
 
@@ -16,10 +17,10 @@ def get_allocations(username: str) -> list[str]:
         return dev_allocations
     else:
         client = TASClient(
-            baseURL=os.getenv("tasURL"),
+            baseURL=settings.tasURL,
             credentials={
-                "username": os.getenv("tasUser"),
-                "password": os.getenv("tasSecret"),
+                "username": settings.tasUser,
+                "password": settings.tasSecret,
             },
         )
         return [
