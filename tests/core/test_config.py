@@ -1,0 +1,37 @@
+# import pytest
+# from app.core.config import get_settings, Settings
+
+# def test_get_settings():
+#     settings = get_settings()
+#     assert isinstance(settings, Settings)
+#     assert hasattr(settings, 'ENV')
+#     assert hasattr(settings, 'tasURL')
+#     assert hasattr(settings, 'tasUser')
+#     assert hasattr(settings, 'tasSecret')
+#     assert hasattr(settings, 'JWT_SECRET')
+#     assert hasattr(settings, 'ALG')
+
+# def test_settings_singleton():
+#     settings1 = get_settings()
+#     settings2 = get_settings()
+#     assert settings1 is settings2
+
+# @pytest.mark.parametrize("env", ["dev", "prod", "test"])
+# def test_settings_environment(env, monkeypatch):
+#     monkeypatch.setenv("ENVIRONMENT", env)
+#     settings = get_settings()
+#     assert settings.ENV == env
+
+# def test_settings_required_values():
+#     settings = get_settings()
+#     assert settings.tasURL is not None
+#     assert settings.tasUser is not None
+#     assert settings.tasSecret is not None
+#     assert settings.JWT_SECRET is not None
+#     assert settings.ALG is not None
+
+# def test_settings_jwt_config():
+#     settings = get_settings()
+#     assert isinstance(settings.JWT_SECRET, str)
+#     assert len(settings.JWT_SECRET) > 0
+#     assert settings.ALG in ["HS256", "HS384", "HS512"]  # Common JWT algorithms
