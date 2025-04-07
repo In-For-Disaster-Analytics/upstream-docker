@@ -1,16 +1,16 @@
-import os
-
 from app.pytas.http import TASClient
 from app.pytas.models.schemas import PyTASUser, PyTASProject
+from app.core.config import get_settings
 
+settings = get_settings()
 
 class ProjectService:
     def __init__(self):
         self.client = TASClient(
-            baseURL=os.getenv("tasURL"),
+            baseURL=settings.tasURL,
             credentials={
-                "username": os.getenv("tasUser"),
-                "password": os.getenv("tasSecret"),
+                "username": settings.tasUser,
+                "password": settings.tasSecret,
             },
         )
 
