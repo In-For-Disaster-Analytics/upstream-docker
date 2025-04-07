@@ -4,10 +4,11 @@ from fastapi.security import OAuth2PasswordBearer
 
 from app.api.v1.schemas.user import User
 from app.pytas.http import TASClient
+from app.core.config import get_settings, Settings
 
-from app.core.config import get_settings
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
-settings = get_settings()
+settings : Settings = get_settings()
+
 
 
 def authenticate_user(username, password):
@@ -52,3 +53,4 @@ def unhash(token):
 
 def hash(payload):
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.ALG)
+
