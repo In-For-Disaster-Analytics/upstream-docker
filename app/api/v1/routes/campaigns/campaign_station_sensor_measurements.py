@@ -44,10 +44,10 @@ async def get_measurements_with_confidence_intervals(
     sensor_id: int,
     interval: str = Query("hour", description="Time interval for aggregation (minute, hour, day)"),
     interval_value: int = Query(1, description="Multiple of interval (e.g., 15 for 15-minute intervals)"),
-    start_date: Optional[datetime] = Query(None, description="Start date for filtering measurements"),
-    end_date: Optional[datetime] = Query(None, description="End date for filtering measurements"),
-    min_value: Optional[float] = Query(None, description="Minimum measurement value to include"),
-    max_value: Optional[float] = Query(None, description="Maximum measurement value to include"),
+    start_date: datetime | None = Query(None, description="Start date for filtering measurements"),
+    end_date: datetime | None = Query(None, description="End date for filtering measurements"),
+    min_value: float | None = Query(None, description="Minimum measurement value to include"),
+    max_value: float | None = Query(None, description="Maximum measurement value to include"),
     db: Session = Depends(get_db)
 ) -> list[AggregatedMeasurement]:
     """Get sensor measurements with confidence intervals for visualization."""
