@@ -9,11 +9,11 @@ class MeasurementService:
     def __init__(self, measurement_repository: MeasurementRepository):
         self.measurement_repository = measurement_repository
 
-    def list_measurements(self, sensor_id: int, start_date: datetime, end_date: datetime, min_value: float, max_value: float, page: int = 1, limit: int = 20, downsample_threshold: int = None) -> ListMeasurementsResponsePagination:
+    def list_measurements(self, sensor_id: int, start_date: datetime | None, end_date: datetime | None, min_value: float | None, max_value: float | None, page: int = 1, limit: int = 20, downsample_threshold: int | None = None) -> ListMeasurementsResponsePagination:
         rows, total_count, stats_min_value, stats_max_value, stats_average_value = self.measurement_repository.list_measurements(sensor_id=sensor_id, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value, page=page, limit=limit)
 
         # Convert rows to MeasurementItem objects
-        measurements = []
+        measurements : list[MeasurementItem] = []
         for row in rows:
             if row[1] is not None:
                 measurements.append(MeasurementItem(
@@ -39,10 +39,10 @@ class MeasurementService:
             page=page,
             size=limit,
             pages=total_count // limit + 1,
-            min_value=stats_min_value,
-            max_value=stats_max_value,
-            average_value=stats_average_value
+            min_value=stats_min_value if stats_min_value is not None else 0,
+            max_value=stats_max_value if stats_max_value is not None else 0,
+            average_value=stats_average_value if stats_average_value is not None else 0
         )
 
-    def get_measurements_with_confidence_intervals(self, sensor_id: int, interval: str, interval_value: int, start_date: datetime, end_date: datetime, min_value: float, max_value: float) -> list[AggregatedMeasurement]:
+    def get_measurements_with_confidence_intervals(self, sensor_id: int, interval: str, interval_value: int, start_date: datetime | None, end_date: datetime | None, min_value: float | None, max_value: float | None) -> list[AggregatedMeasurement]:
         return self.measurement_repository.get_measurements_with_confidence_intervals(sensor_id=sensor_id, interval=interval, interval_value=interval_value, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value)

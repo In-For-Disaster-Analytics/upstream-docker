@@ -1,4 +1,5 @@
-import csv 
+# type: ignore
+import csv
 import time
 from datetime import datetime
 from io import TextIOWrapper
@@ -52,22 +53,22 @@ def post_sensor_and_measurement(
     sensor_data = csv.DictReader(text_wrapper)
 
     for sd in sensor_data:
-        
+
         try:
             sensor = SensorCSV.model_validate(sd)
         except ValidationError as exc:
             error_messages = [f"Field {err['loc'][0]}: {err['msg']}" for err in exc.errors()]
             raise HTTPException(status_code=400, detail=str(error_messages))
-        
+
         sensor_dict = sensor.model_dump()
         if sensor_dict['variablename'] is None:
             sensor_dict['variablename'] = 'No BestGuess Formula'
-        
+
         sensor_dict['upload_file_event'] = uploadevent
         sensors_objs[sensor.alias] = Sensor(**sensor_dict)
 
     upload_file_sensors.file.close()
-    
+
     # Open and process the second file - upload_file_measurements
     text_wrapper = TextIOWrapper(upload_file_measurements.file, encoding='utf-8-sig', errors='replace')
     measurement_data = csv.DictReader(text_wrapper)
@@ -75,11 +76,11 @@ def post_sensor_and_measurement(
     # iterate over each dictionary(i.e., row) in measurement data
     counter = 0
     for md in measurement_data:
-        
+
         counter += 1
         if counter % 100 == 0:
             print(counter)
-        
+
         # Validate collection_time and location with Pydantic
         try:
             collection_time = CollTimeCSV(collection_time=md['collectiontime']) # md['Time_CDT'])
@@ -87,20 +88,20 @@ def post_sensor_and_measurement(
         except ValidationError as exc:
             error_messages = [f"Field {err['loc'][0]}: {err['msg']}" for err in exc.errors()]
             raise HTTPException(status_code=400, detail=str(error_messages))
-        
+
         # Process location data and create an instance of Locations
         loc_geometry = f"Point ({location.long_deg} {location.lat_deg})"
         loc_geometry = WKTElement(loc_geometry, srid=4326)
         # iterate over each alias in sensors_objs
         for al in sensors_objs.keys():
-            
+
             # Validate measurement_value with Pydantic
             try:
                 measurement_value = MeasurementCSV(measurement_value=md[al])
             except ValidationError as exc:
                 error_messages = [f"Field {err['loc'][0]}: {err['msg']}" for err in exc.errors()]
                 raise HTTPException(status_code=400, detail=str(error_messages))
-        
+
 
             # Create an instance of Measurement
             measurement = Measurement(
@@ -113,16 +114,16 @@ def post_sensor_and_measurement(
             )
 
             meas_objs_all.append(measurement)
-    
+
     upload_file_measurements.file.close()
 
     t2 = time.time() # Timestamp when the data processing is complete.
     print('Data processing step is complete.')
 
-    with SessionLocal() as session:    
+    with SessionLocal() as session:
         session.add_all(meas_objs_all)
         session.commit()
-    
+
     t3 = time.time()
 
     response['Data Processing time'] = f"{round(t2-t1, 1)} seconds."

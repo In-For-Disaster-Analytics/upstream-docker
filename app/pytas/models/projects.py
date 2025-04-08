@@ -3,7 +3,7 @@
 #
 #
 ###
-from pytas.http import TASClient
+from app.pytas.http import TASClient
 
 from .base import TASModel
 from .users import User

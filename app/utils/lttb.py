@@ -64,7 +64,7 @@ def lttb(data: List[MeasurementItem], threshold: int) -> List[MeasurementItem]:
         )
 
         # Find point with maximum triangle area
-        max_area = -1
+        max_area : float = -1.0
         max_area_point = bucket_data[0]
 
         for point in bucket_data:
@@ -73,7 +73,6 @@ def lttb(data: List[MeasurementItem], threshold: int) -> List[MeasurementItem]:
                 point,
                 avg_point
             )
-
             if area > max_area:
                 max_area = area
                 max_area_point = point

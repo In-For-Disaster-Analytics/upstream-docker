@@ -1,6 +1,7 @@
+# type: ignore
 from datetime import datetime
 from pydantic import (
-    BaseModel,  
+    BaseModel,
     Field,
     ValidationError,
     field_validator,
