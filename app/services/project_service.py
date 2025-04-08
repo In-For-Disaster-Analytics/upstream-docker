@@ -1,4 +1,4 @@
-from app.pytas.http import TASClient
+from app.pytas.http import TASClient # type: ignore[attr-defined]
 from app.pytas.models.schemas import PyTASUser, PyTASProject
 from app.core.config import get_settings
 

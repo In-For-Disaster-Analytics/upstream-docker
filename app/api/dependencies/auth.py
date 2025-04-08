@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from app.api.v1.schemas.user import User
-from app.pytas.http import TASClient
+from app.pytas.http import TASClient # type: ignore[attr-defined]
 from app.core.config import get_settings, Settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/token")
@@ -11,18 +11,18 @@ settings : Settings = get_settings()
 
 
 
-def authenticate_user(username, password):
+def authenticate_user(username: str, password: str) -> dict[str, str | bool]:
     if settings.ENV == "dev":
-        return {"status": "success", "message": None, "result": True}
+        return {"status": "success", "message": "ok", "result": True}
     else:
         client = TASClient(
-            baseURL=settings.tasURL,
+            baseURL=settings.TAS_URL,
             credentials={
-                "username": settings.tasUser,
-                "password": settings.tasSecret,
+                "username": settings.TAS_USER,
+                "password": settings.TAS_SECRET,
             },
         )
-        return client.authenticate(username, password)
+        return client.authenticate(username, password) # type: ignore[no-any-return]
 
 
 # Async function to get the current user based on the provided OAuth2 token
@@ -47,10 +47,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
 
 
 # Function to decode a JWT token using the specified secret and algorithm
-def unhash(token):
-    return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALG])
+def unhash(token: str) -> dict[str, str]:
+    return jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALG]) # type: ignore[no-any-return]
 
-
-def hash(payload):
+def hash(payload: dict[str, str]) -> str:
     return jwt.encode(payload, settings.JWT_SECRET, algorithm=settings.ALG)
-
