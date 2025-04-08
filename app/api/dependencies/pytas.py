@@ -4,7 +4,7 @@ from app.api.v1.schemas.user import User
 from app.db.models.campaign import Campaign
 from app.db.session import SessionLocal
 from app.pytas.http import TASClient
-from app.core.config import Settings, get_settings
+from app.core.config import get_settings
 
 settings = get_settings()
 

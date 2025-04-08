@@ -5,12 +5,12 @@ from app.core.config import get_settings
 settings = get_settings()
 
 class ProjectService:
-    def __init__(self):
+    def __init__(self) -> None:
         self.client = TASClient(
-            baseURL=settings.tasURL,
+            baseURL=settings.TAS_URL,
             credentials={
-                "username": settings.tasUser,
-                "password": settings.tasSecret,
+                "username": settings.TAS_USER,
+                "password": settings.TAS_SECRET,
             },
         )
 
@@ -23,4 +23,4 @@ class ProjectService:
 
 
     def get_project_members(self, project_id: str) -> list[PyTASUser]:
-        return self.client.get_project_members(project_id=project_id)
+        return self.client.get_project_members(project_id=project_id)  # type: ignore[no-any-return]

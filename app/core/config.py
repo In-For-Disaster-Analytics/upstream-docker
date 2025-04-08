@@ -17,4 +17,4 @@ class Settings(BaseSettings):
         case_sensitive = False
 
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore[call-arg]
