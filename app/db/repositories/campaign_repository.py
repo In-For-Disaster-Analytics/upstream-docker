@@ -44,7 +44,6 @@ class CampaignRepository:
         geometry = result[1]
         if campaign:
             campaign.geometry = geometry
-            print("campaign", campaign.geometry)
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
