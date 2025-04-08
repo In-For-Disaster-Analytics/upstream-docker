@@ -17,10 +17,10 @@ def get_allocations(username: str) -> list[str]:
         return dev_allocations
     else:
         client = TASClient(
-            baseURL=settings.tasURL,
+            baseURL=settings.TAS_URL,
             credentials={
-                "username": settings.tasUser,
-                "password": settings.tasSecret,
+                "username": settings.TAS_USER,
+                "password": settings.TAS_SECRET,
             },
         )
         return [

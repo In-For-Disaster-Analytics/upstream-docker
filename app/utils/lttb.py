@@ -73,9 +73,8 @@ def lttb(data: List[MeasurementItem], threshold: int) -> List[MeasurementItem]:
                 point,
                 avg_point
             )
-
             if area > max_area:
-                max_area = area
+                max_area = float(area)
                 max_area_point = point
 
         sampled.append(max_area_point)

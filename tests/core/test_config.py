@@ -20,11 +20,11 @@ def test_settings_singleton() -> None:
 
 def test_settings_required_values() -> None:
     settings = get_settings()
-    assert settings.tasURL is not None
-    assert settings.tasUser is not None
-    assert settings.tasSecret is not None
-    assert settings.jwtSecret is not None
-    assert settings.alg is not None
+    assert settings.TAS_URL is not None
+    assert settings.TAS_USER is not None
+    assert settings.TAS_SECRET is not None
+    assert settings.JWT_SECRET is not None
+    assert settings.ALG is not None
     assert settings.POSTGRES_PASSWORD is not None
     assert settings.DATABASE_URL is not None
 

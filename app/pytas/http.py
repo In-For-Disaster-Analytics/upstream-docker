@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# type: ignore
 import json
 import logging
 from typing import List

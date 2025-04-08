@@ -6,7 +6,6 @@
 from app.pytas.http import TASClient
 from app.pytas.models.base import TASModel
 
-
 class User(TASModel):
     _resource_uri = "users/"
 

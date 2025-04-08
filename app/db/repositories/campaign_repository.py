@@ -63,7 +63,7 @@ class CampaignRepository:
         sensor_variables: list[str] | None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[tuple[Campaign, int, int, list[str], list[str]]], int]:
+    ) -> tuple[list[tuple[Campaign, int, int, list[str | None], list[str | None], str | None]], int]:
         # Base campaign query
         query = self.db.query(
             Campaign,
