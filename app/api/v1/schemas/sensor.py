@@ -32,6 +32,8 @@ class ListSensorsResponse(SensorItem):
 class GetSensorResponse(SensorItem):
     max_value: float | None = None
     min_value: float | None = None
+    avg_value: float | None = None
+    count: int | None = None
     first_measurement_time: datetime | None = None
     last_measurement_time: datetime | None = None
 

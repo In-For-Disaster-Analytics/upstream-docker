@@ -31,7 +31,9 @@ class SensorRepository:
         stmt = select(
             Sensor,
             func.max(Measurement.measurementvalue).label('max_value'),
-            func.min(Measurement.measurementvalue).label('min_value')
+            func.min(Measurement.measurementvalue).label('min_value'),
+            func.avg(Measurement.measurementvalue).label('avg_value'),
+            func.count(Measurement.measurementvalue).label('count')
         ).join(Measurement, Sensor.sensorid == Measurement.sensorid).where(Sensor.sensorid == sensor_id).group_by(Sensor.sensorid)
         result = self.db.execute(stmt).first()
 
@@ -66,7 +68,9 @@ class SensorRepository:
             max_value=result[1],
             min_value=result[2],
             first_measurement_time=first_measurement_time,
-            last_measurement_time=last_measurement_time
+            last_measurement_time=last_measurement_time,
+            avg_value=result[3],
+            count=result[4]
         )
 
     def get_sensors_by_station_id(
