@@ -65,16 +65,7 @@ async def get_sensor(station_id: int, sensor_id: int, campaign_id: int, current_
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
-    sensor = sensor_repository.get_sensor(sensor_id)
-    if sensor is None:
+    response = sensor_repository.get_sensor(sensor_id)
+    if response is None:
         raise HTTPException(status_code=404, detail="Sensor not found")
-    return GetSensorResponse(
-        id=sensor.sensorid,
-        alias=sensor.alias,
-        variablename=sensor.variablename,
-        description=sensor.description,
-        postprocess=sensor.postprocess,
-        postprocessscript=sensor.postprocessscript,
-        units=sensor.units,
-    )
-
+    return response

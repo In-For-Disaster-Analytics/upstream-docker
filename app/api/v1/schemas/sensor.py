@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 
 from pydantic import BaseModel
@@ -29,7 +30,10 @@ class ListSensorsResponse(SensorItem):
     pass
 
 class GetSensorResponse(SensorItem):
-    pass
+    max_value: float | None = None
+    min_value: float | None = None
+    first_measurement_time: datetime | None = None
+    last_measurement_time: datetime | None = None
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):

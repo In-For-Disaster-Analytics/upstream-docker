@@ -1,12 +1,12 @@
 from typing import Optional, List
 
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, select, func
 from sqlalchemy.sql import text
 
-from app.api.v1.schemas.sensor import SensorIn
+from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse
 from app.db.models.sensor import Sensor
-
+from app.db.models.measurement import Measurement
 
 class SensorRepository:
     def __init__(self, db: Session):
@@ -27,8 +27,47 @@ class SensorRepository:
         self.db.refresh(db_sensor)
         return db_sensor
 
-    def get_sensor(self, sensor_id: int) -> Sensor | None:
-        return self.db.query(Sensor).get(sensor_id)
+    def get_sensor(self, sensor_id: int) -> GetSensorResponse | None:
+        stmt = select(
+            Sensor,
+            func.max(Measurement.measurementvalue).label('max_value'),
+            func.min(Measurement.measurementvalue).label('min_value')
+        ).join(Measurement, Sensor.sensorid == Measurement.sensorid).where(Sensor.sensorid == sensor_id).group_by(Sensor.sensorid)
+        result = self.db.execute(stmt).first()
+
+        if result is None:
+            return None
+
+        #Get the first and last measurement time
+        stmt_first_measurement = select(Measurement).where(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.asc()).limit(1)
+        first_measurement = self.db.execute(stmt_first_measurement).first()
+        if first_measurement is not None:
+            first_measurement_time = first_measurement[0].collectiontime
+        else:
+            first_measurement_time = None
+
+        #Get the last measurement time
+        stmt_last_measurement = select(Measurement).where(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.desc()).limit(1)
+        last_measurement = self.db.execute(stmt_last_measurement).first()
+        if last_measurement is not None:
+            last_measurement_time = last_measurement[0].collectiontime
+        else:
+            last_measurement_time = None
+
+
+        return GetSensorResponse(
+            id=result[0].sensorid,
+            alias=result[0].alias,
+            variablename=result[0].variablename,
+            description=result[0].description,
+            postprocess=result[0].postprocess,
+            postprocessscript=result[0].postprocessscript,
+            units=result[0].units,
+            max_value=result[1],
+            min_value=result[2],
+            first_measurement_time=first_measurement_time,
+            last_measurement_time=last_measurement_time
+        )
 
     def get_sensors_by_station_id(
         self,
