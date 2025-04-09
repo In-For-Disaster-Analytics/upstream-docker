@@ -35,6 +35,10 @@ jobs:
           cp .env.sample .env
           pytest --cov=. --cov-report=xml --cov-report=term-missing
 
+      - name: Check mypy
+        run: |
+          mypy .
+
   build-and-push:
     needs: pytest
     runs-on: ubuntu-latest

@@ -44,7 +44,7 @@ async def list_campaigns(
         size=limit,
         pages=(total_count + limit - 1) // limit,
     )
-    return jsonable_encoder(response)
+    return response
 
 @router.get("/{campaign_id}")
 async def get_campaign(campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> GetCampaignResponse:
@@ -52,4 +52,4 @@ async def get_campaign(campaign_id: int, current_user: User = Depends(get_curren
     campaign = campaign_service.get_campaign_with_summary(campaign_id)
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
-    return jsonable_encoder(campaign)
+    return campaign

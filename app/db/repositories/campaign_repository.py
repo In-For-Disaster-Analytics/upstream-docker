@@ -32,25 +32,27 @@ class CampaignRepository:
         return db_campaign
 
     def get_campaign(self, id: int) -> Campaign | None:
-        result = (
-            self.db.query(Campaign, ST_AsGeoJSON(Campaign.geometry).label('geometry'))
+        stmt = (
+            select(Campaign)
             .options(
                 joinedload(Campaign.stations).joinedload(Station.sensors),
             )
             .filter(Campaign.campaignid == id)
-            .first()
         )
-        campaign = result[0]
-        geometry = result[1]
+        result = self.db.execute(stmt).first()
+
+        if not result:
+            return None
+
+        campaign : Campaign = result[0]
+
         if campaign:
-            campaign.geometry = geometry
-            print("campaign", campaign.geometry)
+            campaign.geometry = self.db.scalar(select(ST_AsGeoJSON(Campaign.geometry)))
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
-                    station.geometry = self.db.scalar(
-                        ST_AsGeoJSON(Station.geometry)
-                    )
+                    station_geometry_stmt = select(ST_AsGeoJSON(Station.geometry))
+                    station.geometry = self.db.scalar(station_geometry_stmt)
 
         return campaign
 
@@ -63,7 +65,7 @@ class CampaignRepository:
         sensor_variables: list[str] | None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[tuple[Campaign, int, int, list[str], list[str]]], int]:
+    ) -> tuple[list[tuple[Campaign, int, int, list[str | None], list[str | None], str | None]], int]:
         # Base campaign query
         query = self.db.query(
             Campaign,

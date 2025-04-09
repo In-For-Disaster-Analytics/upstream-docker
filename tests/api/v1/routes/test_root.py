@@ -17,11 +17,11 @@ TEST_JWT_SECRET = "test_secret"
 def mock_settings():
     with patch("app.core.config.get_settings") as mock:
         settings = Settings(
-            jwtSecret=TEST_JWT_SECRET,
-            tasUser=TEST_USERNAME,
-            tasSecret=TEST_PASSWORD,
-            tasURL='http://localhost:5432',
-            alg="HS256",
+            JWT_SECRET=TEST_JWT_SECRET,
+            TAS_USER=TEST_USERNAME,
+            TAS_SECRET=TEST_PASSWORD,
+            TAS_URL='http://localhost:5432',
+            ALG="HS256",
             ENV="test",
             ENVIRONMENT="test",
             # Add any missing required settings here

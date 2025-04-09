@@ -1,3 +1,5 @@
+# mypy: allow-untyped-calls
+
 import jwt
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -6,11 +8,11 @@ from app.core.config import get_settings
 
 router = APIRouter()
 
-def get_jwt_secret():
+def get_jwt_secret() -> str:
     settings = get_settings()
-    return settings.jwtSecret
+    return settings.JWT_SECRET
 
-def create_token(username: str, jwt_secret: str = Depends(get_jwt_secret)):
+def create_token(username: str, jwt_secret: str) -> str:
     return jwt.encode({"username": username}, jwt_secret, algorithm="HS256")
 
 # Route for user authentication and token generation
@@ -18,7 +20,7 @@ def create_token(username: str, jwt_secret: str = Depends(get_jwt_secret)):
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     jwt_secret: str = Depends(get_jwt_secret)
-):
+) -> dict[str, str]:
     authenticated = authenticate_user(form_data.username, form_data.password)
     if not authenticated:
         raise HTTPException(status_code=400, detail="Incorrect username or password")

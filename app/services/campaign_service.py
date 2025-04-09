@@ -9,9 +9,9 @@ class CampaignService:
         self.campaign_repository = campaign_repository
 
     def create_campaign(self, campaign: CampaignsIn) -> CampaignCreateResponse:
-        campaign = self.campaign_repository.create_campaign(campaign)
+        response = self.campaign_repository.create_campaign(campaign)
         return CampaignCreateResponse(
-            id=campaign.campaignid,
+            id=response.campaignid,
         )
 
     def get_campaigns_with_summary(
@@ -48,8 +48,8 @@ class CampaignService:
                 ),
                 geometry=json.loads(row[5]) if row[5] else None,
                 summary=SummaryListCampaigns(
-                    sensor_types=list(filter(lambda x: x is not None, sensor_types)),
-                    variable_names=list(filter(lambda x: x is not None, variable_names))
+                    sensor_types=[x for x in sensor_types if x is not None],
+                    variable_names=[x for x in variable_names if x is not None]
                 )
             )
             items.append(item)
@@ -89,7 +89,7 @@ class CampaignService:
                 bbox_south=campaign.bbox_south,
                 bbox_north=campaign.bbox_north,
             ),
-            geometry=json.loads(campaign.geometry) if campaign.geometry else None,
+            geometry=json.loads(campaign.geometry) if campaign.geometry else None, # type: ignore[arg-type]
             stations=stations,
             summary=SummaryGetCampaign(
                 station_count=self.campaign_repository.count_stations(campaign_id),

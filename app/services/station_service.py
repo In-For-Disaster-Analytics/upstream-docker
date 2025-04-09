@@ -23,8 +23,8 @@ class StationService:
                 name=row[0].stationname,
                 description=row[0].description,
                 geometry=geometry,
-                sensor_types=list(filter(lambda x: x is not None, sensor_types)),
-                sensor_variables=list(filter(lambda x: x is not None, sensor_variables)),
+                sensor_types=[x for x in sensor_types if x is not None],
+                sensor_variables=[x for x in sensor_variables if x is not None],
                 sensor_count=row[1]
             )
             stations.append(station)
@@ -36,7 +36,7 @@ class StationService:
         geometry = None
         if row:
             try:
-                geometry = json.loads(row.geometry)
+                geometry = json.loads(row.geometry) # type: ignore[arg-type]
             except Exception as e:
                 print(e)
 
