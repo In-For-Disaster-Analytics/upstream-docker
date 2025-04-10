@@ -76,12 +76,10 @@ class CampaignRepository:
             ST_AsGeoJSON(Campaign.geometry).label('geometry')
         ).select_from(Campaign).outerjoin(Station).outerjoin(Station.sensors).group_by(Campaign.campaignid)
 
-        print("query", allocations, bbox, start_date, end_date, sensor_variables)
         # Apply filters
         if allocations:
             query = query.filter(Campaign.allocation.in_(allocations))
         if bbox:
-            print("bbox", bbox)
             bbox_north, bbox_east, bbox_south, bbox_west = bbox.split(",")
             query = query.filter(
                 func.ST_Intersects(

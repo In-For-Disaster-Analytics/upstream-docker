@@ -47,7 +47,6 @@ class TASClient:
     def authenticate(self, username, password):
         payload = {"username": username, "password": password}
         headers = {"Content-Type": "application/json"}
-        print(self.baseURL + "/auth/login")
         r = requests.post(
             self.baseURL + "/auth/login",
             data=json.dumps(payload),
@@ -340,7 +339,6 @@ class TASClient:
         )
         if r.status_code == 200:
             resp = r.json()
-            print(resp)
             projects = [PyTASProject(**p) for p in resp["result"]]
             return projects
         else:

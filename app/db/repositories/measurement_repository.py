@@ -144,19 +144,6 @@ class MeasurementRepository:
                 :start_date, :end_date, :min_value, :max_value
             )
         """)
-        print(stmt)
-
-        # Execute with named parameters
-
-        # Log query
-        print(stmt)
-
-        # Log query with parameters
-        print(stmt, sensor_id, interval, interval_value, start_date, end_date, min_value, max_value)
-
-        # Log query
-        print(stmt)
-
         result = self.db.execute(
             stmt,
             {
@@ -169,11 +156,6 @@ class MeasurementRepository:
                 "max_value": max_value
             }
         )
-
-        # Log query
-        print(result)
-
-
         # Process results - in SQLAlchemy v2, the rows are mappings by default
         measurements = [AggregatedMeasurement.model_validate(row) for row in result]
 
