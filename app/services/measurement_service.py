@@ -29,8 +29,9 @@ class MeasurementService:
             else:
                 print(f"Measurement {row[0].measurementid} has no geometry {row[1]}")
 
+        is_downsampled = downsample_threshold is not None and downsample_threshold > 2
         # Apply LTTB downsampling if threshold is provided
-        if downsample_threshold is not None and downsample_threshold > 2:
+        if is_downsampled and downsample_threshold is not None:
             measurements = lttb(measurements, downsample_threshold)
 
         return ListMeasurementsResponsePagination(
@@ -38,7 +39,9 @@ class MeasurementService:
             total=total_count,
             page=page,
             size=limit,
-            pages=total_count // limit + 1,
+            pages=total_count // downsample_threshold + 1 if is_downsampled else total_count // limit + 1,
+            downsampled=is_downsampled,
+            downsampled_total=downsample_threshold if downsample_threshold is not None else None,
             min_value=stats_min_value if stats_min_value is not None else 0,
             max_value=stats_max_value if stats_max_value is not None else 0,
             average_value=stats_average_value if stats_average_value is not None else 0

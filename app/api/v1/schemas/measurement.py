@@ -37,6 +37,8 @@ class ListMeasurementsResponsePagination(BaseModel):
     min_value: float
     max_value: float
     average_value: float
+    downsampled: bool
+    downsampled_total: int | None = None
 
 class AggregatedMeasurement(BaseModel):
     measurement_time: datetime
