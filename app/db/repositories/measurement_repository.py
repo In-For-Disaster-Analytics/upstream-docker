@@ -39,12 +39,12 @@ class MeasurementRepository:
 
     def list_measurements(
         self,
-        sensor_id: Optional[int] = None,
-        start_date: Optional[datetime] = None,
-        end_date: Optional[datetime] = None,
-        min_value: Optional[float] = None,
-        max_value: Optional[float] = None,
-        variable_name: Optional[str] = None,
+        sensor_id: int | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        min_value: float | None = None,
+        max_value: float | None = None,
+        variable_name: str | None = None,
         page: int = 1,
         limit: int = 20,
     ) -> tuple[list[tuple[Measurement, str]], int, float | None, float | None, float | None]:

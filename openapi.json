@@ -28,7 +28,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Login Api V1 Token Post"
+                }
               }
             }
           },
@@ -1165,6 +1171,10 @@
                       },
                       {
                         "type": "string"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date-time"
                       }
                     ]
                   },
@@ -1858,6 +1868,74 @@
               }
             ],
             "title": "Variablename"
+          },
+          "max_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Value"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Value"
+          },
+          "avg_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avg Value"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "first_measurement_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Measurement Time"
+          },
+          "last_measurement_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Measurement Time"
           }
         },
         "type": "object",
@@ -2312,6 +2390,21 @@
           "average_value": {
             "type": "number",
             "title": "Average Value"
+          },
+          "downsampled": {
+            "type": "boolean",
+            "title": "Downsampled"
+          },
+          "downsampled_total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Downsampled Total"
           }
         },
         "type": "object",
@@ -2323,7 +2416,8 @@
           "pages",
           "min_value",
           "max_value",
-          "average_value"
+          "average_value",
+          "downsampled"
         ],
         "title": "ListMeasurementsResponsePagination"
       },

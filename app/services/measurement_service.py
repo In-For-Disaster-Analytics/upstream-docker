@@ -34,14 +34,16 @@ class MeasurementService:
         if is_downsampled and downsample_threshold is not None:
             measurements = lttb(measurements, downsample_threshold)
 
+        downsampled_total = len(measurements) if is_downsampled else None
+        pages = len(measurements) // downsample_threshold + 1 if is_downsampled else total_count // limit + 1
         return ListMeasurementsResponsePagination(
             items=measurements,
             total=total_count,
             page=page,
             size=limit,
-            pages=total_count // downsample_threshold + 1 if is_downsampled else total_count // limit + 1,
+            pages=pages,
             downsampled=is_downsampled,
-            downsampled_total=downsample_threshold if downsample_threshold is not None else None,
+            downsampled_total=downsampled_total,
             min_value=stats_min_value if stats_min_value is not None else 0,
             max_value=stats_max_value if stats_max_value is not None else 0,
             average_value=stats_average_value if stats_average_value is not None else 0
