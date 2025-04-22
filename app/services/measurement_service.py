@@ -33,9 +33,12 @@ class MeasurementService:
         # Apply LTTB downsampling if threshold is provided
         if is_downsampled and downsample_threshold is not None:
             measurements = lttb(measurements, downsample_threshold)
+            pages = len(measurements) // downsample_threshold + 1
+            downsampled_total = len(measurements)
+        else:
+            pages = total_count // limit + 1
+            downsampled_total = None
 
-        downsampled_total = len(measurements) if is_downsampled else None
-        pages = len(measurements) // downsample_threshold + 1 if is_downsampled else total_count // limit + 1
         return ListMeasurementsResponsePagination(
             items=measurements,
             total=total_count,
