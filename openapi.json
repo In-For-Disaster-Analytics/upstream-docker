@@ -1048,70 +1048,6 @@
         ]
       }
     },
-    "/api/v1/uploadfile/campaign/{campaign_id}/station/{station_id}/sensor/": {
-      "post": {
-        "tags": [
-          "uploadfile"
-        ],
-        "summary": "Post Sensor And Measurement",
-        "operationId": "post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "campaign_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
-          },
-          {
-            "name": "station_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v1/uploadfile_csv/campaign/{campaign_id}/station/{station_id}/sensor": {
       "post": {
         "tags": [
@@ -1415,20 +1351,6 @@
           "password"
         ],
         "title": "Body_login_api_v1_token_post"
-      },
-      "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post": {
-        "properties": {
-          "uploaded_file": {
-            "type": "string",
-            "format": "binary",
-            "title": "Uploaded File"
-          }
-        },
-        "type": "object",
-        "required": [
-          "uploaded_file"
-        ],
-        "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_campaign__campaign_id__station__station_id__sensor__post"
       },
       "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post": {
         "properties": {
@@ -3551,6 +3473,29 @@
               }
             ],
             "title": "Count"
+          },
+          "first_measurement_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Measurement Value"
+          },
+          "first_measurement_collectiontime": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Measurement Collectiontime"
           },
           "last_measurement_time": {
             "anyOf": [

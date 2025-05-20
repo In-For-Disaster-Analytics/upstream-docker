@@ -15,6 +15,21 @@ class SensorIn(BaseModel):
     units: Optional[str] = None
     variablename: str
 
+class SensorStatistics(BaseModel):
+    max_value: float | None = None
+    min_value: float | None = None
+    avg_value: float | None = None
+    stddev_value: float | None = None
+    percentile_90: float | None = None
+    percentile_95: float | None = None
+    percentile_99: float | None = None
+    count: int | None = None
+    first_measurement_value: float | None = None
+    first_measurement_collectiontime: datetime | None = None
+    last_measurement_time: datetime | None = None
+    last_measurement_value: float | None = None
+    stats_last_updated: datetime | None = None
+
 
 class SensorItem(BaseModel):
     id: int
@@ -24,18 +39,14 @@ class SensorItem(BaseModel):
     postprocessscript: str | None = None
     units: str | None = None
     variablename: str | None = None
-
+    statistics: SensorStatistics | None = None
 
 class ListSensorsResponse(SensorItem):
     pass
 
+
 class GetSensorResponse(SensorItem):
-    max_value: float | None = None
-    min_value: float | None = None
-    avg_value: float | None = None
-    count: int | None = None
-    first_measurement_time: datetime | None = None
-    last_measurement_time: datetime | None = None
+    statistics: SensorStatistics | None = None
 
 # Pydantic model for incoming sensor and measurement data
 class SensorAndMeasurementIn(BaseModel):
