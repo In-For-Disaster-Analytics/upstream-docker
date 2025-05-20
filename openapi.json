@@ -3474,6 +3474,29 @@
             ],
             "title": "Count"
           },
+          "first_measurement_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Measurement Value"
+          },
+          "first_measurement_collectiontime": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Measurement Collectiontime"
+          },
           "last_measurement_time": {
             "anyOf": [
               {

@@ -24,6 +24,8 @@ class SensorStatistics(BaseModel):
     percentile_95: float | None = None
     percentile_99: float | None = None
     count: int | None = None
+    first_measurement_value: float | None = None
+    first_measurement_collectiontime: datetime | None = None
     last_measurement_time: datetime | None = None
     last_measurement_value: float | None = None
     stats_last_updated: datetime | None = None

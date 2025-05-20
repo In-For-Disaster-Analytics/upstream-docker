@@ -43,8 +43,29 @@ async def list_sensors(
         postprocess=postprocess
     )
 
-    return ListSensorsResponsePagination(
-        items=[SensorItem(
+    response = []
+
+    for sensor, statistics in result:
+        if statistics is None:
+            statistics = SensorStatistics()
+        else:
+            statistics = SensorStatistics(
+                max_value=statistics.max_value if statistics.max_value is not None else None,
+                min_value=statistics.min_value if statistics.min_value is not None else None,
+                avg_value=statistics.avg_value if statistics.avg_value is not None else None,
+                stddev_value=statistics.stddev_value if statistics.stddev_value is not None else None,
+                percentile_90=statistics.percentile_90 if statistics.percentile_90 is not None else None,
+                percentile_95=statistics.percentile_95 if statistics.percentile_95 is not None else None,
+                percentile_99=statistics.percentile_99 if statistics.percentile_99 is not None else None,
+                count=statistics.count if statistics.count is not None else None,
+                last_measurement_time=statistics.last_measurement_collectiontime if statistics.last_measurement_collectiontime is not None else None,
+                last_measurement_value=statistics.last_measurement_value if statistics.last_measurement_value is not None else None,
+                first_measurement_value=statistics.first_measurement_value if statistics.first_measurement_value is not None else None,
+                first_measurement_collectiontime=statistics.first_measurement_collectiontime if statistics.first_measurement_collectiontime is not None else None,
+                stats_last_updated=statistics.stats_last_updated if statistics.stats_last_updated is not None else None
+            )
+
+        response.append(SensorItem(
             id=sensor.sensorid,
             alias=sensor.alias,
             variablename=sensor.variablename,
@@ -52,20 +73,11 @@ async def list_sensors(
             postprocess=sensor.postprocess,
             postprocessscript=sensor.postprocessscript,
             units=sensor.units,
-            statistics=SensorStatistics(
-                max_value=statistics.max_value,
-                min_value=statistics.min_value,
-                avg_value=statistics.avg_value,
-                stddev_value=statistics.stddev_value,
-                percentile_90=statistics.percentile_90,
-                percentile_95=statistics.percentile_95,
-                percentile_99=statistics.percentile_99,
-                count=statistics.count,
-                last_measurement_time=statistics.last_measurement_collectiontime,
-                last_measurement_value=statistics.last_measurement_value,
-                stats_last_updated=statistics.stats_last_updated
-            )
-        ) for sensor, statistics in result],
+            statistics=statistics
+        ))
+
+    return ListSensorsResponsePagination(
+        items=response,
         total=total_count,
         page=page,
         size=limit,

@@ -23,6 +23,11 @@ class SensorStatistics(Base):
     percentile_95: Mapped[Optional[float]] = mapped_column(Numeric, nullable=True)
     percentile_99: Mapped[Optional[float]] = mapped_column(Numeric, nullable=True)
     count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    first_measurement_value: Mapped[Optional[float]] = mapped_column(Numeric, nullable=True)
+    first_measurement_collectiontime: Mapped[Optional[datetime]] = mapped_column(
+        TIMESTAMP(timezone=True),
+        nullable=True
+    )
     last_measurement_value: Mapped[Optional[float]] = mapped_column(Numeric, nullable=True)
     last_measurement_collectiontime: Mapped[Optional[datetime]] = mapped_column(
         TIMESTAMP(timezone=True),

@@ -60,6 +60,8 @@ class SensorRepository:
                 percentile_95=statistics.percentile_95 if statistics else None,
                 percentile_99=statistics.percentile_99 if statistics else None,
                 count=statistics.count if statistics else None,
+                first_measurement_value=statistics.first_measurement_value if statistics else None,
+                first_measurement_collectiontime=statistics.first_measurement_collectiontime if statistics else None,
                 last_measurement_time=statistics.last_measurement_collectiontime if statistics else None,
                 last_measurement_value=statistics.last_measurement_value if statistics else None,
                 stats_last_updated=statistics.stats_last_updated if statistics else None
@@ -89,7 +91,7 @@ class SensorRepository:
     ) -> Tuple[list[Row[Tuple[Sensor, SensorStatistics]]], int]:
         count_stmt = select(func.count()).select_from(Sensor).where(Sensor.stationid == station_id)
         stmt = select(Sensor, SensorStatistics).outerjoin(SensorStatistics, Sensor.sensorid == SensorStatistics.sensorid)
-        stmt = stmt.where(Sensor.stationid == station_id)
+        stmt = stmt.where(Sensor.stationid == station_id).limit(limit).offset((page - 1) * limit)
         if variable_name:
             stmt = stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
             count_stmt = count_stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
@@ -107,7 +109,6 @@ class SensorRepository:
             count_stmt = count_stmt.where(Sensor.postprocess == postprocess)
         result = list(self.db.execute(stmt).all())
         total_count = self.db.execute(count_stmt).scalar_one()
-        stmt = stmt.limit(limit).offset((page - 1) * limit)
         return result, total_count
 
     def get_sensors(

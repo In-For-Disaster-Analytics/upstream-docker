@@ -30,6 +30,8 @@ def upgrade():
         sa.Column('percentile_95', sa.Numeric(), nullable=True),
         sa.Column('percentile_99', sa.Numeric(), nullable=True),
         sa.Column('count', sa.Integer(), nullable=True),
+        sa.Column('first_measurement_value', sa.Numeric(), nullable=True),
+        sa.Column('first_measurement_collectiontime', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('last_measurement_value', sa.Numeric(), nullable=True),
         sa.Column('last_measurement_collectiontime', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('stats_last_updated', sa.TIMESTAMP(timezone=True), nullable=True),
@@ -56,6 +58,8 @@ def upgrade():
         percentile_95,
         percentile_99,
         count,
+        first_measurement_value,
+        first_measurement_collectiontime,
         last_measurement_value,
         last_measurement_collectiontime,
         stats_last_updated
@@ -70,6 +74,8 @@ def upgrade():
         stats.p95,
         stats.p99,
         stats.cnt,
+        first.first_value,
+        first.first_collectiontime,
         latest.last_value,
         latest.last_collectiontime,
         NOW()
@@ -104,7 +110,24 @@ def upgrade():
         ) m
         WHERE rn = 1
     ) latest ON stats.sensorid = latest.sensorid
+    JOIN (
+        -- First values
+        SELECT
+            sensorid,
+            measurementvalue AS first_value,
+            collectiontime AS first_collectiontime
+        FROM (
+            SELECT
+                sensorid,
+                measurementvalue,
+                collectiontime,
+                ROW_NUMBER() OVER (PARTITION BY sensorid ORDER BY collectiontime ASC) AS rn
+            FROM measurements
+        ) m
+        WHERE rn = 1
+    ) first ON stats.sensorid = first.sensorid
     """)
+
 
 
 def downgrade():
