@@ -1,11 +1,10 @@
-from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination
+from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.sensor_repository import SensorRepository
@@ -33,7 +32,7 @@ async def list_sensors(
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
-    sensors, total_count = sensor_repository.get_sensors_by_station_id(
+    result, total_count = sensor_repository.get_sensors_by_station_id(
         station_id,
         page,
         limit,
@@ -53,7 +52,20 @@ async def list_sensors(
             postprocess=sensor.postprocess,
             postprocessscript=sensor.postprocessscript,
             units=sensor.units,
-        ) for sensor in sensors],
+            statistics=SensorStatistics(
+                max_value=statistics.max_value,
+                min_value=statistics.min_value,
+                avg_value=statistics.avg_value,
+                stddev_value=statistics.stddev_value,
+                percentile_90=statistics.percentile_90,
+                percentile_95=statistics.percentile_95,
+                percentile_99=statistics.percentile_99,
+                count=statistics.count,
+                last_measurement_time=statistics.last_measurement_collectiontime,
+                last_measurement_value=statistics.last_measurement_value,
+                stats_last_updated=statistics.stats_last_updated
+            )
+        ) for sensor, statistics in result],
         total=total_count,
         page=page,
         size=limit,

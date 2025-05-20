@@ -1,12 +1,12 @@
-from typing import Optional, List
-
+from typing import Optional, List, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, select, func
+from sqlalchemy import Row, Sequence, or_, select, func
 from sqlalchemy.sql import text
 
-from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse
+from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse, SensorStatistics as SensorStatisticsSchema
 from app.db.models.sensor import Sensor
 from app.db.models.measurement import Measurement
+from app.db.models.sensor_statistics import SensorStatistics
 
 class SensorRepository:
     def __init__(self, db: Session):
@@ -30,48 +30,51 @@ class SensorRepository:
     def get_sensor(self, sensor_id: int) -> GetSensorResponse | None:
         stmt = select(
             Sensor,
-            func.max(Measurement.measurementvalue).label('max_value'),
-            func.min(Measurement.measurementvalue).label('min_value'),
-            func.avg(Measurement.measurementvalue).label('avg_value'),
-            func.count(Measurement.measurementvalue).label('count')
-        ).join(Measurement, Sensor.sensorid == Measurement.sensorid).where(Sensor.sensorid == sensor_id).group_by(Sensor.sensorid)
+            SensorStatistics
+        ).outerjoin(
+            SensorStatistics,
+            Sensor.sensorid == SensorStatistics.sensorid
+        ).where(Sensor.sensorid == sensor_id)
+
         result = self.db.execute(stmt).first()
 
         if result is None:
             return None
 
-        #Get the first and last measurement time
-        stmt_first_measurement = select(Measurement).where(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.asc()).limit(1)
-        first_measurement = self.db.execute(stmt_first_measurement).first()
-        if first_measurement is not None:
-            first_measurement_time = first_measurement[0].collectiontime
-        else:
-            first_measurement_time = None
-
-        #Get the last measurement time
-        stmt_last_measurement = select(Measurement).where(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.desc()).limit(1)
-        last_measurement = self.db.execute(stmt_last_measurement).first()
-        if last_measurement is not None:
-            last_measurement_time = last_measurement[0].collectiontime
-        else:
-            last_measurement_time = None
-
+        sensor, statistics = result
 
         return GetSensorResponse(
-            id=result[0].sensorid,
-            alias=result[0].alias,
-            variablename=result[0].variablename,
-            description=result[0].description,
-            postprocess=result[0].postprocess,
-            postprocessscript=result[0].postprocessscript,
-            units=result[0].units,
-            max_value=result[1],
-            min_value=result[2],
-            first_measurement_time=first_measurement_time,
-            last_measurement_time=last_measurement_time,
-            avg_value=result[3],
-            count=result[4]
+            id=sensor.sensorid,
+            alias=sensor.alias,
+            variablename=sensor.variablename,
+            description=sensor.description,
+            postprocess=sensor.postprocess,
+            postprocessscript=sensor.postprocessscript,
+            units=sensor.units,
+            statistics=SensorStatisticsSchema(
+                max_value=statistics.max_value if statistics else None,
+                min_value=statistics.min_value if statistics else None,
+                avg_value=statistics.avg_value if statistics else None,
+                stddev_value=statistics.stddev_value if statistics else None,
+                percentile_90=statistics.percentile_90 if statistics else None,
+                percentile_95=statistics.percentile_95 if statistics else None,
+                percentile_99=statistics.percentile_99 if statistics else None,
+                count=statistics.count if statistics else None,
+                last_measurement_time=statistics.last_measurement_collectiontime if statistics else None,
+                last_measurement_value=statistics.last_measurement_value if statistics else None,
+                stats_last_updated=statistics.stats_last_updated if statistics else None
+            )
         )
+
+    def delete_sensor_statistics(self, sensor_id: int) -> bool:
+        self.db.query(SensorStatistics).filter(SensorStatistics.sensorid == sensor_id).delete()
+        self.db.commit()
+        return True
+
+    def refresh_sensor_statistics(self, sensor_id: int) -> bool:
+        self.db.execute(text("SELECT refresh_outdated_sensor_statistics(:sensor_id);"), {"sensor_id": sensor_id})
+        self.db.commit()
+        return True
 
     def get_sensors_by_station_id(
         self,
@@ -83,28 +86,29 @@ class SensorRepository:
         alias: str | None = None,
         description_contains: str | None = None,
         postprocess: bool | None = None,
-    ) -> tuple[list[Sensor], int]:
-        query = self.db.query(Sensor).filter(Sensor.stationid == station_id)
-
-        # Apply filters if provided
+    ) -> Tuple[list[Row[Tuple[Sensor, SensorStatistics]]], int]:
+        count_stmt = select(func.count()).select_from(Sensor).where(Sensor.stationid == station_id)
+        stmt = select(Sensor, SensorStatistics).outerjoin(SensorStatistics, Sensor.sensorid == SensorStatistics.sensorid)
+        stmt = stmt.where(Sensor.stationid == station_id)
         if variable_name:
-            query = query.filter(Sensor.variablename.ilike(f"%{variable_name}%"))
+            stmt = stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
+            count_stmt = count_stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
         if units:
-            query = query.filter(Sensor.units == units)
+            stmt = stmt.where(Sensor.units == units)
+            count_stmt = count_stmt.where(Sensor.units == units)
         if alias:
-            query = query.filter(Sensor.alias.ilike(f"%{alias}%"))
+            stmt = stmt.where(Sensor.alias.ilike(f"%{alias}%"))
+            count_stmt = count_stmt.where(Sensor.alias.ilike(f"%{alias}%"))
         if description_contains:
-            query = query.filter(Sensor.description.ilike(f"%{description_contains}%"))
+            stmt = stmt.where(Sensor.description.ilike(f"%{description_contains}%"))
+            count_stmt = count_stmt.where(Sensor.description.ilike(f"%{description_contains}%"))
         if postprocess is not None:
-            query = query.filter(Sensor.postprocess == postprocess)
-
-        # Get total count before pagination
-        total_count = query.count()
-
-        # Apply pagination
-        sensors = query.offset((page - 1) * limit).limit(limit).all()
-
-        return sensors, total_count
+            stmt = stmt.where(Sensor.postprocess == postprocess)
+            count_stmt = count_stmt.where(Sensor.postprocess == postprocess)
+        result = list(self.db.execute(stmt).all())
+        total_count = self.db.execute(count_stmt).scalar_one()
+        stmt = stmt.limit(limit).offset((page - 1) * limit)
+        return result, total_count
 
     def get_sensors(
         self,
