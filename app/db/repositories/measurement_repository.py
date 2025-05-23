@@ -163,4 +163,5 @@ class MeasurementRepository:
 
 
 
-
+    def get_latest_measurement_by_sensor_id(self, sensor_id: int) -> Measurement | None:
+        return self.db.query(Measurement).filter(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.desc()).first()
