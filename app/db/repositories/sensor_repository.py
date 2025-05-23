@@ -27,6 +27,11 @@ class SensorRepository:
         self.db.refresh(db_sensor)
         return db_sensor
 
+    def create_sensors(self, sensors: list[Sensor]) -> list[Sensor]:
+        self.db.add_all(sensors)
+        self.db.commit()
+        return sensors
+
     def get_sensor(self, sensor_id: int) -> GetSensorResponse | None:
         stmt = select(
             Sensor,
@@ -140,3 +145,6 @@ class SensorRepository:
 
     def list_sensor_variables(self) -> list[str]:
         return [row[0] for row in self.db.query(Sensor.variablename).distinct().all()]
+
+    def get_sensor_by_alias_and_station_id(self, alias: str, station_id: int) -> Sensor | None:
+        return self.db.query(Sensor).filter(Sensor.alias == alias, Sensor.stationid == station_id).first()

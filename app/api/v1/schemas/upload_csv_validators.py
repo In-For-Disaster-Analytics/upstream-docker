@@ -13,10 +13,10 @@ class SensorCSV(BaseModel):
 
     alias: str
     variablename: str | None = Field(alias='BestGuessFormula', default=None)
-    postprocess: bool = True
-    postprocessscript: str | None = None
-    description: str | None = None
-    units: str | None = None
+    postprocess: bool | None = Field(default=True)
+    postprocessscript: str | None = Field(default=None)
+    description: str | None = Field(default=None)
+    units: str | None = Field(default=None)
 
     @field_validator('alias', mode="before")
     @classmethod

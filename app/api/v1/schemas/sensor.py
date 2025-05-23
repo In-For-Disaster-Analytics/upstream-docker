@@ -13,7 +13,7 @@ class SensorIn(BaseModel):
     postprocess: Optional[bool] = True
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
-    variablename: str
+    variablename: str | None = None
 
 class SensorStatistics(BaseModel):
     max_value: float | None = None
