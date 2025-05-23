@@ -25,7 +25,7 @@ from app.db.repositories.measurement_repository import MeasurementRepository
 
 # Constants
 MultiPartParser.spool_max_size = 500 * 1024 * 1024
-BATCH_SIZE = 100000
+BATCH_SIZE = 10000
 DEFAULT_VARIABLE_NAME = 'No BestGuess Formula'
 
 router = APIRouter(prefix="/uploadfile_csv", tags=["uploadfile_csv"])
@@ -89,7 +89,7 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
         if existing_sensor is None:
             sensor_maps.append(sensor)
         else:
-            print(f"Sensor {sensor.alias}  already exists in the database w")
+            print(f"Sensor {sensor.alias}  already exists in the database ")
             existing_sensors.append(existing_sensor)
     sensor_repository.create_sensors(sensor_maps)
 
@@ -133,6 +133,7 @@ def process_measurements_file(
 ) -> int:
     """Process the measurements CSV file and return total number of measurements processed."""
     # Read CSV using pandas
+
     df_measurements = pd.read_csv(
         file.file,
         keep_default_na=False,  # Prevent NaN creation
@@ -159,12 +160,14 @@ def process_measurements_file(
     df_measurements['geometry_str'] = 'Point (' + df_measurements['Lon_deg'].astype(str) + ' ' + df_measurements['Lat_deg'].astype(str) + ')'
 
     measurement_repository = MeasurementRepository(session)
+
+
+
     for alias, sensor_id in alias_to_sensorid_map.items():
         if alias not in df_measurements.columns:
             continue
         latest_measurement = measurement_repository.get_latest_measurement_by_sensor_id(sensor_id)
         filtered_measurements = df_measurements[df_measurements['collectiontime'] > latest_measurement.collectiontime] if latest_measurement else df_measurements
-
         sensor_measurements = [
             {
                 'stationid': station_id,
@@ -218,27 +221,38 @@ def post_sensor_and_measurement(
             # Create upload event
             upload_event = create_upload_event(session)
 
+
+            print(f"Upload event created in {round(time.time() - start_time, 1)} seconds.")
             # Process sensors file
             alias_to_sensorid_map = process_sensors_file(
                 upload_file_sensors, station_id, upload_event.id, session
             )
             upload_file_sensors.file.close()
+            print(f"Sensors file processed in {round(time.time() - start_time, 1)} seconds.")
 
             # Process measurements file
             total_measurements = process_measurements_file(
                 upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, session
             )
+            print(f"Measurements file processed in {round(time.time() - start_time, 1)} seconds.")
             upload_file_measurements.file.close()
 
+        response.update({
+            'Total sensors processed': len(alias_to_sensorid_map),
+            'Total measurements processed': total_measurements,
+            'Data Processing time': f"{round(time.time() - start_time, 1)} seconds."
+        })
         # Update sensor statistics
         sensor_repository = SensorRepository(db)
         update_sensor_statistics(sensor_repository, alias_to_sensorid_map)
 
-        processing_time = time.time() - start_time
         response.update({
+            'Total sensors processed': len(alias_to_sensorid_map),
             'Total measurements processed': total_measurements,
-            'Data Processing time': f"{round(processing_time, 1)} seconds."
+            'Data Processing time': f"{round(time.time() - start_time, 1)} seconds.",
+            'Update sensor statistics time': f"{round(time.time() - start_time, 1)} seconds."
         })
+
 
         return response
 
