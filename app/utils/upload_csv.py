@@ -9,6 +9,7 @@ from app.db.models.measurement import Measurement
 from app.db.repositories.sensor_repository import SensorRepository
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.models.sensor import Sensor
+from app.api.v1.schemas.sensor import SensorIn
 
 # Constants
 MultiPartParser.spool_max_size = 500 * 1024 * 1024
@@ -31,11 +32,12 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
     df_sensors = pd.read_csv(file.file, keep_default_na=False, na_values=[])
     sensor_maps : list[Sensor]= []
     existing_sensors : list[Sensor]= []
-    validator = Pandantic(schema=Sensor)
+    validator = Pandantic(schema=SensorIn)
 
     try:
         validator.validate(dataframe=df_sensors, errors="raise")
     except ValueError:
+        print(f"Validation failed! {validator.errors}")
         raise HTTPException(status_code=400, detail="Validation failed!")
 
     # Process each row
@@ -44,7 +46,10 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
             alias=sensor_row.alias,
             variablename=sensor_row.variablename if 'variablename' in sensor_row else DEFAULT_VARIABLE_NAME,
             stationid=station_id,
-            upload_file_events_id=upload_event_id
+            upload_file_events_id=upload_event_id,
+            units=sensor_row.units if 'units' in sensor_row else None,
+            postprocess=sensor_row.postprocess if 'postprocess' in sensor_row else None,
+            postprocessscript=sensor_row.postprocessscript if 'postprocessscript' in sensor_row else None,
         )
         existing_sensor = sensor_repository.get_sensor_by_alias_and_station_id(str(sensor.alias), station_id)
         if existing_sensor is None:
@@ -139,6 +144,7 @@ def process_measurements_file(
                 'measurementvalue': value,
                 'geometry': WKTElement(geom, srid=4326),
                 'sensorid': sensor_id,
+                'variablename': alias,
                 'upload_file_events_id': upload_event_id
             }
             for time, value, geom in zip(
