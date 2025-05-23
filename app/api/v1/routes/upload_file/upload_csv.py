@@ -2,25 +2,18 @@
 import time
 from datetime import datetime
 from typing import Annotated, Dict, Any, List
-from pydantic import ValidationError
-import pandas as pd
 
 from starlette.formparsers import MultiPartParser
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
-from geoalchemy2 import WKTElement
 from sqlalchemy.orm import Session
 
-from pandantic import Pandantic
 from app.api.dependencies.auth import get_current_user
 from app.api.v1.schemas.user import User
-from app.api.v1.schemas.upload_csv_validators import *
-from app.db.models.measurement import Measurement
-from app.db.models.sensor import Sensor
 from app.db.models.upload_file_event import UploadFileEvent
 from app.db.session import SessionLocal, get_db
 from app.db.repositories.sensor_repository import SensorRepository
 from app.db.repositories.measurement_repository import MeasurementRepository
-
+from app.utils.upload_csv import process_sensors_file, process_measurements_file, update_sensor_statistics
 
 
 # Constants
@@ -37,167 +30,6 @@ def create_upload_event(session: Session) -> UploadFileEvent:
     session.commit()
     return upload_event
 
-def process_batch(batch: List[Dict], session: Session) -> None:
-    """Process a batch of measurements and insert to database."""
-    if not batch:
-        return
-    session.bulk_insert_mappings(Measurement, batch)
-    session.commit()
-    batch.clear()
-
-def validate_sensor_data(sensor_data: Dict) -> SensorCSV:
-    """Validate sensor data using Pydantic model."""
-    try:
-        return SensorCSV.model_validate(sensor_data)
-    except ValidationError as exc:
-        error_messages = [f"Field {err['loc'][0]}: {err['msg']}" for err in exc.errors()]
-        raise HTTPException(status_code=400, detail=str(error_messages))
-
-def validate_measurement_data(measurement_data: Dict) -> tuple[CollTimeCSV, LocationCSV]:
-    """Validate measurement data using Pydantic models."""
-    try:
-        collection_time = CollTimeCSV(collection_time=measurement_data['collectiontime'])
-        location = LocationCSV(long_deg=measurement_data['Lon_deg'], lat_deg=measurement_data['Lat_deg'])
-        return collection_time, location
-    except ValidationError as exc:
-        error_messages = [f"Field {err['loc'][0]}: {err['msg']}" for err in exc.errors()]
-        raise HTTPException(status_code=400, detail=str(error_messages))
-
-def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int, session: Session) -> Dict[str, int]:
-    """Process the sensors CSV file and return a mapping of aliases to sensor IDs."""
-    # Read CSV using pandas
-    sensor_repository = SensorRepository(session)
-    df_sensors = pd.read_csv(file.file, keep_default_na=False, na_values=[])
-    sensor_maps : list[Sensor]= []
-    existing_sensors : list[Sensor]= []
-    validator = Pandantic(schema=SensorCSV)
-    # Validate with error raising
-    try:
-        validator.validate(dataframe=df_sensors, errors="raise")
-    except ValueError:
-        print("Validation failed!")
-
-    # Process each row
-    for _, sensor_row in df_sensors.iterrows():
-        sensor: Sensor = Sensor(
-            alias=sensor_row.alias,
-            variablename=sensor_row.variablename if 'variablename' in sensor_row else DEFAULT_VARIABLE_NAME,
-            stationid=station_id,
-            upload_file_events_id=upload_event_id
-        )
-        existing_sensor = sensor_repository.get_sensor_by_alias_and_station_id(str(sensor.alias), station_id)
-        if existing_sensor is None:
-            sensor_maps.append(sensor)
-        else:
-            print(f"Sensor {sensor.alias}  already exists in the database ")
-            existing_sensors.append(existing_sensor)
-    sensor_repository.create_sensors(sensor_maps)
-
-    # Get sensor mapping
-    alias_to_sensorid = session.query(
-        Sensor.alias, Sensor.sensorid
-    ).filter(Sensor.upload_file_events_id == upload_event_id).all()
-
-    response: dict[str, int] = {}
-    for el in alias_to_sensorid:
-        response[el.alias] = el.sensorid
-    for sensor in existing_sensors:
-        response[sensor.alias] = sensor.sensorid
-
-    return response
-
-def create_measurement_dict(
-    station_id: int,
-    collection_time: datetime,
-    measurement_value: float,
-    geometry: WKTElement,
-    sensor_id: int,
-    upload_event_id: int
-) -> Dict:
-    """Create a measurement dictionary with all required fields."""
-    return {
-        'stationid': station_id,
-        'collectiontime': collection_time,
-        'measurementvalue': measurement_value,
-        'geometry': geometry,
-        'sensorid': sensor_id,
-        'upload_file_events_id': upload_event_id
-    }
-
-def process_measurements_file(
-    file: UploadFile,
-    station_id: int,
-    alias_to_sensorid_map: Dict[str, int],
-    upload_event_id: int,
-    session: Session
-) -> int:
-    """Process the measurements CSV file and return total number of measurements processed."""
-    # Read CSV using pandas
-
-    df_measurements = pd.read_csv(
-        file.file,
-        keep_default_na=False,  # Prevent NaN creation
-        na_values=[''],         # Only empty strings become NaN
-        dtype={'Lon_deg': 'float64', 'Lat_deg': 'float64'},  # Pre-specify dtypes
-        parse_dates=['collectiontime'],  # Parse dates during read
-        date_parser=pd.to_datetime,  # Use fast date parser
-    )
-    df_measurements = df_measurements.sort_values(by='collectiontime')
-
-    measurement_batch = []
-    total_measurements = 0
-
-
-    sensor_aliases = list(alias_to_sensorid_map.keys())
-
-    # Convert all sensor columns at once (vectorized operation)
-    for alias in sensor_aliases:
-        if alias in df_measurements.columns:
-            df_measurements[alias] = pd.to_numeric(df_measurements[alias], errors='coerce')
-
-    # 3. OPTIMIZATION: Pre-compute geometry for all rows (vectorized)
-    # This is MUCH faster than creating WKTElement in the loop
-    df_measurements['geometry_str'] = 'Point (' + df_measurements['Lon_deg'].astype(str) + ' ' + df_measurements['Lat_deg'].astype(str) + ')'
-
-    measurement_repository = MeasurementRepository(session)
-
-
-
-    for alias, sensor_id in alias_to_sensorid_map.items():
-        if alias not in df_measurements.columns:
-            continue
-        latest_measurement = measurement_repository.get_latest_measurement_by_sensor_id(sensor_id)
-        filtered_measurements = df_measurements[df_measurements['collectiontime'] > latest_measurement.collectiontime] if latest_measurement else df_measurements
-        sensor_measurements = [
-            {
-                'stationid': station_id,
-                'collectiontime': row['collectiontime'],
-                'measurementvalue': row[alias],
-                'geometry': WKTElement(row['geometry_str'], srid=4326),
-                'sensorid': sensor_id,
-                'upload_file_events_id': upload_event_id
-            }
-            for _, row in filtered_measurements.iterrows()
-            if pd.notna(row[alias])  # Skip NaN values
-        ]
-        measurement_batch.extend(sensor_measurements)
-        if len(measurement_batch) >= BATCH_SIZE:
-            process_batch(measurement_batch, session)
-            total_measurements += len(measurement_batch)
-            measurement_batch = []
-
-    if measurement_batch:
-        process_batch(measurement_batch, session)
-        total_measurements += len(measurement_batch)
-        measurement_batch = []
-
-    return total_measurements
-
-def update_sensor_statistics(sensor_repository: SensorRepository, alias_to_sensorid_map: Dict[str, int]) -> None:
-    """Update statistics for all sensors."""
-    for sensor_id in alias_to_sensorid_map.values():
-        sensor_repository.delete_sensor_statistics(sensor_id)
-        sensor_repository.refresh_sensor_statistics(sensor_id)
 
 @router.post("/campaign/{campaign_id}/station/{station_id}/sensor")
 def post_sensor_and_measurement(
@@ -221,20 +53,16 @@ def post_sensor_and_measurement(
             # Create upload event
             upload_event = create_upload_event(session)
 
-
-            print(f"Upload event created in {round(time.time() - start_time, 1)} seconds.")
             # Process sensors file
             alias_to_sensorid_map = process_sensors_file(
                 upload_file_sensors, station_id, upload_event.id, session
             )
             upload_file_sensors.file.close()
-            print(f"Sensors file processed in {round(time.time() - start_time, 1)} seconds.")
 
             # Process measurements file
             total_measurements = process_measurements_file(
                 upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, session
             )
-            print(f"Measurements file processed in {round(time.time() - start_time, 1)} seconds.")
             upload_file_measurements.file.close()
 
         response.update({
@@ -248,11 +76,10 @@ def post_sensor_and_measurement(
 
         response.update({
             'Total sensors processed': len(alias_to_sensorid_map),
-            'Total measurements processed': total_measurements,
+            'Total measurements added to database': total_measurements,
             'Data Processing time': f"{round(time.time() - start_time, 1)} seconds.",
             'Update sensor statistics time': f"{round(time.time() - start_time, 1)} seconds."
         })
-
 
         return response
 
