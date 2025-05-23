@@ -27,6 +27,18 @@ def upgrade() -> None:
     DECLARE
         updated_count INTEGER := 0;
     BEGIN
+        -- First, insert new records for sensors that don't have statistics
+        WITH sensors_without_stats AS (
+            SELECT DISTINCT m.sensorid
+            FROM measurements m
+            LEFT JOIN sensor_statistics ss ON m.sensorid = ss.sensorid
+            WHERE ss.sensorid IS NULL
+            AND (sensor_id IS NULL OR m.sensorid = sensor_id)
+        )
+        INSERT INTO sensor_statistics (sensorid, stats_last_updated)
+        SELECT sensorid, NULL
+        FROM sensors_without_stats;
+
         -- Find sensors needing stats refresh (where last_updated is NULL)
         WITH updated_sensors AS (
             UPDATE sensor_statistics ss
