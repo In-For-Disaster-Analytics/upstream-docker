@@ -42,46 +42,33 @@ def post_sensor_and_measurement(
 ) -> Dict[str, Any]:
     """Process sensor and measurement files and store data in the database."""
     start_time = time.time()
+    sensor_repository = SensorRepository(db)
 
     response = {
         'uploaded_file_sensors stored in memory': upload_file_sensors._in_memory,
         'uploaded_file_measurements stored in memory': upload_file_measurements._in_memory
     }
 
-    try:
-        with SessionLocal() as session:
-            # Create upload event
-            upload_event = create_upload_event(session)
+    # Create upload event
+    upload_event = create_upload_event(db)
 
-            # Process sensors file
-            alias_to_sensorid_map = process_sensors_file(
-                upload_file_sensors, station_id, upload_event.id, session
-            )
-            upload_file_sensors.file.close()
+    # Process sensors file
+    alias_to_sensorid_map = process_sensors_file(
+            upload_file_sensors, station_id, upload_event.id, db
+        )
+    upload_file_sensors.file.close()
 
-            # Process measurements file
-            total_measurements = process_measurements_file(
-                upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, session
-            )
-            upload_file_measurements.file.close()
+    # Process measurements file
+    total_measurements = process_measurements_file(upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, db)
+    upload_file_measurements.file.close()
+    data_processing_time = round(time.time() - start_time, 1)
+    update_sensor_statistics(sensor_repository, alias_to_sensorid_map)
 
-        response.update({
-            'Total sensors processed': len(alias_to_sensorid_map),
-            'Total measurements processed': total_measurements,
-            'Data Processing time': f"{round(time.time() - start_time, 1)} seconds."
-        })
-        # Update sensor statistics
-        sensor_repository = SensorRepository(db)
-        update_sensor_statistics(sensor_repository, alias_to_sensorid_map)
+    response.update({
+        'Total sensors processed': len(alias_to_sensorid_map),
+        'Total measurements added to database': total_measurements,
+        'Data Processing time': f"{data_processing_time} seconds.",
+    })
 
-        response.update({
-            'Total sensors processed': len(alias_to_sensorid_map),
-            'Total measurements added to database': total_measurements,
-            'Data Processing time': f"{round(time.time() - start_time, 1)} seconds.",
-            'Update sensor statistics time': f"{round(time.time() - start_time, 1)} seconds."
-        })
+    return response
 
-        return response
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
