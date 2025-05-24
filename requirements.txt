@@ -11,3 +11,5 @@ psycopg2-binary
 geojson-pydantic>=1.2.0
 python-dateutil
 types-requests
+pandas
+pandantic
