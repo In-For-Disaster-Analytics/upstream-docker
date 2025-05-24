@@ -1,5 +1,7 @@
 from datetime import datetime
 import pandas as pd
+from sqlalchemy import insert
+from sqlalchemy.dialects.postgresql import insert
 from starlette.formparsers import MultiPartParser
 from fastapi import HTTPException, UploadFile
 from pandantic import Pandantic
@@ -17,13 +19,19 @@ BATCH_SIZE = 10000
 DEFAULT_VARIABLE_NAME = 'No BestGuess Formula'
 
 
-def process_batch(batch: list[dict[str, int | datetime | float | WKTElement]], session: Session) -> None:
+def process_batch(batch: list[dict[str, int | datetime | float | WKTElement]], session: Session) -> int:
     """Process a batch of measurements and insert to database."""
     if not batch:
-        return
-    session.bulk_insert_mappings(Measurement, batch) # type: ignore[arg-type]
+        return 0
+    stmt = pg_insert(Measurement).values(batch)
+    stmt = stmt.on_conflict_do_nothing(
+        index_elements=['sensorid', 'collectiontime']
+    )
+    result = session.execute(stmt)
+    inserted_count = result.rowcount if hasattr(result, 'rowcount') else len(batch)
     session.commit()
     batch.clear()
+    return inserted_count
 
 def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int, session: Session) -> dict[str, int]:
     """Process the sensors CSV file and return a mapping of aliases to sensor IDs."""
@@ -37,7 +45,6 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
     try:
         validator.validate(dataframe=df_sensors, errors="raise")
     except ValueError:
-        print(f"Validation failed! {validator.errors}")
         raise HTTPException(status_code=400, detail="Validation failed!")
 
     # Process each row
@@ -100,8 +107,6 @@ def process_measurements_file(
     session: Session
 ) -> int:
     """Process the measurements CSV file and return total number of measurements processed."""
-    measurement_repository = MeasurementRepository(session)
-
     # Read CSV using pandas
     df = pd.read_csv(
         file.file,
@@ -111,15 +116,9 @@ def process_measurements_file(
         parse_dates=['collectiontime'],  # Parse dates during read
         date_parser=pd.to_datetime,  # Use fast date parser
     ) # type: ignore[call-overload]
-    df = df.sort_values(by='collectiontime')
-
     measurement_batch = []
     total_measurements = 0
-
-    sensor_aliases = list(alias_to_sensorid_map.keys())
-
-    # Convert all sensor columns at once (vectorized operation)
-    for alias in sensor_aliases:
+    for alias in list(alias_to_sensorid_map.keys()):
         if alias in df.columns:
             df[alias] = pd.to_numeric(df[alias], errors='coerce')
 
@@ -129,11 +128,7 @@ def process_measurements_file(
     for alias, sensor_id in alias_to_sensorid_map.items():
         if alias not in df.columns:
             continue
-        latest_measurement = measurement_repository.get_latest_measurement_by_sensor_id(sensor_id)
-        df_filtered = df[df['collectiontime'] > latest_measurement.collectiontime] if latest_measurement else df
-
-        # Create measurements using vectorized operations
-        valid_mask = pd.notna(df_filtered[alias])
+        valid_mask = pd.notna(df[alias])
         if not valid_mask.any():
             continue
 
@@ -148,20 +143,18 @@ def process_measurements_file(
                 'upload_file_events_id': upload_event_id
             }
             for time, value, geom in zip(
-                df_filtered.loc[valid_mask, 'collectiontime'],
-                df_filtered.loc[valid_mask, alias],
-                df_filtered.loc[valid_mask, 'geometry_str']
+                df.loc[valid_mask, 'collectiontime'],
+                df.loc[valid_mask, alias],
+                df.loc[valid_mask, 'geometry_str']
             )
         ]
         measurement_batch.extend(sensor_measurements)
         if len(measurement_batch) >= BATCH_SIZE:
-            process_batch(measurement_batch, session)
-            total_measurements += len(measurement_batch)
+            total_measurements += process_batch(measurement_batch, session)
             measurement_batch = []
 
     if measurement_batch:
-        process_batch(measurement_batch, session)
-        total_measurements += len(measurement_batch)
+        total_measurements += process_batch(measurement_batch, session)
         measurement_batch = []
 
     return total_measurements
