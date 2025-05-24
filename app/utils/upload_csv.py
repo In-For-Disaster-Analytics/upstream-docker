@@ -23,9 +23,9 @@ def process_batch(batch: list[dict[str, int | datetime | float | WKTElement]], s
     if not batch:
         return 0
     stmt = insert(Measurement).values(batch)
-    stmt = stmt.on_conflict_do_nothing(
+    stmt = stmt.on_conflict_do_nothing( # type: ignore[attr-defined]
         index_elements=['sensorid', 'collectiontime']
-    ) # type: ignore[attr-defined]
+    )
     result = session.execute(stmt)
     inserted_count = result.rowcount if hasattr(result, 'rowcount') else len(batch)
     session.commit()
@@ -111,7 +111,7 @@ def process_measurements_file(
         keep_default_na=False,  # Prevent NaN creation
         na_values=[''],         # Only empty strings become NaN
         dtype={'Lon_deg': 'str', 'Lat_deg': 'str'},  # Pre-specify dtypes
-    ) # type: ignore[call-overload]
+    )
     measurement_batch = []
     total_measurements = 0
     df['geometry_str'] = 'Point (' + df['Lon_deg'] + ' ' + df['Lat_deg'] + ')'
