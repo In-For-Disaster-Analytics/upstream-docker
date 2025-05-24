@@ -8,7 +8,7 @@ from app.api.v1.schemas.measurement import MeasurementIn
 
 # Pydantic model for incoming sensor data
 class SensorIn(BaseModel):
-    alias: Optional[str | float] = None
+    alias: str | float
     description: Optional[str] = None
     postprocess: Optional[bool] = True
     postprocessscript: Optional[str] = None

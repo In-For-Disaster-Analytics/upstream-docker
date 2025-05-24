@@ -9,7 +9,6 @@ from geoalchemy2 import WKTElement
 from sqlalchemy.orm import Session
 from app.db.models.measurement import Measurement
 from app.db.repositories.sensor_repository import SensorRepository
-from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.models.sensor import Sensor
 from app.api.v1.schemas.sensor import SensorIn
 
@@ -23,10 +22,10 @@ def process_batch(batch: list[dict[str, int | datetime | float | WKTElement]], s
     """Process a batch of measurements and insert to database."""
     if not batch:
         return 0
-    stmt = pg_insert(Measurement).values(batch)
+    stmt = insert(Measurement).values(batch)
     stmt = stmt.on_conflict_do_nothing(
         index_elements=['sensorid', 'collectiontime']
-    )
+    ) # type: ignore[attr-defined]
     result = session.execute(stmt)
     inserted_count = result.rowcount if hasattr(result, 'rowcount') else len(batch)
     session.commit()
@@ -62,7 +61,6 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
         if existing_sensor is None:
             sensor_maps.append(sensor)
         else:
-            print(f"Sensor {sensor.alias}  already exists in the database ")
             existing_sensors.append(existing_sensor)
     sensor_repository.create_sensors(sensor_maps)
 
@@ -113,16 +111,9 @@ def process_measurements_file(
         keep_default_na=False,  # Prevent NaN creation
         na_values=[''],         # Only empty strings become NaN
         dtype={'Lon_deg': 'str', 'Lat_deg': 'str'},  # Pre-specify dtypes
-        parse_dates=['collectiontime'],  # Parse dates during read
-        date_parser=pd.to_datetime,  # Use fast date parser
     ) # type: ignore[call-overload]
     measurement_batch = []
     total_measurements = 0
-    for alias in list(alias_to_sensorid_map.keys()):
-        if alias in df.columns:
-            df[alias] = pd.to_numeric(df[alias], errors='coerce')
-
-    # 3. OPTIMIZATION: Pre-compute geometry for all rows (vectorized)
     df['geometry_str'] = 'Point (' + df['Lon_deg'] + ' ' + df['Lat_deg'] + ')'
 
     for alias, sensor_id in alias_to_sensorid_map.items():
