@@ -1,12 +1,36 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Union, Any
 from sqlalchemy.orm import Session
-from sqlalchemy import Row, Sequence, or_, select, func
+from sqlalchemy import Row, Sequence, or_, select, func, Column
 from sqlalchemy.sql import text
+from enum import Enum
 
 from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse, SensorStatistics as SensorStatisticsSchema
 from app.db.models.sensor import Sensor
 from app.db.models.measurement import Measurement
 from app.db.models.sensor_statistics import SensorStatistics
+
+class SortField(str, Enum):
+    # Sensor fields
+    ALIAS = "alias"
+    DESCRIPTION = "description"
+    POSTPROCESS = "postprocess"
+    POSTPROCESSSCRIPT = "postprocessscript"
+    UNITS = "units"
+    VARIABLENAME = "variablename"
+
+    # SensorStatistics fields
+    MAX_VALUE = "max_value"
+    MIN_VALUE = "min_value"
+    AVG_VALUE = "avg_value"
+    STDDEV_VALUE = "stddev_value"
+    PERCENTILE_90 = "percentile_90"
+    PERCENTILE_95 = "percentile_95"
+    PERCENTILE_99 = "percentile_99"
+    COUNT = "count"
+    FIRST_MEASUREMENT_VALUE = "first_measurement_value"
+    FIRST_MEASUREMENT_COLLECTIONTIME = "first_measurement_collectiontime"
+    LAST_MEASUREMENT_VALUE = "last_measurement_value"
+    LAST_MEASUREMENT_COLLECTIONTIME = "last_measurement_collectiontime"
 
 class SensorRepository:
     def __init__(self, db: Session):
@@ -83,6 +107,33 @@ class SensorRepository:
         self.db.commit()
         return True
 
+    def get_sort_column(self, sort_by: SortField) -> Column[Any] | None:
+        if sort_by.value in [
+            SortField.ALIAS.value,
+            SortField.DESCRIPTION.value,
+            SortField.POSTPROCESS.value,
+            SortField.POSTPROCESSSCRIPT.value,
+            SortField.UNITS.value,
+            SortField.VARIABLENAME.value
+        ]:
+            return getattr(Sensor, sort_by.value)
+        elif sort_by.value in [
+            SortField.MAX_VALUE.value,
+            SortField.MIN_VALUE.value,
+            SortField.AVG_VALUE.value,
+            SortField.STDDEV_VALUE.value,
+            SortField.PERCENTILE_90.value,
+            SortField.PERCENTILE_95.value,
+            SortField.PERCENTILE_99.value,
+            SortField.COUNT.value,
+            SortField.FIRST_MEASUREMENT_VALUE.value,
+            SortField.FIRST_MEASUREMENT_COLLECTIONTIME.value,
+            SortField.LAST_MEASUREMENT_VALUE.value,
+            SortField.LAST_MEASUREMENT_COLLECTIONTIME.value
+        ]:
+            return getattr(SensorStatistics, sort_by.value)
+        return None
+
     def get_sensors_by_station_id(
         self,
         station_id: int,
@@ -93,10 +144,13 @@ class SensorRepository:
         alias: str | None = None,
         description_contains: str | None = None,
         postprocess: bool | None = None,
+        sort_by: Optional[SortField] = None,
+        sort_order: str = "asc"
     ) -> Tuple[list[Row[Tuple[Sensor, SensorStatistics]]], int]:
         count_stmt = select(func.count()).select_from(Sensor).where(Sensor.stationid == station_id)
         stmt = select(Sensor, SensorStatistics).outerjoin(SensorStatistics, Sensor.sensorid == SensorStatistics.sensorid)
-        stmt = stmt.where(Sensor.stationid == station_id).limit(limit).offset((page - 1) * limit)
+        stmt = stmt.where(Sensor.stationid == station_id)
+
         if variable_name:
             stmt = stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
             count_stmt = count_stmt.where(Sensor.variablename.ilike(f"%{variable_name}%"))
@@ -112,6 +166,17 @@ class SensorRepository:
         if postprocess is not None:
             stmt = stmt.where(Sensor.postprocess == postprocess)
             count_stmt = count_stmt.where(Sensor.postprocess == postprocess)
+
+        # Handle sorting
+        if sort_by:
+            sort_column = self.get_sort_column(sort_by)
+            if sort_column is not None:
+                if sort_order.lower() == "desc":
+                    stmt = stmt.order_by(sort_column.desc())
+                else:
+                    stmt = stmt.order_by(sort_column.asc())
+
+        stmt = stmt.limit(limit).offset((page - 1) * limit)
         result = list(self.db.execute(stmt).all())
         total_count = self.db.execute(count_stmt).scalar_one()
         return result, total_count
@@ -123,17 +188,37 @@ class SensorRepository:
         postprocess: Optional[bool] = None,
         page: int = 1,
         limit: int = 20,
-    ) -> tuple[list[Sensor], int]:
-        query = self.db.query(Sensor)
-        if station_id:
-            query = query.filter(Sensor.stationid == station_id)
-        if variable_name:
-            query = query.filter(Sensor.variablename == variable_name)
-        if postprocess is not None:
-            query = query.filter(Sensor.postprocess == postprocess)
+        sort_by: Optional[SortField] = None,
+        sort_order: str = "asc"
+    ) -> tuple[list[Row[Tuple[Sensor, SensorStatistics]]], int]:
+        stmt = select(Sensor, SensorStatistics).outerjoin(
+            SensorStatistics,
+            Sensor.sensorid == SensorStatistics.sensorid
+        )
+        count_stmt = select(func.count()).select_from(Sensor)
 
-        total_count = query.count()
-        return query.offset((page - 1) * limit).limit(limit).all(), total_count
+        if station_id:
+            stmt = stmt.where(Sensor.stationid == station_id)
+            count_stmt = count_stmt.where(Sensor.stationid == station_id)
+        if variable_name:
+            stmt = stmt.where(Sensor.variablename == variable_name)
+            count_stmt = count_stmt.where(Sensor.variablename == variable_name)
+        if postprocess is not None:
+            stmt = stmt.where(Sensor.postprocess == postprocess)
+            count_stmt = count_stmt.where(Sensor.postprocess == postprocess)
+
+        # Handle sorting
+        if sort_by:
+            sort_column = self.get_sort_column(sort_by)
+            if sort_column is not None:
+                if sort_order.lower() == "desc":
+                    stmt = stmt.order_by(sort_column.desc())
+                else:
+                    stmt = stmt.order_by(sort_column.asc())
+
+        total_count = self.db.execute(count_stmt).scalar_one()
+        result = list(self.db.execute(stmt.offset((page - 1) * limit).limit(limit)).all())
+        return result, total_count
 
     def delete_sensor(self, sensor_id: int) -> bool:
         db_sensor = self.get_sensor(sensor_id)

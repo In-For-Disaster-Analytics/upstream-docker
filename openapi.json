@@ -597,6 +597,36 @@
               "title": "Postprocess"
             },
             "description": "Filter sensors by postprocess flag"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SortField"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Sort sensors by field",
+              "title": "Sort By"
+            },
+            "description": "Sort sensors by field"
+          },
+          {
+            "name": "sort_order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Sort order (asc or desc)",
+              "default": "asc",
+              "title": "Sort Order"
+            },
+            "description": "Sort order (asc or desc)"
           }
         ],
         "responses": {
@@ -1054,6 +1084,7 @@
           "uploadfile_csv"
         ],
         "summary": "Post Sensor And Measurement",
+        "description": "Process sensor and measurement files and store data in the database.",
         "operationId": "post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post",
         "security": [
           {
@@ -1097,23 +1128,6 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "number"
-                      },
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "string",
-                        "format": "date-time"
-                      }
-                    ]
-                  },
                   "title": "Response Post Sensor And Measurement Api V1 Uploadfile Csv Campaign  Campaign Id  Station  Station Id  Sensor Post"
                 }
               }
@@ -3570,6 +3584,30 @@
           "id"
         ],
         "title": "SensorSummaryForStations"
+      },
+      "SortField": {
+        "type": "string",
+        "enum": [
+          "alias",
+          "description",
+          "postprocess",
+          "postprocessscript",
+          "units",
+          "variablename",
+          "max_value",
+          "min_value",
+          "avg_value",
+          "stddev_value",
+          "percentile_90",
+          "percentile_95",
+          "percentile_99",
+          "count",
+          "first_measurement_value",
+          "first_measurement_collectiontime",
+          "last_measurement_value",
+          "last_measurement_collectiontime"
+        ],
+        "title": "SortField"
       },
       "StationCreate": {
         "properties": {

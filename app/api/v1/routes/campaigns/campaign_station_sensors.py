@@ -7,7 +7,7 @@ from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
-from app.db.repositories.sensor_repository import SensorRepository
+from app.db.repositories.sensor_repository import SensorRepository, SortField
 
 
 router = APIRouter(
@@ -28,6 +28,8 @@ async def list_sensors(
     postprocess: Optional[bool] = Query(None, description="Filter sensors by postprocess flag"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    sort_by: Optional[SortField] = Query(None, description="Sort sensors by field"),
+    sort_order: str = Query("asc", description="Sort order (asc or desc)"),
 ) -> ListSensorsResponsePagination:
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
@@ -40,7 +42,9 @@ async def list_sensors(
         units=units,
         alias=alias,
         description_contains=description_contains,
-        postprocess=postprocess
+        postprocess=postprocess,
+        sort_by=sort_by,
+        sort_order=sort_order
     )
 
     response = []
