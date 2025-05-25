@@ -107,6 +107,7 @@ class SensorRepository:
         self.db.commit()
         return True
 
+
     def get_sort_column(self, sort_by: SortField) -> Column[Any] | None:
         if sort_by.value in [
             SortField.ALIAS.value,
@@ -116,7 +117,7 @@ class SensorRepository:
             SortField.UNITS.value,
             SortField.VARIABLENAME.value
         ]:
-            return getattr(Sensor, sort_by.value)
+            return getattr(Sensor, sort_by.value) # type: ignore
         elif sort_by.value in [
             SortField.MAX_VALUE.value,
             SortField.MIN_VALUE.value,
@@ -131,7 +132,7 @@ class SensorRepository:
             SortField.LAST_MEASUREMENT_VALUE.value,
             SortField.LAST_MEASUREMENT_COLLECTIONTIME.value
         ]:
-            return getattr(SensorStatistics, sort_by.value)
+            return getattr(SensorStatistics, sort_by.value) # type: ignore
         return None
 
     def get_sensors_by_station_id(
