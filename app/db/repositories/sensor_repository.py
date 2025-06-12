@@ -109,7 +109,6 @@ class SensorRepository:
 
 
     def delete_sensor_measurements(self, sensor_id: int) -> None:
-        self.delete_sensor_statistics(sensor_id=sensor_id)
         self.db.query(Measurement).filter(Measurement.sensorid == sensor_id).delete()
         self.db.commit()
 

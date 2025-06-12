@@ -145,6 +145,10 @@ class SensorService:
     def refresh_sensor_statistics(self, sensor_id: int) -> bool:
         return self.sensor_repository.refresh_sensor_statistics(sensor_id)
 
+    def delete_sensor_measurements(self, sensor_id: int) -> None:
+        self.sensor_repository.delete_sensor_statistics(sensor_id)
+        self.sensor_repository.delete_sensor_measurements(sensor_id)
+
     def create_measurement(self, measurement: MeasurementIn, sensor_id: int) -> bool:
         self.measurement_repository.create_measurement(measurement, sensor_id)
         return True

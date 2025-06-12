@@ -11,6 +11,7 @@ from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.repositories.sensor_repository import SensorRepository
 from app.db.session import get_db
 from app.services.measurement_service import MeasurementService
+from app.services.sensor_service import SensorService
 
 router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}",
@@ -67,5 +68,7 @@ def delete_sensor_measurements(
     if not check_allocation_permission(current_user, campaign_id):
         raise HTTPException(status_code=404, detail="Allocation is incorrect")
     sensor_repository = SensorRepository(db)
-    sensor_repository.delete_sensor_measurements(sensor_id=sensor_id)
+    measurement_repository = MeasurementRepository(db)
+    sensor_service = SensorService(sensor_repository=sensor_repository, measurement_repository=measurement_repository)
+    sensor_service.delete_sensor_measurements(sensor_id=sensor_id)
     return Response(status_code=204)
