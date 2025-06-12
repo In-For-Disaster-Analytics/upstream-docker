@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.user import User
 from app.api.v1.schemas.measurement import AggregatedMeasurement, ListMeasurementsResponsePagination
 from app.db.repositories.measurement_repository import MeasurementRepository
+from app.db.repositories.sensor_repository import SensorRepository
 from app.db.session import get_db
 from app.services.measurement_service import MeasurementService
 
@@ -54,3 +55,17 @@ async def get_measurements_with_confidence_intervals(
     measurement_repository = MeasurementRepository(db)
     measurement_service = MeasurementService(measurement_repository)
     return measurement_service.get_measurements_with_confidence_intervals(sensor_id=sensor_id, interval=interval, interval_value=interval_value, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value)
+
+@router.delete("/measurements", status_code=204)
+def delete_sensor_measurements(
+    campaign_id: int,
+    station_id: int,
+    sensor_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    sensor_repository = SensorRepository(db)
+    sensor_repository.delete_sensor_measurements(sensor_id=sensor_id)
+    return Response(status_code=204)
