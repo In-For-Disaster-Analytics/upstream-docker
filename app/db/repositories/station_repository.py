@@ -101,3 +101,8 @@ class StationRepository:
             self.db.commit()
             return True
         return False
+    
+    def delete_station_sensors(self, station_id: int) -> bool:
+        self.db.query(Sensor).filter(Sensor.stationid == station_id).delete()
+        self.db.commit()
+        return True

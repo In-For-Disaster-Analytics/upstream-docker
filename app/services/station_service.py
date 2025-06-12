@@ -60,3 +60,5 @@ class StationService:
                 variablename=sensor.variablename,
             ) for sensor in row.sensors]
         )
+    def delete_station_sensors(self, station_id: int) ->bool:
+        return self.station_repository.delete_station_sensors(station_id)
