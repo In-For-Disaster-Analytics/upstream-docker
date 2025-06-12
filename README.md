@@ -29,10 +29,23 @@ A RESTful API service for managing environmental sensor data and campaigns.
    docker compose -f docker-compose.dev.yml  up -d
    ```
 
+   or just the database:
+
+   ```bash
+   docker compose -f docker-compose.dev.yml up -d db
+   ```
+
 6. Initialize the database:
+
    ```bash
    # Run database migrations
    alembic upgrade head
+   ```
+
+7. Run the application for development:
+
+   ```bash
+   fastapi dev app/main.py
    ```
 
 ## On-premise Environment
@@ -142,4 +155,8 @@ classDiagram
     Campaign "1" --> "*" Station : has
     Station "1" --> "*" Sensor : contains
     Sensor "1" --> "*" Measurement : records
+```
+
+```
+
 ```
