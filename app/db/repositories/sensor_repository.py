@@ -108,6 +108,10 @@ class SensorRepository:
         return True
 
 
+    def delete_sensor_measurements(self, sensor_id: int) -> None:
+        self.db.query(Measurement).filter(Measurement.sensorid == sensor_id).delete()
+        self.db.commit()
+
     def get_sort_column(self, sort_by: SortField) -> Column[Any] | None:
         if sort_by.value in [
             SortField.ALIAS.value,
