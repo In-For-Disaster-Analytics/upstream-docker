@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from app.services.campaign_service import CampaignService
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
@@ -6,6 +7,7 @@ from app.api.v1.schemas.station import GetStationResponse, ListStationsResponseP
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.station_repository import StationRepository
+from app.db.repositories.campaign_repository import CampaignRepository
 from app.services.station_service import StationService
 router = APIRouter(prefix="/campaigns/{campaign_id}", tags=["stations"])
 
@@ -44,3 +46,17 @@ async def get_station(station_id: int, campaign_id: int, current_user: User = De
     if not station:
         raise HTTPException(status_code=404, detail="Station not found")
     return station
+
+
+@router.delete("/stations", status_code=204)
+def delete_sensor(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    campaign_repository = CampaignRepository(db)
+    campaign_service = CampaignService(campaign_repository=campaign_repository)
+    campaign_service.delete_campaign_station(campaign_id=campaign_id)
+    return Response(status_code=204)
