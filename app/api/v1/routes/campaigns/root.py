@@ -1,9 +1,10 @@
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from app.api.dependencies.pytas import check_allocation_permission
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
@@ -47,9 +48,25 @@ async def list_campaigns(
     return response
 
 @router.get("/{campaign_id}")
-async def get_campaign(campaign_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> GetCampaignResponse:
+async def get_campaign(campaign_id: int,
+                    current_user: User = Depends(get_current_user), 
+                    db: Session = Depends(get_db)) -> GetCampaignResponse:
     campaign_service = CampaignService(CampaignRepository(db))
     campaign = campaign_service.get_campaign_with_summary(campaign_id)
     if not campaign:
         raise HTTPException(status_code=404, detail="Campaign not found")
     return campaign
+
+
+@router.delete("/{campaign_id}", status_code=204)
+def delete_sensor(
+    campaign_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Response:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    campaign_repository = CampaignRepository(db)
+    campaign_service = CampaignService(campaign_repository=campaign_repository)
+    campaign_service.delete_campaign(campaign_id=campaign_id)
+    return Response(status_code=204)

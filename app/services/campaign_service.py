@@ -101,3 +101,6 @@ class CampaignService:
 
     def delete_campaign_station(self, campaign_id: int) ->bool:
             return self.campaign_repository.delete_campaign_stations(campaign_id)
+    
+    def delete_campaign(self, campaign_id: int) ->bool:
+            return self.campaign_repository.delete_campaign(campaign_id)
