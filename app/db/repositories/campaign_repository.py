@@ -139,3 +139,8 @@ class CampaignRepository:
     def get_sensor_variables(self, campaign_id: int) -> list[str]:
         stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
         return list(set(sensor.variablename for station in stations for sensor in station.sensors))
+    
+    def delete_campaign_stations(self, campaign_id: int) -> bool:
+        self.db.query(Station).filter(Station.campaignid == campaign_id).delete()
+        self.db.commit()
+        return True
