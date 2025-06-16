@@ -164,14 +164,38 @@ class CampaignRepository:
                 db_field = field_mapping.get(field, field)
                 setattr(db_campaign, db_field, value)
         else:
-            full_request = request if isinstance(request, CampaignsIn) else request
-            db_campaign.campaignname = full_request.name
-            db_campaign.description = full_request.description
-            db_campaign.contactname = full_request.contact_name
-            db_campaign.contactemail = full_request.contact_email
-            db_campaign.allocation = full_request.allocation
-            db_campaign.startdate = full_request.start_date
-            db_campaign.enddate = full_request.end_date
+            # Full update (existing logic)
+            # Ensure all fields for a full update are provided and not None
+            name = request.name
+            description = request.description
+            contact_name = request.contact_name
+            contact_email = request.contact_email
+            allocation = request.allocation
+            start_date = request.start_date
+            end_date = request.end_date
+
+            if name is None:
+                raise ValueError("Campaign name must be provided for a full update")
+            if description is None:
+                raise ValueError("Campaign description must be provided for a full update")
+            if contact_name is None:
+                raise ValueError("Contact name must be provided for a full update")
+            if contact_email is None:
+                raise ValueError("Contact email must be provided for a full update")
+            if allocation is None:
+                raise ValueError("Allocation must be provided for a full update")
+            if start_date is None:
+                raise ValueError("Start date must be provided for a full update")
+            if end_date is None:
+                raise ValueError("End date must be provided for a full update")
+
+            db_campaign.campaignname = name
+            db_campaign.description = description
+            db_campaign.contactname = contact_name
+            db_campaign.contactemail = contact_email 
+            db_campaign.allocation = allocation
+            db_campaign.startdate = start_date
+            db_campaign.enddate = end_date
         
         self.db.commit()
         self.db.refresh(db_campaign)
