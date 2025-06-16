@@ -1,13 +1,12 @@
 from datetime import datetime
+from typing import Union
 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, select, or_
-from geoalchemy2.functions import ST_AsGeoJSON # Add this import at the top
+from geoalchemy2.functions import ST_AsGeoJSON
 
-from app.api.v1.schemas.campaign import CampaignsIn
-from app.db.models.campaign import (  # Adjust the import based on your model's location
-    Campaign,
-)
+from app.api.v1.schemas.campaign import CampaignsIn, CampaignUpdate
+from app.db.models.campaign import Campaign
 from app.db.models.station import Station
 from app.db.models.sensor import Sensor
 
@@ -145,7 +144,7 @@ class CampaignRepository:
         self.db.commit()
         return True
     
-    def update_campaign(self, campaign_id: int, request, partial: bool = False) -> Campaign | None:
+    def update_campaign(self, campaign_id: int, request: Union[CampaignsIn, CampaignUpdate], partial: bool = False) -> Campaign | None:
         db_campaign = self.db.query(Campaign).filter(Campaign.campaignid == campaign_id).first()
         if not db_campaign:
             return None
