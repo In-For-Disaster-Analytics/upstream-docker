@@ -144,3 +144,36 @@ class CampaignRepository:
         self.db.query(Station).filter(Station.campaignid == campaign_id).delete()
         self.db.commit()
         return True
+    
+    def update_campaign(self, campaign_id: int, request, partial: bool = False) -> Campaign | None:
+        db_campaign = self.db.query(Campaign).filter(Campaign.campaignid == campaign_id).first()
+        if not db_campaign:
+            return None
+        
+        if partial:
+            # Get only the fields that were explicitly set in the request
+            update_data = request.model_dump(exclude_unset=True)
+            field_mapping = {
+                'name': 'campaignname',
+                'contact_name': 'contactname',
+                'contact_email': 'contactemail',
+                'start_date': 'startdate',
+                'end_date': 'enddate'
+            }
+        
+            for field, value in update_data.items():
+                db_field = field_mapping.get(field, field)
+                setattr(db_campaign, db_field, value)
+        else:
+            # Full update (existing logic)
+            db_campaign.campaignname = request.name
+            db_campaign.description = request.description
+            db_campaign.contactname = request.contact_name
+            db_campaign.contactemail = request.contact_email
+            db_campaign.allocation = request.allocation
+            db_campaign.startdate = request.start_date
+            db_campaign.enddate = request.end_date
+        
+        self.db.commit()
+        self.db.refresh(db_campaign)
+        return db_campaign

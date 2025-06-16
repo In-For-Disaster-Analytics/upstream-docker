@@ -8,7 +8,7 @@ from app.api.dependencies.pytas import check_allocation_permission
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import get_allocations
-from app.api.v1.schemas.campaign import CampaignCreateResponse, GetCampaignResponse, ListCampaignsResponsePagination, CampaignsIn
+from app.api.v1.schemas.campaign import CampaignCreateResponse, GetCampaignResponse, ListCampaignsResponsePagination, CampaignsIn, CampaignUpdate
 from app.api.v1.schemas.user import User
 from app.db.repositories.campaign_repository import CampaignRepository
 from app.db.session import get_db
@@ -18,7 +18,9 @@ from app.services.campaign_service import CampaignService
 router = APIRouter(prefix="/campaigns", tags=["campaigns"])
 
 @router.post("")
-async def create_campaign(campaign: CampaignsIn, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)) -> CampaignCreateResponse:
+async def create_campaign(campaign: CampaignsIn,
+                         current_user: User = Depends(get_current_user), 
+                         db: Session = Depends(get_db)) -> CampaignCreateResponse:
     campaign_service = CampaignService(CampaignRepository(db))
     return campaign_service.create_campaign(campaign)
 
@@ -70,3 +72,33 @@ def delete_sensor(
     campaign_service = CampaignService(campaign_repository=campaign_repository)
     campaign_service.delete_campaign(campaign_id=campaign_id)
     return Response(status_code=204)
+
+@router.put("/{campaign_id}", response_model=CampaignCreateResponse)
+def update_campaign(
+    campaign_id: int,
+    campaign: CampaignsIn,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> CampaignCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    campaign_service = CampaignService(CampaignRepository(db))
+    updated_campaign = campaign_service.update_campaign(campaign_id, campaign)
+    if not updated_campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return updated_campaign
+
+@router.patch("/{campaign_id}", response_model=CampaignCreateResponse)
+def partial_update_campaign(
+    campaign_id: int,
+    campaign: CampaignUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> CampaignCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    campaign_service = CampaignService(CampaignRepository(db))
+    updated_campaign = campaign_service.partial_update_campaign(campaign_id, campaign)
+    if not updated_campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return updated_campaign
