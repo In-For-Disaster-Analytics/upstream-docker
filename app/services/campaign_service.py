@@ -2,7 +2,8 @@ from datetime import datetime
 import json
 from app.api.v1.schemas.station import SensorSummaryForStations, StationsListResponseItem
 from app.db.repositories.campaign_repository import CampaignRepository
-from app.api.v1.schemas.campaign import CampaignsIn, CampaignCreateResponse, GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns
+from app.api.v1.schemas.campaign import CampaignsIn, CampaignCreateResponse, GetCampaignResponse, ListCampaignsResponseItem, Location, SummaryGetCampaign, SummaryListCampaigns, CampaignUpdate
+
 
 class CampaignService:
     def __init__(self, campaign_repository: CampaignRepository):
@@ -10,6 +11,20 @@ class CampaignService:
 
     def create_campaign(self, campaign: CampaignsIn) -> CampaignCreateResponse:
         response = self.campaign_repository.create_campaign(campaign)
+        return CampaignCreateResponse(
+            id=response.campaignid,
+        )
+    def update_campaign(self, campaign_id: int, campaign: CampaignsIn) -> CampaignCreateResponse | None:
+        response = self.campaign_repository.update_campaign(campaign_id, campaign)
+        if not response:
+            return None
+        return CampaignCreateResponse(
+            id=response.campaignid,
+        )
+    def partial_update_campaign(self, campaign_id: int, campaign: CampaignUpdate) -> CampaignCreateResponse | None:
+        response = self.campaign_repository.update_campaign(campaign_id, campaign, partial=True)
+        if not response:
+            return None
         return CampaignCreateResponse(
             id=response.campaignid,
         )
@@ -104,3 +119,4 @@ class CampaignService:
     
     def delete_campaign(self, campaign_id: int) ->bool:
             return self.campaign_repository.delete_campaign(campaign_id)
+    

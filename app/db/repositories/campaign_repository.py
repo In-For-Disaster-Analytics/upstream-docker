@@ -1,13 +1,12 @@
 from datetime import datetime
+from typing import Union
 
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, select, or_
-from geoalchemy2.functions import ST_AsGeoJSON # Add this import at the top
+from geoalchemy2.functions import ST_AsGeoJSON
 
-from app.api.v1.schemas.campaign import CampaignsIn
-from app.db.models.campaign import (  # Adjust the import based on your model's location
-    Campaign,
-)
+from app.api.v1.schemas.campaign import CampaignsIn, CampaignUpdate
+from app.db.models.campaign import Campaign
 from app.db.models.station import Station
 from app.db.models.sensor import Sensor
 
@@ -144,3 +143,60 @@ class CampaignRepository:
         self.db.query(Station).filter(Station.campaignid == campaign_id).delete()
         self.db.commit()
         return True
+    
+    def update_campaign(self, campaign_id: int, request: Union[CampaignsIn, CampaignUpdate], partial: bool = False) -> Campaign | None:
+        db_campaign = self.db.query(Campaign).filter(Campaign.campaignid == campaign_id).first()
+        if not db_campaign:
+            return None
+        
+        if partial:
+            # Get only the fields that were explicitly set in the request
+            update_data = request.model_dump(exclude_unset=True)
+            field_mapping = {
+                'name': 'campaignname',
+                'contact_name': 'contactname',
+                'contact_email': 'contactemail',
+                'start_date': 'startdate',
+                'end_date': 'enddate'
+            }
+        
+            for field, value in update_data.items():
+                db_field = field_mapping.get(field, field)
+                setattr(db_campaign, db_field, value)
+        else:
+            # Full update (existing logic)
+            # Ensure all fields for a full update are provided and not None
+            name = request.name
+            description = request.description
+            contact_name = request.contact_name
+            contact_email = request.contact_email
+            allocation = request.allocation
+            start_date = request.start_date
+            end_date = request.end_date
+
+            if name is None:
+                raise ValueError("Campaign name must be provided for a full update")
+            if description is None:
+                raise ValueError("Campaign description must be provided for a full update")
+            if contact_name is None:
+                raise ValueError("Contact name must be provided for a full update")
+            if contact_email is None:
+                raise ValueError("Contact email must be provided for a full update")
+            if allocation is None:
+                raise ValueError("Allocation must be provided for a full update")
+            if start_date is None:
+                raise ValueError("Start date must be provided for a full update")
+            if end_date is None:
+                raise ValueError("End date must be provided for a full update")
+
+            db_campaign.campaignname = name
+            db_campaign.description = description
+            db_campaign.contactname = contact_name
+            db_campaign.contactemail = contact_email 
+            db_campaign.allocation = allocation
+            db_campaign.startdate = start_date
+            db_campaign.enddate = end_date
+        
+        self.db.commit()
+        self.db.refresh(db_campaign)
+        return db_campaign
