@@ -57,3 +57,12 @@ class StationsListResponseItem(StationItem):
     sensors: List[SensorSummaryForStations] = []
 
 
+
+class StationUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] | None = None
+    contact_name: Optional[str] | None = None
+    contact_email: Optional[str] | None = None
+    active: Optional[bool] | None = None
+    start_date: Optional[datetime] | None = None
+    station_type: Optional[StationType] | None  = None
