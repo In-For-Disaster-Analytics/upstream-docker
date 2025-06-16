@@ -1,6 +1,6 @@
 import json
 from app.api.v1.schemas.sensor import SensorItem
-from app.api.v1.schemas.station import GetStationResponse,  StationItemWithSummary, StationCreate, StationCreateResponse
+from app.api.v1.schemas.station import GetStationResponse,  StationItemWithSummary, StationCreate, StationCreateResponse, StationUpdate
 from app.db.repositories.station_repository import StationRepository
 
 
@@ -10,7 +10,21 @@ class StationService:
 
     def create_station(self, station: StationCreate, campaign_id: int) -> StationCreateResponse:
         return StationCreateResponse(id=self.station_repository.create_station(station, campaign_id).stationid)
-
+    
+    def update_station(self, station_id: int, station: StationUpdate) -> StationCreateResponse | None:
+        response = self.station_repository.update_station(station_id, station)
+        if not response:
+            return None
+        return StationCreateResponse(
+            id=response.campaignid,
+        )
+    def partial_update_station(self, station_id: int, station: StationUpdate) -> StationCreateResponse | None:
+        response = self.station_repository.update_station(station_id, station, partial=True)
+        if not response:
+            return None
+        return StationCreateResponse(
+            id=response.campaignid,
+        )
     def get_stations_with_summary(self, campaign_id: int, page: int = 1, limit: int = 20) -> tuple[list[StationItemWithSummary], int]:
         rows, total_count = self.station_repository.list_stations_and_summary(campaign_id, page, limit)
         stations : list[StationItemWithSummary] = []

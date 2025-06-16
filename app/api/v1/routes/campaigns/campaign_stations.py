@@ -1,9 +1,10 @@
+from app.db.models.station import Station
 from app.services.campaign_service import CampaignService
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.station import GetStationResponse, ListStationsResponsePagination, StationCreate, StationCreateResponse
+from app.api.v1.schemas.station import GetStationResponse, ListStationsResponsePagination, StationCreate, StationCreateResponse, StationUpdate
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.station_repository import StationRepository
@@ -60,3 +61,36 @@ def delete_sensor(
     campaign_service = CampaignService(campaign_repository=campaign_repository)
     campaign_service.delete_campaign_station(campaign_id=campaign_id)
     return Response(status_code=204)
+
+
+@router.put("/stations/{station_id}", response_model=StationCreateResponse)
+def update_station(
+    station_id: int,
+    campaign_id: int,
+    station: StationUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    ) -> StationCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    station_service = StationService(StationRepository(db))
+    updated_station = station_service.update_station(station_id, station)
+    if not updated_station:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return updated_station
+
+@router.patch("/stations/{station_id}", response_model=StationCreateResponse)
+def partial_update_station(
+    campaign_id: int,
+    station_id: int,
+    station: StationUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> StationCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    station_service = StationService(StationRepository(db))
+    update_station = station_service.partial_update_station(station_id, station)
+    if not update_station:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return update_station

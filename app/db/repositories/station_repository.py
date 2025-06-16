@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from sqlalchemy import func
 from sqlalchemy.orm import joinedload
-from app.api.v1.schemas.station import StationCreate
+from app.api.v1.schemas.station import StationCreate, StationUpdate
 from app.db.models.sensor import Sensor
 from app.db.models.station import Station
 
@@ -106,3 +106,60 @@ class StationRepository:
         self.db.query(Sensor).filter(Sensor.stationid == station_id).delete()
         self.db.commit()
         return True
+
+    def update_station(self, station_id: int, request:  StationUpdate, partial: bool = False) -> Station | None:
+        
+        db_station = self.db.query(Station).filter(Station.stationid == station_id).first()
+        
+        if not db_station:
+            return None
+        
+        if partial:
+            # Get only the fields that were explicitly set in the request
+            update_data = request.model_dump(exclude_unset=True)
+            field_mapping = {
+                'name': 'stationname',
+                'contact_name': 'contactname',
+                'contact_email': 'contactemail',
+                'active': 'active',
+                'start_date': 'startdate',
+                
+            }
+        
+            for field, value in update_data.items():
+                db_field = field_mapping.get(field, field)
+                setattr(db_station, db_field, value)
+        else:
+            # Full update (existing logic)
+            # Ensure all fields for a full update are provided and not None
+            name = request.name
+            description = request.description
+            contact_name = request.contact_name
+            contact_email = request.contact_email
+            active = request.active
+            start_date = request.start_date
+            
+
+            if name is None:
+                raise ValueError("Campaign name must be provided for a full update")
+            if description is None:
+                raise ValueError("Campaign description must be provided for a full update")
+            if contact_name is None:
+                raise ValueError("Contact name must be provided for a full update")
+            if contact_email is None:
+                raise ValueError("Contact email must be provided for a full update")
+            if active is None:
+                raise ValueError("Active must be provided for a full update")
+            if start_date is None:
+                raise ValueError("Start date must be provided for a full update")
+            
+            db_station.stationname = name
+            db_station.description = description
+            db_station.contactname = contact_name
+            db_station.contactemail = contact_email 
+            db_station.active = active
+            db_station.startdate = start_date
+            
+        self.db.commit()
+        self.db.refresh(db_station)
+        return db_station
