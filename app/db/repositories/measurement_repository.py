@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from geoalchemy2 import WKTElement
 from sqlalchemy import func, text
-from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementIn
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementIn, MeasurementUpdate
 from app.db.models.measurement import Measurement
 
 
@@ -165,3 +165,61 @@ class MeasurementRepository:
 
     def get_latest_measurement_by_sensor_id(self, sensor_id: int) -> Measurement | None:
         return self.db.query(Measurement).filter(Measurement.sensorid == sensor_id).order_by(Measurement.collectiontime.desc()).first()
+    
+    
+    def update_measurement(self, measurement_id: int, request:  MeasurementUpdate, partial: bool = False) -> Measurement | None:
+        
+        db_measurement = self.db.query(Measurement).filter(Measurement.measurementid == measurement_id).first()
+        
+        if not db_measurement:
+            return None
+        
+
+        if partial:
+            # Get only the fields that were explicitly set in the request
+            update_data = request.model_dump(exclude_unset=True)
+            field_mapping = {
+                'sensorid': 'sensorid', # This field is not updatable via this method
+                'collectiontime': 'collectiontime',
+                'geometry': 'geometry',
+                'measurementvalue': 'measurementvalue',
+                'variabletype': 'variabletype',
+                'description': 'description',
+            }
+            for field, value in update_data.items():
+                db_field = field_mapping.get(field, field)
+                if db_field == 'geometry' and value is not None:
+                    setattr(db_measurement, db_field, WKTElement(value, srid=4326))
+                else:
+                    setattr(db_measurement, db_field, value)
+        else:
+            # Full update (existing logic)
+            # Ensure all fields for a full update are provided and not None
+            sensorid = request.sensorid
+            collectiontime = request.collectiontime
+            geometry = request.geometry
+            measurementvalue = request.measurementvalue
+            variabletype = request.variabletype
+            
+
+            if sensorid is None:
+                raise ValueError("Sensor ID must be provided for a full update")
+            if collectiontime is None:
+                raise ValueError("collectiontime must be provided for a full update")
+            if geometry is None:
+                raise ValueError("geometry must be provided for a full update")
+            if measurementvalue is None:
+                raise ValueError("measurementvalue must be provided for a full update")
+            if variabletype is None:
+                raise ValueError("variabletype must be provided for a full update")
+            
+            db_measurement.sensorid = sensorid
+            db_measurement.collectiontime = collectiontime
+            db_measurement.geometry = WKTElement(geometry, srid=4326)  # type: ignore[assignment]
+            db_measurement.measurementvalue = measurementvalue
+            db_measurement.variabletype = variabletype
+            
+            
+        self.db.commit()
+        self.db.refresh(db_measurement)
+        return db_measurement

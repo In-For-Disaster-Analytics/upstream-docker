@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.user import User
-from app.api.v1.schemas.measurement import AggregatedMeasurement, ListMeasurementsResponsePagination
+from app.api.v1.schemas.measurement import AggregatedMeasurement, ListMeasurementsResponsePagination, MeasurementCreateResponse, MeasurementUpdate
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.repositories.sensor_repository import SensorRepository
 from app.db.session import get_db
@@ -72,3 +72,44 @@ def delete_sensor_measurements(
     sensor_service = SensorService(sensor_repository=sensor_repository, measurement_repository=measurement_repository)
     sensor_service.delete_sensor_measurements(sensor_id=sensor_id)
     return Response(status_code=204)
+
+
+@router.put("/measurements/{measurement_id}", response_model=MeasurementCreateResponse)
+def update_sensor(
+    measurement_id: int,
+    station_id: int,
+    sensor_id: int,
+    campaign_id: int,
+    measurement: MeasurementUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    ) -> MeasurementCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    measurement_service = MeasurementService(
+                                           measurement_repository=MeasurementRepository(db)
+)
+    updated_measurement = measurement_service.update_measurement(measurement_id, measurement)
+    if not updated_measurement:
+        raise HTTPException(status_code=404, detail="Measurement not found")
+    return updated_measurement
+
+@router.patch("/measurements/{measurement_id}", response_model=MeasurementCreateResponse)
+def partial_update_sensor(
+    campaign_id: int,
+    station_id: int,
+    sensor_id: int,
+    measurement_id:  int,
+    measurement: MeasurementUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> MeasurementCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    measurement_service = MeasurementService(
+                                           measurement_repository=MeasurementRepository(db)
+)
+    updated_measurement = measurement_service.partial_update_measurement(measurement_id, measurement)
+    if not updated_measurement:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return updated_measurement

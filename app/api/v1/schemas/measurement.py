@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from geoalchemy2 import Geometry
 from geojson_pydantic import Point
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # Pydantic model for incoming measurement data
@@ -16,7 +16,8 @@ class MeasurementIn(BaseModel):
     variabletype: Optional[str] = None
     description: Optional[str] = None
 
-
+class MeasurementCreateResponse(BaseModel):
+    id: int
 # Pydantic model for outgoing measurement data
 class MeasurementItem(BaseModel):
     id: int
@@ -59,3 +60,17 @@ class AggregatedMeasurement(BaseModel):
 
     class Config:
         from_attributes = True
+
+# Pydantic model for incoming measurement data
+class MeasurementUpdate(BaseModel):
+    sensorid: Optional[int] = None
+    collectiontime: Optional[datetime] = None
+    geometry: Optional[str] = Field(
+        default=None,
+        description='Geometry in Well-Known Text (WKT) format, e.g. "POINT(longitude latitude)"',
+         examples=['POINT(10.12345 20.54321)']
+    )
+    measurementvalue: Optional[float] = None
+    variablename: Optional[str] = None  # modified
+    variabletype: Optional[str] = None
+    description: Optional[str] = None
