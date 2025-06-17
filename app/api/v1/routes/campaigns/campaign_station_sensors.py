@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics
+from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics, SensorCreateResponse, SensorUpdate
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.sensor_repository import SensorRepository, SortField
@@ -99,3 +99,43 @@ def delete_sensor(
     station_service = StationService(station_repository=station_repository)
     station_service.delete_station_sensors(station_id=station_id)
     return Response(status_code=204)
+
+
+
+@router.put("/sensors/{sensor_id}", response_model=SensorCreateResponse)
+def update_sensor(
+    sensor_id: int,
+    station_id: int,
+    campaign_id: int,
+    sensor: SensorUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    ) -> SensorCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    sensor_service = SensorService(SensorRepository(db),
+                                           measurement_repository=MeasurementRepository(db)
+)
+    updated_station = sensor_service.update_sensor(sensor_id, sensor)
+    if not updated_station:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return updated_station
+
+@router.patch("/sensors/{sensor_id}", response_model=SensorCreateResponse)
+def partial_update_sensor(
+    campaign_id: int,
+    station_id: int,
+    sensor_id:  int,
+    sensor: SensorUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> SensorCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    sensor_service = SensorService(SensorRepository(db),
+                                           measurement_repository=MeasurementRepository(db)
+)
+    update_station = sensor_service.partial_update_sensor(sensor_id, sensor)
+    if not update_station:
+        raise HTTPException(status_code=404, detail="Station not found")
+    return update_station

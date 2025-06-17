@@ -15,6 +15,9 @@ class SensorIn(BaseModel):
     units: Optional[str] = None
     variablename: str | None = None
 
+class SensorCreateResponse(BaseModel):
+    id: int
+
 class SensorStatistics(BaseModel):
     max_value: float | None = None
     min_value: float | None = None
@@ -60,3 +63,12 @@ class ListSensorsResponsePagination(BaseModel):
     page: int
     size: int
     pages: int
+
+
+class SensorUpdate(BaseModel):
+    alias: Optional[str] = None
+    description: Optional[str] = None
+    postprocess: Optional[bool] = True
+    postprocessscript: Optional[str] = None
+    units: Optional[str] = None
+    variablename: Optional[str] | None = None

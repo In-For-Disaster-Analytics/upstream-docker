@@ -4,7 +4,7 @@ from sqlalchemy import Row, Sequence, or_, select, func, Column
 from sqlalchemy.sql import text
 from enum import Enum
 
-from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse, SensorStatistics as SensorStatisticsSchema
+from app.api.v1.schemas.sensor import SensorIn, GetSensorResponse, SensorStatistics as SensorStatisticsSchema, SensorUpdate
 from app.db.models.sensor import Sensor
 from app.db.models.measurement import Measurement
 from app.db.models.sensor_statistics import SensorStatistics
@@ -238,3 +238,60 @@ class SensorRepository:
 
     def get_sensor_by_alias_and_station_id(self, alias: str, station_id: int) -> Sensor | None:
         return self.db.query(Sensor).filter(Sensor.alias == alias, Sensor.stationid == station_id).first()
+
+    def update_sensor(self, sensor_id: int, request:  SensorUpdate, partial: bool = False) -> Sensor | None:
+        
+        db_station = self.db.query(Sensor).filter(Sensor.sensorid == sensor_id).first()
+        
+        if not db_station:
+            return None
+        
+        if partial:
+            # Get only the fields that were explicitly set in the request
+            update_data = request.model_dump(exclude_unset=True)
+            field_mapping = {
+                'alias': 'alias',
+                'description': 'description',
+                'postprocess': 'postprocess',
+                'postprocessscript': 'postprocessscript',
+                'units': 'units',
+                'variablename': 'variablename'
+            }
+            for field, value in update_data.items():
+                db_field = field_mapping.get(field, field)
+                setattr(db_station, db_field, value)
+        else:
+            # Full update (existing logic)
+            # Ensure all fields for a full update are provided and not None
+            alias = request.alias
+            description = request.description
+            postprocess = request.postprocess
+            postprocessscript = request.postprocessscript
+            units = request.units
+            variablename = request.variablename
+            
+
+            if alias is None:
+                raise ValueError("Sensor alias must be provided for a full update")
+            if description is None:
+                raise ValueError("Sensor description must be provided for a full update")
+            if postprocess is None:
+                raise ValueError("postprocess must be provided for a full update")
+            if postprocessscript is None:
+                raise ValueError("postprocessscript must be provided for a full update")
+            if units is None:
+                raise ValueError("units must be provided for a full update")
+            if variablename is None:
+                raise ValueError("variablename must be provided for a full update")
+            
+            db_station.alias = alias
+            db_station.description = description
+            db_station.postprocess = postprocess
+            db_station.postprocessscript = postprocessscript
+            db_station.units = units
+            db_station.variablename = variablename
+        
+            
+        self.db.commit()
+        self.db.refresh(db_station)
+        return db_station

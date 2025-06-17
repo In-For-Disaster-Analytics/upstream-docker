@@ -2,10 +2,12 @@ from datetime import datetime
 from typing import Optional, List, Tuple
 
 from app.api.v1.schemas.sensor import (
+    SensorCreateResponse,
     SensorIn,
     GetSensorResponse,
     SensorStatistics,
-    SensorItem
+    SensorItem,
+    SensorUpdate
 )
 from app.db.repositories.sensor_repository import SensorRepository, SortField
 from app.db.repositories.measurement_repository import MeasurementRepository
@@ -29,7 +31,20 @@ class SensorService:
             variablename=response.variablename,
             statistics=None
         )
-
+    def update_sensor(self, sensor_id: int, sensor: SensorUpdate) -> SensorCreateResponse | None:
+        response = self.sensor_repository.update_sensor(sensor_id, sensor)
+        if not response:
+            return None
+        return SensorCreateResponse(
+            id=response.sensorid,
+        )
+    def partial_update_sensor(self, sensor_id: int, sensor: SensorUpdate) -> SensorCreateResponse | None:
+        response = self.sensor_repository.update_sensor(sensor_id, sensor, partial=True)
+        if not response:
+            return None
+        return SensorCreateResponse(
+            id=response.sensorid,
+        )
     def get_sensor(self, sensor_id: int) -> GetSensorResponse | None:
         return self.sensor_repository.get_sensor(sensor_id)
 
