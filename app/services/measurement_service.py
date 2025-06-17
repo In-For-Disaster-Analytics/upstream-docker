@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementItem, ListMeasurementsResponsePagination
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementCreateResponse, MeasurementItem, ListMeasurementsResponsePagination, MeasurementUpdate
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.utils.lttb import lttb
 
@@ -54,3 +54,18 @@ class MeasurementService:
 
     def get_measurements_with_confidence_intervals(self, sensor_id: int, interval: str, interval_value: int, start_date: datetime | None, end_date: datetime | None, min_value: float | None, max_value: float | None) -> list[AggregatedMeasurement]:
         return self.measurement_repository.get_measurements_with_confidence_intervals(sensor_id=sensor_id, interval=interval, interval_value=interval_value, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value)
+    
+    def update_measurement(self, measurement_id: int, measurement: MeasurementUpdate) -> MeasurementCreateResponse | None:
+        response = self.measurement_repository.update_measurement(measurement_id, measurement)
+        if not response:
+            return None
+        return MeasurementCreateResponse(
+            id=response.sensorid,
+        )
+    def partial_update_measurement(self, measurement_id: int, measurement: MeasurementUpdate) -> MeasurementCreateResponse | None:
+        response = self.measurement_repository.update_measurement(measurement_id, measurement, partial=True)
+        if not response:
+            return None
+        return MeasurementCreateResponse(
+            id=response.sensorid,
+        )
