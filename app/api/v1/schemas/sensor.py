@@ -66,7 +66,7 @@ class ListSensorsResponsePagination(BaseModel):
 
 
 class SensorUpdate(BaseModel):
-    alias: Optional[str] | float = None
+    alias: Optional[str] = None
     description: Optional[str] = None
     postprocess: Optional[bool] = True
     postprocessscript: Optional[str] = None
