@@ -1,6 +1,6 @@
 from datetime import datetime
 import json
-from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementCreateResponse, MeasurementItem, ListMeasurementsResponsePagination, MeasurementUpdate
+from app.api.v1.schemas.measurement import AggregatedMeasurement, MeasurementCreateResponse, MeasurementIn, MeasurementItem, ListMeasurementsResponsePagination, MeasurementUpdate
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.utils.lttb import lttb
 
@@ -68,4 +68,9 @@ class MeasurementService:
             return None
         return MeasurementCreateResponse(
             id=response.sensorid,
+        )
+    def create_measurement(self, measurement: MeasurementIn, sensor_id:int) -> MeasurementCreateResponse | None:
+        response = self.measurement_repository.create_measurement(measurement, sensor_id)
+        return MeasurementCreateResponse(
+            id=response.measurementid,
         )

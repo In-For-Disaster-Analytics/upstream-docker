@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
 from app.api.v1.schemas.user import User
-from app.api.v1.schemas.measurement import AggregatedMeasurement, ListMeasurementsResponsePagination, MeasurementCreateResponse, MeasurementUpdate
+from app.api.v1.schemas.measurement import AggregatedMeasurement, ListMeasurementsResponsePagination, MeasurementCreateResponse, MeasurementUpdate, MeasurementIn
 from app.db.repositories.measurement_repository import MeasurementRepository
 from app.db.repositories.sensor_repository import SensorRepository
 from app.db.session import get_db
@@ -17,6 +17,21 @@ router = APIRouter(
     prefix="/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}",
     tags=["measurements"],
 )
+
+
+@router.post("/measurements")
+async def create_station(measurement: MeasurementIn,
+                         station_id: int,
+                         sensor_id: int,
+                          campaign_id: int,
+                         current_user: User = Depends(get_current_user),
+                           db: Session = Depends(get_db)) -> MeasurementCreateResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    measurement_service = MeasurementService(MeasurementRepository(db))
+    return measurement_service.create_measurement(measurement, sensor_id) 
+
+
 
 @router.get("/measurements")
 async def get_sensor_measurements(
