@@ -69,7 +69,7 @@ class MeasurementService:
         return MeasurementCreateResponse(
             id=response.sensorid,
         )
-    def create_measurement(self, measurement: MeasurementIn, sensor_id:int) -> MeasurementCreateResponse | None:
+    def create_measurement(self, measurement: MeasurementIn, sensor_id:int) -> MeasurementCreateResponse:
         response = self.measurement_repository.create_measurement(measurement, sensor_id)
         return MeasurementCreateResponse(
             id=response.measurementid,

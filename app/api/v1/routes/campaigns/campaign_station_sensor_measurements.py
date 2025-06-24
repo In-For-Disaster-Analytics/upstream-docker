@@ -20,7 +20,7 @@ router = APIRouter(
 
 
 @router.post("/measurements")
-async def create_station(measurement: MeasurementIn,
+async def create_measurement(measurement: MeasurementIn,
                          station_id: int,
                          sensor_id: int,
                           campaign_id: int,
@@ -126,5 +126,5 @@ def partial_update_sensor(
 )
     updated_measurement = measurement_service.partial_update_measurement(measurement_id, measurement)
     if not updated_measurement:
-        raise HTTPException(status_code=404, detail="Station not found")
+        raise HTTPException(status_code=404, detail="Measurement not found")
     return updated_measurement
