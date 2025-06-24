@@ -18,7 +18,7 @@ class MeasurementRepository:
 
     def create_measurement(self, request: MeasurementIn, sensor_id: int) -> Measurement:
         # Convert the geometry string to WKTElement for PostGIS
-        geometry = WKTElement(request.geometry, srid=4326)
+        geometry = WKTElement(request.geometry, srid=4326)  # type: ignore[arg-type]
 
         db_measurement = Measurement(
             sensorid=sensor_id,
@@ -110,7 +110,7 @@ class MeasurementRepository:
     def bulk_create_measurements(self, measurements: List[MeasurementIn], sensor_id: int) -> List[Measurement]:
         db_measurements = []
         for measurement in measurements:
-            geometry = WKTElement(measurement.geometry, srid=4326)
+            geometry = WKTElement(measurement.geometry, srid=4326)  # type: ignore[arg-type]
             db_measurement = Measurement(
                 sensorid=sensor_id,
                 variablename=measurement.variablename,

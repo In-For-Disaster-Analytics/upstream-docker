@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Tuple
+from unittest.mock import ANY
 import jwt
 
 from app.main import app
@@ -191,12 +192,12 @@ def test_get_sensor_measurements_unauthorized(
 # --- Test GET /measurements/confidence-intervals ---
 @patch('app.api.v1.routes.campaigns.campaign_station_sensor_measurements.MeasurementRepository')
 @patch('app.core.config.get_settings')
-# Note: This route in the provided code does NOT have check_allocation_permission or auth
+# Note: The route being tested below currently lacks authentication and authorization checks (`get_current_user`, `check_allocation_permission`).
+# This might be a potential security oversight in the application code.
 def test_get_measurements_confidence_intervals_success(
     mock_get_settings: MagicMock, # Still need for app load if auth is generally configured
     mock_repo_class: MagicMock,
     client: TestClient,
-    # auth_headers: Dict[str, str], # No auth on this specific endpoint in provided code
     mock_measurement_repo: MagicMock,
     sample_aggregated_measurements_data: List[AggregatedMeasurement]
 ):
@@ -206,7 +207,6 @@ def test_get_measurements_confidence_intervals_success(
 
     response = client.get(
         f"/api/v1/campaigns/{CAMPAIGN_ID}/stations/{STATION_ID}/sensors/{SENSOR_ID}/measurements/confidence-intervals"
-        # headers=auth_headers # No auth
     )
     assert response.status_code == 200
     data = response.json()
@@ -217,6 +217,17 @@ def test_get_measurements_confidence_intervals_success(
 # --- Test PUT /measurements/{measurement_id} ---
 MOCK_MEASUREMENT_UPDATE_PAYLOAD = {
     "measurementvalue": 30.5,
+    "description": "Updated via PUT"
+}
+
+# A full payload is required for PUT, as the repository enforces this for non-partial updates.
+MOCK_FULL_MEASUREMENT_UPDATE_PAYLOAD = {
+    "sensorid": SENSOR_ID,
+    "collectiontime": datetime.utcnow().isoformat(),
+    "geometry": "POINT(10.0 20.0)",
+    "measurementvalue": 30.5,
+    "variablename": "temp",
+    "variabletype": "float",
     "description": "Updated via PUT"
 }
 
@@ -237,19 +248,17 @@ def test_update_measurement_success(
 
     response = client.put(
         f"/api/v1/campaigns/{CAMPAIGN_ID}/stations/{STATION_ID}/sensors/{SENSOR_ID}/measurements/{MEASUREMENT_ID}",
-        json=MOCK_MEASUREMENT_UPDATE_PAYLOAD,
+        json=MOCK_FULL_MEASUREMENT_UPDATE_PAYLOAD,
         headers=auth_headers
     )
     assert response.status_code == 200
     data = response.json()
-    # MeasurementCreateResponse only has 'id'.
-    # The mock logic in update_measurement_mock sets sensorid to 1 if not in request payload.
-    # MEASUREMENT_ID is 1.
-    assert data["id"] == MEASUREMENT_ID
-    mock_measurement_repo.update_measurement.assert_called_once()
-    args, kwargs = mock_measurement_repo.update_measurement.call_args
-    assert args[0] == MEASUREMENT_ID # Check positional argument for measurement_id
-    assert kwargs.get('partial', False) is False # Check effective value of 'partial'
+    # The service returns a MeasurementCreateResponse with the sensorid, not the measurementid.
+    # Our mock ensures the sensorid from the request is used.
+    assert data["id"] == SENSOR_ID
+    
+    # Verify the repository was called correctly for a full update (partial=False)
+    mock_measurement_repo.update_measurement.assert_called_once_with(MEASUREMENT_ID, ANY)
 
 
 
@@ -272,7 +281,7 @@ def test_update_measurement_not_found(
     non_existent_measurement_id = 999
     response = client.put(
         f"/api/v1/campaigns/{CAMPAIGN_ID}/stations/{STATION_ID}/sensors/{SENSOR_ID}/measurements/{non_existent_measurement_id}",
-        json=MOCK_MEASUREMENT_UPDATE_PAYLOAD,
+        json=MOCK_FULL_MEASUREMENT_UPDATE_PAYLOAD,
         headers=auth_headers
     )
     assert response.status_code == 404
@@ -283,12 +292,11 @@ def test_update_measurement_not_found(
 MOCK_MEASUREMENT_PARTIAL_UPDATE_PAYLOAD = {
     "description": "Updated via PATCH"
 }
-SENSOR_ID_IN_PATCH_DECORATOR = 2 
 
 @patch('app.api.v1.routes.campaigns.campaign_station_sensor_measurements.MeasurementRepository')
 @patch('app.core.config.get_settings')
 @patch('app.api.v1.routes.campaigns.campaign_station_sensor_measurements.check_allocation_permission', return_value=True)
-def test_partial_update_measurement_route_as_defined( 
+def test_partial_update_measurement_success( 
     mock_check_alloc: MagicMock,
     mock_get_settings: MagicMock,
     mock_repo_class: MagicMock,
@@ -299,38 +307,18 @@ def test_partial_update_measurement_route_as_defined(
     mock_repo_class.return_value = mock_measurement_repo
     mock_settings = MagicMock(); mock_settings.JWT_SECRET = TEST_JWT_SECRET; mock_settings.ALG = TEST_JWT_ALGORITHM
     mock_get_settings.return_value = mock_settings
-    
-    response = None
-    try:
-        # Corrected URL for the PATCH /measurements/{measurement_id} endpoint
-        response = client.patch(
-            f"/api/v1/campaigns/{CAMPAIGN_ID}/stations/{STATION_ID}/sensors/{SENSOR_ID}/measurements/{MEASUREMENT_ID}",
-            json=MOCK_MEASUREMENT_PARTIAL_UPDATE_PAYLOAD,
-            headers=auth_headers
-        )
-    except Exception as e:
-        pytest.fail(f"PATCH request failed, possibly due to route definition error in app: {e}")
 
-    # Assertions for a successful PATCH request
-    if response.status_code == 200:
-        data = response.json()
-        # MeasurementCreateResponse only has 'id'.
-        # The mock logic in update_measurement_mock sets sensorid to 1.
-        # MEASUREMENT_ID is 1.
-        assert data["id"] == MEASUREMENT_ID 
+    response = client.patch(
+        f"/api/v1/campaigns/{CAMPAIGN_ID}/stations/{STATION_ID}/sensors/{SENSOR_ID}/measurements/{MEASUREMENT_ID}",
+        json=MOCK_MEASUREMENT_PARTIAL_UPDATE_PAYLOAD,
+        headers=auth_headers
+    )
 
-        mock_measurement_repo.update_measurement.assert_called_once()
-        args, kwargs = mock_measurement_repo.update_measurement.call_args
-        assert args[0] == MEASUREMENT_ID # This assumes the service somehow got the correct MEASUREMENT_ID
-        assert kwargs['partial'] is True
-    elif response.status_code == 404 and response.json().get("detail") == "Station not found":
-        # This is the error message if the service's update method returns None (e.g., measurement_id not found).
-        # This outcome is plausible given the route's `measurement_id` parameter issue.
-        # However, with MEASUREMENT_ID = 1, the mock should find it.
-        pytest.fail(f"PATCH returned 404 'Station not found', but mock should have found measurement {MEASUREMENT_ID}: {response.text}")
-    elif response.status_code == 422:
-        # FastAPI might return 422 if it can't find `measurement_id` for the handler
-        print(f"PATCH returned 422, likely due to FastAPI not finding 'measurement_id' in path. Response: {response.text}")
-        pass
-    else:
-        pytest.fail(f"PATCH request returned unexpected status {response.status_code}: {response.text}. This might be due to the route's definition issues.")
+    assert response.status_code == 200
+    data = response.json()
+    # The service returns a MeasurementCreateResponse with the sensorid.
+    # The mock defaults to sensorid=1, which matches SENSOR_ID.
+    assert data["id"] == SENSOR_ID
+
+    # Verify the repository was called correctly for a partial update (partial=True)
+    mock_measurement_repo.update_measurement.assert_called_once_with(MEASUREMENT_ID, ANY, partial=True)

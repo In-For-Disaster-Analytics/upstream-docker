@@ -10,7 +10,11 @@ from pydantic import BaseModel, Field
 class MeasurementIn(BaseModel):
     sensorid: Optional[int] = None
     collectiontime: datetime
-    geometry: str
+    geometry: Optional[str] = Field(
+        default=None,
+        description='Geometry in Well-Known Text (WKT) format, e.g. "POINT(longitude latitude)"',
+         examples=['POINT(10.12345 20.54321)']
+    )
     measurementvalue: float
     variablename: Optional[str] = None  # modified
     variabletype: Optional[str] = None
