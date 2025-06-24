@@ -11,7 +11,7 @@ class MeasurementIn(BaseModel):
     sensorid: Optional[int] = None
     collectiontime: datetime
     geometry: Optional[str] = Field(
-        
+        default=None,
         description='Geometry in Well-Known Text (WKT) format, e.g. "POINT(longitude latitude)"',
          examples=['POINT(10.12345 20.54321)']
     )
@@ -70,6 +70,7 @@ class MeasurementUpdate(BaseModel):
     sensorid: Optional[int] = None
     collectiontime: Optional[datetime] = None
     geometry: Optional[str] = Field(
+        default=None,
         description='Geometry in Well-Known Text (WKT) format, e.g. "POINT(longitude latitude)"',
          examples=['POINT(10.12345 20.54321)']
     )
