@@ -1,10 +1,9 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Any, Optional, List
 from pydantic import BaseModel
 
 from app.api.v1.schemas.sensor import SensorItem
-from geojson_pydantic.geometries import Geometry
 
 class StationCreateResponse(BaseModel):
     id: int
@@ -30,7 +29,7 @@ class StationItem(BaseModel):
     contact_email: str | None = None
     active: bool | None = None
     start_date: datetime | None = None
-    geometry: Geometry | None = None
+    geometry: Any | None = None # no geometry for now breaks the openapi schema
 
 class StationItemWithSummary(StationItem):
     sensor_count: int

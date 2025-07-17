@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pydantic import BaseModel
 
@@ -66,7 +66,7 @@ class GetCampaignResponse(BaseModel):
     allocation: str
     location: Location | None = None
     summary: SummaryGetCampaign
-    geometry: Geometry | None = None
+    geometry: Any | None = None
     stations: list[StationsListResponseItem] = []
 
 
