@@ -8,9 +8,7 @@
   "paths": {
     "/api/v1/token": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login",
         "operationId": "login_api_v1_token_post",
         "requestBody": {
@@ -53,9 +51,7 @@
     },
     "/api/v1/campaigns": {
       "post": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Create Campaign",
         "operationId": "create_campaign_api_v1_campaigns_post",
         "security": [
@@ -97,9 +93,7 @@
         }
       },
       "get": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "List Campaigns",
         "operationId": "list_campaigns_api_v1_campaigns_get",
         "security": [
@@ -234,9 +228,7 @@
     },
     "/api/v1/campaigns/{campaign_id}": {
       "get": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Get Campaign",
         "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
         "security": [
@@ -279,9 +271,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__delete",
         "security": [
@@ -317,9 +307,7 @@
         }
       },
       "put": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Update Campaign",
         "operationId": "update_campaign_api_v1_campaigns__campaign_id__put",
         "security": [
@@ -372,9 +360,149 @@
         }
       },
       "patch": {
-        "tags": [
-          "campaigns"
+        "tags": ["campaigns"],
+        "summary": "Partial Update Campaign",
+        "operationId": "partial_update_campaign_api_v1_campaigns__campaign_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
         ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["campaigns"],
+        "summary": "Delete Sensor",
+        "operationId": "delete_sensor_api_v1_campaigns__campaign_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["campaigns"],
+        "summary": "Update Campaign",
+        "operationId": "update_campaign_api_v1_campaigns__campaign_id__put",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignsIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["campaigns"],
         "summary": "Partial Update Campaign",
         "operationId": "partial_update_campaign_api_v1_campaigns__campaign_id__patch",
         "security": [
@@ -429,9 +557,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations": {
       "post": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Create Station",
         "operationId": "create_station_api_v1_campaigns__campaign_id__stations_post",
         "security": [
@@ -484,9 +610,7 @@
         }
       },
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "List Stations",
         "operationId": "list_stations_api_v1_campaigns__campaign_id__stations_get",
         "security": [
@@ -549,9 +673,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__stations_delete",
         "security": [
@@ -589,9 +711,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Get Station",
         "operationId": "get_station_api_v1_campaigns__campaign_id__stations__station_id__get",
         "security": [
@@ -643,9 +763,7 @@
         }
       },
       "put": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Update Station",
         "operationId": "update_station_api_v1_campaigns__campaign_id__stations__station_id__put",
         "security": [
@@ -707,9 +825,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Partial Update Station",
         "operationId": "partial_update_station_api_v1_campaigns__campaign_id__stations__station_id__patch",
         "security": [
@@ -773,9 +889,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/export": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Export Sensors Csv",
         "description": "Export sensors for a station as CSV with streaming support.",
         "operationId": "export_sensors_csv_api_v1_campaigns__campaign_id__stations__station_id__sensors_export_get",
@@ -828,9 +942,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/measurements/export": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Export Measurements Csv",
         "description": "Export measurements for a station as CSV with streaming support.",
         "operationId": "export_measurements_csv_api_v1_campaigns__campaign_id__stations__station_id__measurements_export_get",
@@ -921,9 +1033,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors": {
       "get": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "List Sensors",
         "operationId": "list_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
         "security": [
@@ -1115,9 +1225,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors_delete",
         "security": [
@@ -1164,9 +1272,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}": {
       "get": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Get Sensor",
         "operationId": "get_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__get",
         "security": [
@@ -1227,9 +1333,7 @@
         }
       },
       "put": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Update Sensor",
         "operationId": "update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__put",
         "security": [
@@ -1300,9 +1404,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Partial Update Sensor",
         "operationId": "partial_update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__patch",
         "security": [
@@ -1375,9 +1477,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements": {
       "post": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Create Measurement",
         "operationId": "create_measurement_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_post",
         "security": [
@@ -1448,9 +1548,7 @@
         }
       },
       "get": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Get Sensor Measurements",
         "operationId": "get_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_get",
         "security": [
@@ -1613,9 +1711,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Delete Sensor Measurements",
         "operationId": "delete_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_delete",
         "security": [
@@ -1671,9 +1767,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements/confidence-intervals": {
       "get": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Get Measurements With Confidence Intervals",
         "description": "Get sensor measurements with confidence intervals for visualization.",
         "operationId": "get_measurements_with_confidence_intervals_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_confidence_intervals_get",
@@ -1834,9 +1928,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements/{measurement_id}": {
       "put": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Update Sensor",
         "operationId": "update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements__measurement_id__put",
         "security": [
@@ -1916,9 +2008,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Partial Update Sensor",
         "operationId": "partial_update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements__measurement_id__patch",
         "security": [
@@ -2000,9 +2090,7 @@
     },
     "/api/v1/sensor_variables": {
       "get": {
-        "tags": [
-          "sensor_variables"
-        ],
+        "tags": ["sensor_variables"],
         "summary": "List Sensor Variables",
         "operationId": "list_sensor_variables_api_v1_sensor_variables_get",
         "responses": {
@@ -2030,9 +2118,7 @@
     },
     "/api/v1/uploadfile_csv/campaign/{campaign_id}/station/{station_id}/sensor": {
       "post": {
-        "tags": [
-          "uploadfile_csv"
-        ],
+        "tags": ["uploadfile_csv"],
         "summary": "Post Sensor And Measurement",
         "description": "Process sensor and measurement files and store data in the database.",
         "operationId": "post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post",
@@ -2098,9 +2184,7 @@
     },
     "/api/v1/projects": {
       "get": {
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "summary": "Get Projects",
         "operationId": "get_projects_api_v1_projects_get",
         "responses": {
@@ -2128,9 +2212,7 @@
     },
     "/api/v1/projects/{project_id}/members": {
       "get": {
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "summary": "Get Project Members For User",
         "operationId": "get_project_members_for_user_api_v1_projects__project_id__members_get",
         "parameters": [
@@ -2310,10 +2392,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
+        "required": ["username", "password"],
         "title": "Body_login_api_v1_token_post"
       },
       "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post": {
@@ -2332,10 +2411,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "upload_file_sensors",
-          "upload_file_measurements"
-        ],
+        "required": ["upload_file_sensors", "upload_file_measurements"],
         "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post"
       },
       "CampaignCreateResponse": {
@@ -2346,9 +2422,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "CampaignCreateResponse"
       },
       "CampaignUpdate": {
@@ -2505,10 +2579,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "allocation"
-        ],
+        "required": ["name", "allocation"],
         "title": "CampaignsIn"
       },
       "GeometryCollection": {
@@ -2613,10 +2684,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "geometries"
-        ],
+        "required": ["type", "geometries"],
         "title": "GeometryCollection",
         "description": "GeometryCollection Model"
       },
@@ -2723,12 +2791,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "allocation",
-          "summary"
-        ],
+        "required": ["id", "name", "allocation", "summary"],
         "title": "GetCampaignResponse"
       },
       "GetSensorResponse": {
@@ -2816,9 +2879,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "GetSensorResponse"
       },
       "GetStationResponse": {
@@ -2912,10 +2973,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
+        "required": ["id", "name"],
         "title": "GetStationResponse"
       },
       "HTTPValidationError": {
@@ -3007,10 +3065,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "LineString",
         "description": "LineString Model"
       },
@@ -3152,11 +3207,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "summary"
-        ],
+        "required": ["id", "name", "summary"],
         "title": "ListCampaignsResponseItem"
       },
       "ListCampaignsResponsePagination": {
@@ -3186,13 +3237,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListCampaignsResponsePagination"
       },
       "ListMeasurementsResponsePagination": {
@@ -3289,13 +3334,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListSensorsResponsePagination"
       },
       "ListStationsResponsePagination": {
@@ -3325,13 +3364,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListStationsResponsePagination"
       },
       "Location": {
@@ -3392,9 +3425,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "MeasurementCreateResponse"
       },
       "MeasurementIn": {
@@ -3426,9 +3457,7 @@
             ],
             "title": "Geometry",
             "description": "Geometry in Well-Known Text (WKT) format, e.g. \"POINT(longitude latitude)\"",
-            "examples": [
-              "POINT(10.12345 20.54321)"
-            ]
+            "examples": ["POINT(10.12345 20.54321)"]
           },
           "measurementvalue": {
             "type": "number",
@@ -3469,10 +3498,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "collectiontime",
-          "measurementvalue"
-        ],
+        "required": ["collectiontime", "measurementvalue"],
         "title": "MeasurementIn"
       },
       "MeasurementItem": {
@@ -3539,12 +3565,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "value",
-          "geometry",
-          "collectiontime"
-        ],
+        "required": ["id", "value", "geometry", "collectiontime"],
         "title": "MeasurementItem"
       },
       "MeasurementUpdate": {
@@ -3583,9 +3604,7 @@
             ],
             "title": "Geometry",
             "description": "Geometry in Well-Known Text (WKT) format, e.g. \"POINT(longitude latitude)\"",
-            "examples": [
-              "POINT(10.12345 20.54321)"
-            ]
+            "examples": ["POINT(10.12345 20.54321)"]
           },
           "measurementvalue": {
             "anyOf": [
@@ -3714,10 +3733,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiLineString",
         "description": "MultiLineString Model"
       },
@@ -3796,10 +3812,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiPoint",
         "description": "MultiPoint Model"
       },
@@ -3885,10 +3898,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiPolygon",
         "description": "MultiPolygon Model"
       },
@@ -3964,10 +3974,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "Point",
         "description": "Point Model"
       },
@@ -4050,10 +4057,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "Polygon",
         "description": "Polygon Model"
       },
@@ -4444,10 +4448,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "username"
-        ],
+        "required": ["id", "username"],
         "title": "PyTASUser"
       },
       "SensorCreateResponse": {
@@ -4458,9 +4459,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorCreateResponse"
       },
       "SensorItem": {
@@ -4548,9 +4547,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorItem"
       },
       "SensorStatistics": {
@@ -4735,9 +4732,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorSummaryForStations"
       },
       "SensorUpdate": {
@@ -4899,10 +4894,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "start_date"
-        ],
+        "required": ["name", "start_date"],
         "title": "StationCreate"
       },
       "StationCreateResponse": {
@@ -4913,9 +4905,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "StationCreateResponse"
       },
       "StationItemWithSummary": {
@@ -5024,10 +5014,7 @@
       },
       "StationType": {
         "type": "string",
-        "enum": [
-          "mobile",
-          "static"
-        ],
+        "enum": ["mobile", "static"],
         "title": "StationType"
       },
       "StationUpdate": {
@@ -5191,11 +5178,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "start_date"
-        ],
+        "required": ["id", "name", "start_date"],
         "title": "StationsListResponseItem"
       },
       "SummaryGetCampaign": {
@@ -5292,11 +5275,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       }
     },
