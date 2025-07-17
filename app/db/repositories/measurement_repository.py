@@ -429,82 +429,79 @@ class MeasurementRepository:
         """
         from app.db.models.sensor import Sensor
         from geoalchemy2.functions import ST_X, ST_Y
+        from collections import defaultdict
 
         # Get sensor aliases for this station
         sensor_aliases = self.get_unique_sensor_aliases_for_station(station_id)
 
+        # Use a simpler approach that generates one row per (time, lat, lon) combination
+        # First, get all unique (time, lat, lon) combinations
+        base_stmt = (
+            select(
+                Measurement.collectiontime,
+                ST_Y(Measurement.geometry).label("lat"),
+                ST_X(Measurement.geometry).label("lon"),
+            )
+            .join(Sensor, Measurement.sensorid == Sensor.sensorid)
+            .filter(Sensor.stationid == station_id)
+            .filter(Sensor.alias.is_not(None))
+            .distinct()
+            .order_by(
+                Measurement.collectiontime,
+                ST_Y(Measurement.geometry),
+                ST_X(Measurement.geometry),
+            )
+        )
+
+        if start_date:
+            base_stmt = base_stmt.filter(Measurement.collectiontime >= start_date)
+        if end_date:
+            base_stmt = base_stmt.filter(Measurement.collectiontime <= end_date)
+
         offset = 0
         while True:
-            stmt = (
-                select(
-                    Measurement.collectiontime,
-                    ST_Y(Measurement.geometry).label("lat"),
-                    ST_X(Measurement.geometry).label("lon"),
-                    Sensor.alias,
-                    Measurement.measurementvalue,
-                )
-                .join(Sensor, Measurement.sensorid == Sensor.sensorid)
-                .filter(Sensor.stationid == station_id)
-                .filter(Sensor.alias.is_not(None))
-                .order_by(
-                    Measurement.collectiontime,
-                    ST_Y(Measurement.geometry),
-                    ST_X(Measurement.geometry),
-                )
-                .offset(offset)
-                .limit(chunk_size)
+            # Get a chunk of unique time/location combinations
+            unique_combinations = list(
+                self.db.execute(base_stmt.offset(offset).limit(chunk_size)).all()
             )
 
-            if start_date:
-                stmt = stmt.filter(Measurement.collectiontime >= start_date)
-            if end_date:
-                stmt = stmt.filter(Measurement.collectiontime <= end_date)
-
-            result = list(self.db.execute(stmt).all())
-            if not result:
+            if not unique_combinations:
                 break
 
-            # Group by (time, lat, lon) efficiently
-            current_group = None
-            current_sensors = {}
             grouped_measurements = []
 
-            for row in result:
-                collection_time, lat, lon, alias, value = row
-                key = (collection_time, lat, lon)
+            for collection_time, lat, lon in unique_combinations:
+                # For each unique combination, get all sensor values
+                sensor_values = {alias: None for alias in sensor_aliases}
 
-                if current_group != key:
-                    # Save previous group if exists
-                    if current_group is not None:
-                        grouped_measurements.append(
-                            {
-                                "collection_time": current_group[0],
-                                "lat": current_group[1],
-                                "lon": current_group[2],
-                                "sensor_values": current_sensors,
-                                "sensor_aliases": sensor_aliases,
-                            }
-                        )
+                # Query to get all measurements for this specific time/location
+                measurements_stmt = (
+                    select(Sensor.alias, Measurement.measurementvalue)
+                    .join(Sensor, Measurement.sensorid == Sensor.sensorid)
+                    .filter(Sensor.stationid == station_id)
+                    .filter(Sensor.alias.is_not(None))
+                    .filter(Measurement.collectiontime == collection_time)
+                    .filter(ST_Y(Measurement.geometry) == lat)
+                    .filter(ST_X(Measurement.geometry) == lon)
+                )
 
-                    # Start new group
-                    current_group = key
-                    current_sensors = {alias: None for alias in sensor_aliases}
+                measurements_result = list(self.db.execute(measurements_stmt).all())
 
-                # Add measurement to current group
-                current_sensors[alias] = value
+                # Populate sensor values
+                for alias, value in measurements_result:
+                    sensor_values[alias] = value
 
-            # Don't forget the last group
-            if current_group is not None:
                 grouped_measurements.append(
                     {
-                        "collection_time": current_group[0],
-                        "lat": current_group[1],
-                        "lon": current_group[2],
-                        "sensor_values": current_sensors,
+                        "collection_time": collection_time,
+                        "lat": lat,
+                        "lon": lon,
+                        "sensor_values": sensor_values,
                         "sensor_aliases": sensor_aliases,
                     }
                 )
 
             if grouped_measurements:
                 yield grouped_measurements
+
             offset += chunk_size
