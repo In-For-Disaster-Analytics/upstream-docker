@@ -3,14 +3,13 @@
   "info": {
     "title": "Upstream Sensor Storage",
     "description": "Sensor Storage for Upstream data",
+    "contact": { "name": "Will Mobley", "email": "wmobley@tacc.utexas.edu" },
     "version": "0.0.1"
   },
   "paths": {
     "/api/v1/token": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login",
         "operationId": "login_api_v1_token_post",
         "requestBody": {
@@ -28,13 +27,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "type": "object",
-                  "title": "Response Login Api V1 Token Post"
-                }
+                "schema": { "$ref": "#/components/schemas/LoginResponse" }
               }
             }
           },
@@ -42,9 +35,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -53,23 +44,15 @@
     },
     "/api/v1/campaigns": {
       "post": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Create Campaign",
         "operationId": "create_campaign_api_v1_campaigns_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CampaignsIn"
-              }
+              "schema": { "$ref": "#/components/schemas/CampaignsIn" }
             }
           }
         },
@@ -88,59 +71,36 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "get": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "List Campaigns",
         "operationId": "list_campaigns_api_v1_campaigns_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "page",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "title": "Page"
-            }
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "title": "Limit"
-            }
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
           },
           {
             "name": "bbox",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
               "description": "Bounding box of the campaign west,south,east,north",
               "title": "Bbox"
             },
@@ -152,13 +112,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "Start date of the campaign",
               "title": "Start Date"
@@ -172,13 +127,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "End date of the campaign",
               "title": "End Date"
@@ -192,15 +142,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "array", "items": { "type": "string" } },
+                { "type": "null" }
               ],
               "description": "List of sensor variables to filter by",
               "title": "Sensor Variables"
@@ -223,9 +166,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -234,25 +175,16 @@
     },
     "/api/v1/campaigns/{campaign_id}": {
       "get": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Get Campaign",
         "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "responses": {
@@ -260,9 +192,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetCampaignResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/GetCampaignResponse" }
               }
             }
           },
@@ -270,81 +200,55 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "delete": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
+          "204": { "description": "Successful Response" },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "put": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Update Campaign",
         "operationId": "update_campaign_api_v1_campaigns__campaign_id__put",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CampaignsIn"
-              }
+              "schema": { "$ref": "#/components/schemas/CampaignsIn" }
             }
           }
         },
@@ -363,43 +267,30 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "patch": {
-        "tags": [
-          "campaigns"
-        ],
+        "tags": ["campaigns"],
         "summary": "Partial Update Campaign",
         "operationId": "partial_update_campaign_api_v1_campaigns__campaign_id__patch",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CampaignUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/CampaignUpdate" }
             }
           }
         },
@@ -418,9 +309,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -429,34 +318,23 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations": {
       "post": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Create Station",
         "operationId": "create_station_api_v1_campaigns__campaign_id__stations_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StationCreate"
-              }
+              "schema": { "$ref": "#/components/schemas/StationCreate" }
             }
           }
         },
@@ -475,54 +353,35 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "List Stations",
         "operationId": "list_stations_api_v1_campaigns__campaign_id__stations_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "page",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "title": "Page"
-            }
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "title": "Limit"
-            }
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
           }
         ],
         "responses": {
@@ -540,47 +399,32 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "delete": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__stations_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
+          "204": { "description": "Successful Response" },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -589,34 +433,22 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Get Station",
         "operationId": "get_station_api_v1_campaigns__campaign_id__stations__station_id__get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "responses": {
@@ -624,9 +456,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetStationResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/GetStationResponse" }
               }
             }
           },
@@ -634,52 +464,36 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "put": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Update Station",
         "operationId": "update_station_api_v1_campaigns__campaign_id__stations__station_id__put",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StationUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/StationUpdate" }
             }
           }
         },
@@ -698,52 +512,36 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "patch": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Partial Update Station",
         "operationId": "partial_update_station_api_v1_campaigns__campaign_id__stations__station_id__patch",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/StationUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/StationUpdate" }
             }
           }
         },
@@ -762,9 +560,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -773,53 +569,35 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/export": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Export Sensors Csv",
         "description": "Export sensors for a station as CSV with streaming support.",
         "operationId": "export_sensors_csv_api_v1_campaigns__campaign_id__stations__station_id__sensors_export_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           }
         ],
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
+            "content": { "application/json": { "schema": {} } }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -828,35 +606,23 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/measurements/export": {
       "get": {
-        "tags": [
-          "stations"
-        ],
+        "tags": ["stations"],
         "summary": "Export Measurements Csv",
         "description": "Export measurements for a station as CSV with streaming support.",
         "operationId": "export_measurements_csv_api_v1_campaigns__campaign_id__stations__station_id__measurements_export_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "start_date",
@@ -864,13 +630,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "Start date filter",
               "title": "Start Date"
@@ -883,13 +644,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "End date filter",
               "title": "End Date"
@@ -900,19 +656,13 @@
         "responses": {
           "200": {
             "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
+            "content": { "application/json": { "schema": {} } }
           },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -921,68 +671,41 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors": {
       "get": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "List Sensors",
         "operationId": "list_sensors_api_v1_campaigns__campaign_id__stations__station_id__sensors_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "page",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "title": "Page"
-            }
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
           },
           {
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 20,
-              "title": "Limit"
-            }
+            "schema": { "type": "integer", "default": 20, "title": "Limit" }
           },
           {
             "name": "variable_name",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
               "description": "Filter sensors by variable name (partial match)",
               "title": "Variable Name"
             },
@@ -993,14 +716,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
               "description": "Filter sensors by units (exact match)",
               "title": "Units"
             },
@@ -1011,14 +727,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
               "description": "Filter sensors by alias (partial match)",
               "title": "Alias"
             },
@@ -1029,14 +738,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "string" }, { "type": "null" }],
               "description": "Filter sensors by text in description (partial match)",
               "title": "Description Contains"
             },
@@ -1047,14 +749,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "boolean"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "boolean" }, { "type": "null" }],
               "description": "Filter sensors by postprocess flag",
               "title": "Postprocess"
             },
@@ -1066,12 +761,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "$ref": "#/components/schemas/SortField"
-                },
-                {
-                  "type": "null"
-                }
+                { "$ref": "#/components/schemas/SortField" },
+                { "type": "null" }
               ],
               "description": "Sort sensors by field",
               "title": "Sort By"
@@ -1106,56 +797,38 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "delete": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Delete Sensor",
         "operationId": "delete_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
+          "204": { "description": "Successful Response" },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -1164,43 +837,28 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}": {
       "get": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Get Sensor",
         "operationId": "get_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "responses": {
@@ -1208,9 +866,7 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetSensorResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/GetSensorResponse" }
               }
             }
           },
@@ -1218,61 +874,42 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "put": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Update Sensor",
         "operationId": "update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__put",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SensorUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/SensorUpdate" }
             }
           }
         },
@@ -1291,61 +928,42 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "patch": {
-        "tags": [
-          "sensors"
-        ],
+        "tags": ["sensors"],
         "summary": "Partial Update Sensor",
         "operationId": "partial_update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__patch",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SensorUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/SensorUpdate" }
             }
           }
         },
@@ -1364,9 +982,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -1375,52 +991,35 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements": {
       "post": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Create Measurement",
         "operationId": "create_measurement_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MeasurementIn"
-              }
+              "schema": { "$ref": "#/components/schemas/MeasurementIn" }
             }
           }
         },
@@ -1439,52 +1038,35 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "get": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Get Sensor Measurements",
         "operationId": "get_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "start_date",
@@ -1492,13 +1074,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "title": "Start Date"
             }
@@ -1509,13 +1086,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "title": "End Date"
             }
@@ -1525,14 +1097,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "number" }, { "type": "null" }],
               "title": "Min Measurement Value"
             }
           },
@@ -1541,14 +1106,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "number" }, { "type": "null" }],
               "title": "Max Measurement Value"
             }
           },
@@ -1556,35 +1114,20 @@
             "name": "limit",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1000,
-              "title": "Limit"
-            }
+            "schema": { "type": "integer", "default": 1000, "title": "Limit" }
           },
           {
             "name": "page",
             "in": "query",
             "required": false,
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "title": "Page"
-            }
+            "schema": { "type": "integer", "default": 1, "title": "Page" }
           },
           {
             "name": "downsample_threshold",
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "integer" }, { "type": "null" }],
               "title": "Downsample Threshold"
             }
           }
@@ -1604,65 +1147,44 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "delete": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Delete Sensor Measurements",
         "operationId": "delete_sensor_measurements_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
+          "204": { "description": "Successful Response" },
           "422": {
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -1671,9 +1193,7 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements/confidence-intervals": {
       "get": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Get Measurements With Confidence Intervals",
         "description": "Get sensor measurements with confidence intervals for visualization.",
         "operationId": "get_measurements_with_confidence_intervals_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements_confidence_intervals_get",
@@ -1682,28 +1202,19 @@
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "interval",
@@ -1735,13 +1246,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "Start date for filtering measurements",
               "title": "Start Date"
@@ -1754,13 +1260,8 @@
             "required": false,
             "schema": {
               "anyOf": [
-                {
-                  "type": "string",
-                  "format": "date-time"
-                },
-                {
-                  "type": "null"
-                }
+                { "type": "string", "format": "date-time" },
+                { "type": "null" }
               ],
               "description": "End date for filtering measurements",
               "title": "End Date"
@@ -1772,14 +1273,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "number" }, { "type": "null" }],
               "description": "Minimum measurement value to include",
               "title": "Min Value"
             },
@@ -1790,14 +1284,7 @@
             "in": "query",
             "required": false,
             "schema": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
-              ],
+              "anyOf": [{ "type": "number" }, { "type": "null" }],
               "description": "Maximum measurement value to include",
               "title": "Max Value"
             },
@@ -1823,9 +1310,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -1834,61 +1319,41 @@
     },
     "/api/v1/campaigns/{campaign_id}/stations/{station_id}/sensors/{sensor_id}/measurements/{measurement_id}": {
       "put": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Update Sensor",
         "operationId": "update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements__measurement_id__put",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "measurement_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Measurement Id"
-            }
+            "schema": { "type": "integer", "title": "Measurement Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MeasurementUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/MeasurementUpdate" }
             }
           }
         },
@@ -1907,70 +1372,48 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
         }
       },
       "patch": {
-        "tags": [
-          "measurements"
-        ],
+        "tags": ["measurements"],
         "summary": "Partial Update Sensor",
         "operationId": "partial_update_sensor_api_v1_campaigns__campaign_id__stations__station_id__sensors__sensor_id__measurements__measurement_id__patch",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           },
           {
             "name": "sensor_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Sensor Id"
-            }
+            "schema": { "type": "integer", "title": "Sensor Id" }
           },
           {
             "name": "measurement_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Measurement Id"
-            }
+            "schema": { "type": "integer", "title": "Measurement Id" }
           }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MeasurementUpdate"
-              }
+              "schema": { "$ref": "#/components/schemas/MeasurementUpdate" }
             }
           }
         },
@@ -1989,9 +1432,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -2000,9 +1441,7 @@
     },
     "/api/v1/sensor_variables": {
       "get": {
-        "tags": [
-          "sensor_variables"
-        ],
+        "tags": ["sensor_variables"],
         "summary": "List Sensor Variables",
         "operationId": "list_sensor_variables_api_v1_sensor_variables_get",
         "responses": {
@@ -2011,9 +1450,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "type": "string"
-                  },
+                  "items": { "type": "string" },
                   "type": "array",
                   "title": "Response List Sensor Variables Api V1 Sensor Variables Get"
                 }
@@ -2021,44 +1458,28 @@
             }
           }
         },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        "security": [{ "OAuth2PasswordBearer": [] }]
       }
     },
     "/api/v1/uploadfile_csv/campaign/{campaign_id}/station/{station_id}/sensor": {
       "post": {
-        "tags": [
-          "uploadfile_csv"
-        ],
+        "tags": ["uploadfile_csv"],
         "summary": "Post Sensor And Measurement",
         "description": "Process sensor and measurement files and store data in the database.",
         "operationId": "post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
+        "security": [{ "OAuth2PasswordBearer": [] }],
         "parameters": [
           {
             "name": "campaign_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Campaign Id"
-            }
+            "schema": { "type": "integer", "title": "Campaign Id" }
           },
           {
             "name": "station_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "title": "Station Id"
-            }
+            "schema": { "type": "integer", "title": "Station Id" }
           }
         ],
         "requestBody": {
@@ -2087,9 +1508,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -2098,9 +1517,7 @@
     },
     "/api/v1/projects": {
       "get": {
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "summary": "Get Projects",
         "operationId": "get_projects_api_v1_projects_get",
         "responses": {
@@ -2109,9 +1526,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/PyTASProject"
-                  },
+                  "items": { "$ref": "#/components/schemas/PyTASProject" },
                   "type": "array",
                   "title": "Response Get Projects Api V1 Projects Get"
                 }
@@ -2119,18 +1534,12 @@
             }
           }
         },
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ]
+        "security": [{ "OAuth2PasswordBearer": [] }]
       }
     },
     "/api/v1/projects/{project_id}/members": {
       "get": {
-        "tags": [
-          "projects"
-        ],
+        "tags": ["projects"],
         "summary": "Get Project Members For User",
         "operationId": "get_project_members_for_user_api_v1_projects__project_id__members_get",
         "parameters": [
@@ -2138,10 +1547,7 @@
             "name": "project_id",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Project Id"
-            }
+            "schema": { "type": "string", "title": "Project Id" }
           }
         ],
         "responses": {
@@ -2151,9 +1557,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PyTASUser"
-                  },
+                  "items": { "$ref": "#/components/schemas/PyTASUser" },
                   "title": "Response Get Project Members For User Api V1 Projects  Project Id  Members Get"
                 }
               }
@@ -2163,9 +1567,7 @@
             "description": "Validation Error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
+                "schema": { "$ref": "#/components/schemas/HTTPValidationError" }
               }
             }
           }
@@ -2182,26 +1584,11 @@
             "format": "date-time",
             "title": "Measurement Time"
           },
-          "value": {
-            "type": "number",
-            "title": "Value"
-          },
-          "median_value": {
-            "type": "number",
-            "title": "Median Value"
-          },
-          "point_count": {
-            "type": "integer",
-            "title": "Point Count"
-          },
-          "lower_bound": {
-            "type": "number",
-            "title": "Lower Bound"
-          },
-          "upper_bound": {
-            "type": "number",
-            "title": "Upper Bound"
-          },
+          "value": { "type": "number", "title": "Value" },
+          "median_value": { "type": "number", "title": "Median Value" },
+          "point_count": { "type": "integer", "title": "Point Count" },
+          "lower_bound": { "type": "number", "title": "Lower Bound" },
+          "upper_bound": { "type": "number", "title": "Upper Bound" },
           "parametric_lower_bound": {
             "type": "number",
             "title": "Parametric Lower Bound"
@@ -2210,34 +1597,13 @@
             "type": "number",
             "title": "Parametric Upper Bound"
           },
-          "std_dev": {
-            "type": "number",
-            "title": "Std Dev"
-          },
-          "min_value": {
-            "type": "number",
-            "title": "Min Value"
-          },
-          "max_value": {
-            "type": "number",
-            "title": "Max Value"
-          },
-          "percentile_25": {
-            "type": "number",
-            "title": "Percentile 25"
-          },
-          "percentile_75": {
-            "type": "number",
-            "title": "Percentile 75"
-          },
-          "ci_method": {
-            "type": "string",
-            "title": "Ci Method"
-          },
-          "confidence_level": {
-            "type": "number",
-            "title": "Confidence Level"
-          }
+          "std_dev": { "type": "number", "title": "Std Dev" },
+          "min_value": { "type": "number", "title": "Min Value" },
+          "max_value": { "type": "number", "title": "Max Value" },
+          "percentile_25": { "type": "number", "title": "Percentile 25" },
+          "percentile_75": { "type": "number", "title": "Percentile 75" },
+          "ci_method": { "type": "string", "title": "Ci Method" },
+          "confidence_level": { "type": "number", "title": "Confidence Level" }
         },
         "type": "object",
         "required": [
@@ -2263,57 +1629,25 @@
         "properties": {
           "grant_type": {
             "anyOf": [
-              {
-                "type": "string",
-                "pattern": "^password$"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "pattern": "^password$" },
+              { "type": "null" }
             ],
             "title": "Grant Type"
           },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "password": {
-            "type": "string",
-            "title": "Password"
-          },
-          "scope": {
-            "type": "string",
-            "title": "Scope",
-            "default": ""
-          },
+          "username": { "type": "string", "title": "Username" },
+          "password": { "type": "string", "title": "Password" },
+          "scope": { "type": "string", "title": "Scope", "default": "" },
           "client_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Client Id"
           },
           "client_secret": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Client Secret"
           }
         },
         "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
+        "required": ["username", "password"],
         "title": "Body_login_api_v1_token_post"
       },
       "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post": {
@@ -2332,103 +1666,48 @@
           }
         },
         "type": "object",
-        "required": [
-          "upload_file_sensors",
-          "upload_file_measurements"
-        ],
+        "required": ["upload_file_sensors", "upload_file_measurements"],
         "title": "Body_post_sensor_and_measurement_api_v1_uploadfile_csv_campaign__campaign_id__station__station_id__sensor_post"
       },
       "CampaignCreateResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          }
-        },
+        "properties": { "id": { "type": "integer", "title": "Id" } },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "CampaignCreateResponse"
       },
       "CampaignUpdate": {
         "properties": {
           "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Name"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "allocation": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Allocation"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "end_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "End Date"
           }
@@ -2438,77 +1717,37 @@
       },
       "CampaignsIn": {
         "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "name": { "type": "string", "title": "Name" },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "end_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "End Date"
           },
-          "allocation": {
-            "type": "string",
-            "title": "Allocation"
-          }
+          "allocation": { "type": "string", "title": "Allocation" }
         },
         "type": "object",
-        "required": [
-          "name",
-          "allocation"
-        ],
+        "required": ["name", "allocation"],
         "title": "CampaignsIn"
       },
       "GeometryCollection": {
@@ -2517,18 +1756,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -2536,32 +1767,18 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
@@ -2573,27 +1790,13 @@
           "geometries": {
             "items": {
               "oneOf": [
-                {
-                  "$ref": "#/components/schemas/Point"
-                },
-                {
-                  "$ref": "#/components/schemas/MultiPoint"
-                },
-                {
-                  "$ref": "#/components/schemas/LineString"
-                },
-                {
-                  "$ref": "#/components/schemas/MultiLineString"
-                },
-                {
-                  "$ref": "#/components/schemas/Polygon"
-                },
-                {
-                  "$ref": "#/components/schemas/MultiPolygon"
-                },
-                {
-                  "$ref": "#/components/schemas/GeometryCollection"
-                }
+                { "$ref": "#/components/schemas/Point" },
+                { "$ref": "#/components/schemas/MultiPoint" },
+                { "$ref": "#/components/schemas/LineString" },
+                { "$ref": "#/components/schemas/MultiLineString" },
+                { "$ref": "#/components/schemas/Polygon" },
+                { "$ref": "#/components/schemas/MultiPolygon" },
+                { "$ref": "#/components/schemas/GeometryCollection" }
               ],
               "discriminator": {
                 "propertyName": "type",
@@ -2613,104 +1816,50 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "geometries"
-        ],
+        "required": ["type", "geometries"],
         "title": "GeometryCollection",
         "description": "GeometryCollection Model"
       },
       "GetCampaignResponse": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "end_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "End Date"
           },
-          "allocation": {
-            "type": "string",
-            "title": "Allocation"
-          },
+          "allocation": { "type": "string", "title": "Allocation" },
           "location": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/Location"
-              },
-              {
-                "type": "null"
-              }
+              { "$ref": "#/components/schemas/Location" },
+              { "type": "null" }
             ]
           },
-          "summary": {
-            "$ref": "#/components/schemas/SummaryGetCampaign"
-          },
+          "summary": { "$ref": "#/components/schemas/SummaryGetCampaign" },
           "geometry": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{}, { "type": "null" }],
             "title": "Geometry"
           },
           "stations": {
@@ -2723,207 +1872,98 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "allocation",
-          "summary"
-        ],
+        "required": ["id", "name", "allocation", "summary"],
         "title": "GetCampaignResponse"
       },
       "GetSensorResponse": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
+          "id": { "type": "integer", "title": "Id" },
           "alias": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Alias"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "postprocess": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Postprocess",
             "default": true
           },
           "postprocessscript": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Postprocessscript"
           },
           "units": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Units"
           },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           },
           "statistics": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/SensorStatistics"
-              },
-              {
-                "type": "null"
-              }
+              { "$ref": "#/components/schemas/SensorStatistics" },
+              { "type": "null" }
             ]
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "GetSensorResponse"
       },
       "GetStationResponse": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Active"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{}, { "type": "null" }],
             "title": "Geometry"
           },
           "sensors": {
             "anyOf": [
               {
-                "items": {
-                  "$ref": "#/components/schemas/SensorItem"
-                },
+                "items": { "$ref": "#/components/schemas/SensorItem" },
                 "type": "array"
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Sensors"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
+        "required": ["id", "name"],
         "title": "GetStationResponse"
       },
       "HTTPValidationError": {
         "properties": {
           "detail": {
-            "items": {
-              "$ref": "#/components/schemas/ValidationError"
-            },
+            "items": { "$ref": "#/components/schemas/ValidationError" },
             "type": "array",
             "title": "Detail"
           }
@@ -2937,18 +1977,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -2956,49 +1988,27 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
-          "type": {
-            "type": "string",
-            "const": "LineString",
-            "title": "Type"
-          },
+          "type": { "type": "string", "const": "LineString", "title": "Type" },
           "coordinates": {
             "items": {
               "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Position2D"
-                },
-                {
-                  "$ref": "#/components/schemas/Position3D"
-                }
+                { "$ref": "#/components/schemas/Position2D" },
+                { "$ref": "#/components/schemas/Position3D" }
               ]
             },
             "type": "array",
@@ -3007,129 +2017,62 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "LineString",
         "description": "LineString Model"
       },
       "ListCampaignsResponseItem": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
           "location": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/Location"
-              },
-              {
-                "type": "null"
-              }
+              { "$ref": "#/components/schemas/Location" },
+              { "type": "null" }
             ]
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "end_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "End Date"
           },
           "allocation": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Allocation"
           },
-          "summary": {
-            "$ref": "#/components/schemas/SummaryListCampaigns"
-          },
+          "summary": { "$ref": "#/components/schemas/SummaryListCampaigns" },
           "geometry": {
             "anyOf": [
               {
                 "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/Point"
-                  },
-                  {
-                    "$ref": "#/components/schemas/MultiPoint"
-                  },
-                  {
-                    "$ref": "#/components/schemas/LineString"
-                  },
-                  {
-                    "$ref": "#/components/schemas/MultiLineString"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Polygon"
-                  },
-                  {
-                    "$ref": "#/components/schemas/MultiPolygon"
-                  },
-                  {
-                    "$ref": "#/components/schemas/GeometryCollection"
-                  }
+                  { "$ref": "#/components/schemas/Point" },
+                  { "$ref": "#/components/schemas/MultiPoint" },
+                  { "$ref": "#/components/schemas/LineString" },
+                  { "$ref": "#/components/schemas/MultiLineString" },
+                  { "$ref": "#/components/schemas/Polygon" },
+                  { "$ref": "#/components/schemas/MultiPolygon" },
+                  { "$ref": "#/components/schemas/GeometryCollection" }
                 ],
                 "discriminator": {
                   "propertyName": "type",
@@ -3144,19 +2087,13 @@
                   }
                 }
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Geometry"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "summary"
-        ],
+        "required": ["id", "name", "summary"],
         "title": "ListCampaignsResponseItem"
       },
       "ListCampaignsResponsePagination": {
@@ -3168,83 +2105,32 @@
             "type": "array",
             "title": "Items"
           },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "title": "Pages"
-          }
+          "total": { "type": "integer", "title": "Total" },
+          "page": { "type": "integer", "title": "Page" },
+          "size": { "type": "integer", "title": "Size" },
+          "pages": { "type": "integer", "title": "Pages" }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListCampaignsResponsePagination"
       },
       "ListMeasurementsResponsePagination": {
         "properties": {
           "items": {
-            "items": {
-              "$ref": "#/components/schemas/MeasurementItem"
-            },
+            "items": { "$ref": "#/components/schemas/MeasurementItem" },
             "type": "array",
             "title": "Items"
           },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "title": "Pages"
-          },
-          "min_value": {
-            "type": "number",
-            "title": "Min Value"
-          },
-          "max_value": {
-            "type": "number",
-            "title": "Max Value"
-          },
-          "average_value": {
-            "type": "number",
-            "title": "Average Value"
-          },
-          "downsampled": {
-            "type": "boolean",
-            "title": "Downsampled"
-          },
+          "total": { "type": "integer", "title": "Total" },
+          "page": { "type": "integer", "title": "Page" },
+          "size": { "type": "integer", "title": "Size" },
+          "pages": { "type": "integer", "title": "Pages" },
+          "min_value": { "type": "number", "title": "Min Value" },
+          "max_value": { "type": "number", "title": "Max Value" },
+          "average_value": { "type": "number", "title": "Average Value" },
+          "downsampled": { "type": "boolean", "title": "Downsampled" },
           "downsampled_total": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
             "title": "Downsampled Total"
           }
         },
@@ -3265,149 +2151,76 @@
       "ListSensorsResponsePagination": {
         "properties": {
           "items": {
-            "items": {
-              "$ref": "#/components/schemas/SensorItem"
-            },
+            "items": { "$ref": "#/components/schemas/SensorItem" },
             "type": "array",
             "title": "Items"
           },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "title": "Pages"
-          }
+          "total": { "type": "integer", "title": "Total" },
+          "page": { "type": "integer", "title": "Page" },
+          "size": { "type": "integer", "title": "Size" },
+          "pages": { "type": "integer", "title": "Pages" }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListSensorsResponsePagination"
       },
       "ListStationsResponsePagination": {
         "properties": {
           "items": {
-            "items": {
-              "$ref": "#/components/schemas/StationItemWithSummary"
-            },
+            "items": { "$ref": "#/components/schemas/StationItemWithSummary" },
             "type": "array",
             "title": "Items"
           },
-          "total": {
-            "type": "integer",
-            "title": "Total"
-          },
-          "page": {
-            "type": "integer",
-            "title": "Page"
-          },
-          "size": {
-            "type": "integer",
-            "title": "Size"
-          },
-          "pages": {
-            "type": "integer",
-            "title": "Pages"
-          }
+          "total": { "type": "integer", "title": "Total" },
+          "page": { "type": "integer", "title": "Page" },
+          "size": { "type": "integer", "title": "Size" },
+          "pages": { "type": "integer", "title": "Pages" }
         },
         "type": "object",
-        "required": [
-          "items",
-          "total",
-          "page",
-          "size",
-          "pages"
-        ],
+        "required": ["items", "total", "page", "size", "pages"],
         "title": "ListStationsResponsePagination"
       },
       "Location": {
         "properties": {
           "bbox_west": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Bbox West"
           },
           "bbox_east": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Bbox East"
           },
           "bbox_south": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Bbox South"
           },
           "bbox_north": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Bbox North"
           }
         },
         "type": "object",
         "title": "Location"
       },
-      "MeasurementCreateResponse": {
+      "LoginResponse": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          }
+          "access_token": { "type": "string", "title": "Access Token" },
+          "token_type": { "type": "string", "title": "Token Type" }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["access_token", "token_type"],
+        "title": "LoginResponse"
+      },
+      "MeasurementCreateResponse": {
+        "properties": { "id": { "type": "integer", "title": "Id" } },
+        "type": "object",
+        "required": ["id"],
         "title": "MeasurementCreateResponse"
       },
       "MeasurementIn": {
         "properties": {
           "sensorid": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
             "title": "Sensorid"
           },
           "collectiontime": {
@@ -3416,219 +2229,93 @@
             "title": "Collectiontime"
           },
           "geometry": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Geometry",
             "description": "Geometry in Well-Known Text (WKT) format, e.g. \"POINT(longitude latitude)\"",
-            "examples": [
-              "POINT(10.12345 20.54321)"
-            ]
+            "examples": ["POINT(10.12345 20.54321)"]
           },
-          "measurementvalue": {
-            "type": "number",
-            "title": "Measurementvalue"
-          },
+          "measurementvalue": { "type": "number", "title": "Measurementvalue" },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           },
           "variabletype": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variabletype"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           }
         },
         "type": "object",
-        "required": [
-          "collectiontime",
-          "measurementvalue"
-        ],
+        "required": ["collectiontime", "measurementvalue"],
         "title": "MeasurementIn"
       },
       "MeasurementItem": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "value": {
-            "type": "number",
-            "title": "Value"
-          },
-          "geometry": {
-            "$ref": "#/components/schemas/Point"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "value": { "type": "number", "title": "Value" },
+          "geometry": { "$ref": "#/components/schemas/Point" },
           "collectiontime": {
             "type": "string",
             "format": "date-time",
             "title": "Collectiontime"
           },
           "sensorid": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
             "title": "Sensorid"
           },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           },
           "variabletype": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variabletype"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "value",
-          "geometry",
-          "collectiontime"
-        ],
+        "required": ["id", "value", "geometry", "collectiontime"],
         "title": "MeasurementItem"
       },
       "MeasurementUpdate": {
         "properties": {
           "sensorid": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
             "title": "Sensorid"
           },
           "collectiontime": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Collectiontime"
           },
           "geometry": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Geometry",
             "description": "Geometry in Well-Known Text (WKT) format, e.g. \"POINT(longitude latitude)\"",
-            "examples": [
-              "POINT(10.12345 20.54321)"
-            ]
+            "examples": ["POINT(10.12345 20.54321)"]
           },
           "measurementvalue": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Measurementvalue"
           },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           },
           "variabletype": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variabletype"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           }
         },
@@ -3641,18 +2328,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -3660,32 +2339,18 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
@@ -3698,12 +2363,8 @@
             "items": {
               "items": {
                 "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/Position2D"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Position3D"
-                  }
+                  { "$ref": "#/components/schemas/Position2D" },
+                  { "$ref": "#/components/schemas/Position3D" }
                 ]
               },
               "type": "array",
@@ -3714,10 +2375,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiLineString",
         "description": "MultiLineString Model"
       },
@@ -3727,18 +2385,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -3746,49 +2396,27 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
-          "type": {
-            "type": "string",
-            "const": "MultiPoint",
-            "title": "Type"
-          },
+          "type": { "type": "string", "const": "MultiPoint", "title": "Type" },
           "coordinates": {
             "items": {
               "anyOf": [
-                {
-                  "$ref": "#/components/schemas/Position2D"
-                },
-                {
-                  "$ref": "#/components/schemas/Position3D"
-                }
+                { "$ref": "#/components/schemas/Position2D" },
+                { "$ref": "#/components/schemas/Position3D" }
               ]
             },
             "type": "array",
@@ -3796,10 +2424,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiPoint",
         "description": "MultiPoint Model"
       },
@@ -3809,18 +2434,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -3828,32 +2445,18 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
@@ -3867,12 +2470,8 @@
               "items": {
                 "items": {
                   "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/Position2D"
-                    },
-                    {
-                      "$ref": "#/components/schemas/Position3D"
-                    }
+                    { "$ref": "#/components/schemas/Position2D" },
+                    { "$ref": "#/components/schemas/Position3D" }
                   ]
                 },
                 "type": "array",
@@ -3885,10 +2484,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "MultiPolygon",
         "description": "MultiPolygon Model"
       },
@@ -3898,18 +2494,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -3917,57 +2505,32 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
-          "type": {
-            "type": "string",
-            "const": "Point",
-            "title": "Type"
-          },
+          "type": { "type": "string", "const": "Point", "title": "Type" },
           "coordinates": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/Position2D"
-              },
-              {
-                "$ref": "#/components/schemas/Position3D"
-              }
+              { "$ref": "#/components/schemas/Position2D" },
+              { "$ref": "#/components/schemas/Position3D" }
             ],
             "title": "Coordinates"
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "Point",
         "description": "Point Model"
       },
@@ -3977,18 +2540,10 @@
             "anyOf": [
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 4,
@@ -3996,50 +2551,28 @@
               },
               {
                 "prefixItems": [
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  },
-                  {
-                    "type": "number"
-                  }
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" },
+                  { "type": "number" }
                 ],
                 "type": "array",
                 "maxItems": 6,
                 "minItems": 6
               },
-              {
-                "type": "null"
-              }
+              { "type": "null" }
             ],
             "title": "Bbox"
           },
-          "type": {
-            "type": "string",
-            "const": "Polygon",
-            "title": "Type"
-          },
+          "type": { "type": "string", "const": "Polygon", "title": "Type" },
           "coordinates": {
             "items": {
               "items": {
                 "anyOf": [
-                  {
-                    "$ref": "#/components/schemas/Position2D"
-                  },
-                  {
-                    "$ref": "#/components/schemas/Position3D"
-                  }
+                  { "$ref": "#/components/schemas/Position2D" },
+                  { "$ref": "#/components/schemas/Position3D" }
                 ]
               },
               "type": "array",
@@ -4050,23 +2583,14 @@
           }
         },
         "type": "object",
-        "required": [
-          "type",
-          "coordinates"
-        ],
+        "required": ["type", "coordinates"],
         "title": "Polygon",
         "description": "Polygon Model"
       },
       "Position2D": {
         "prefixItems": [
-          {
-            "type": "number",
-            "title": "Longitude"
-          },
-          {
-            "type": "number",
-            "title": "Latitude"
-          }
+          { "type": "number", "title": "Longitude" },
+          { "type": "number", "title": "Latitude" }
         ],
         "type": "array",
         "maxItems": 2,
@@ -4074,18 +2598,9 @@
       },
       "Position3D": {
         "prefixItems": [
-          {
-            "type": "number",
-            "title": "Longitude"
-          },
-          {
-            "type": "number",
-            "title": "Latitude"
-          },
-          {
-            "type": "number",
-            "title": "Altitude"
-          }
+          { "type": "number", "title": "Longitude" },
+          { "type": "number", "title": "Latitude" },
+          { "type": "number", "title": "Altitude" }
         ],
         "type": "array",
         "maxItems": 3,
@@ -4093,50 +2608,18 @@
       },
       "PyTASAllocation": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "start": {
-            "type": "string",
-            "title": "Start"
-          },
-          "end": {
-            "type": "string",
-            "title": "End"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "justification": {
-            "type": "string",
-            "title": "Justification"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "start": { "type": "string", "title": "Start" },
+          "end": { "type": "string", "title": "End" },
+          "status": { "type": "string", "title": "Status" },
+          "justification": { "type": "string", "title": "Justification" },
           "decisionSummary": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Decisionsummary"
           },
-          "dateRequested": {
-            "type": "string",
-            "title": "Daterequested"
-          },
+          "dateRequested": { "type": "string", "title": "Daterequested" },
           "dateReviewed": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Datereviewed"
           },
           "computeRequested": {
@@ -4155,49 +2638,17 @@
             "type": "integer",
             "title": "Storageallocated"
           },
-          "memoryRequested": {
-            "type": "integer",
-            "title": "Memoryrequested"
-          },
-          "memoryAllocated": {
-            "type": "integer",
-            "title": "Memoryallocated"
-          },
-          "resourceId": {
-            "type": "integer",
-            "title": "Resourceid"
-          },
-          "resource": {
-            "type": "string",
-            "title": "Resource"
-          },
-          "projectId": {
-            "type": "integer",
-            "title": "Projectid"
-          },
-          "project": {
-            "type": "string",
-            "title": "Project"
-          },
-          "requestorId": {
-            "type": "integer",
-            "title": "Requestorid"
-          },
-          "requestor": {
-            "type": "string",
-            "title": "Requestor"
-          },
-          "reviewerId": {
-            "type": "integer",
-            "title": "Reviewerid"
-          },
-          "reviewer": {
-            "title": "Reviewer"
-          },
-          "computeUsed": {
-            "type": "number",
-            "title": "Computeused"
-          }
+          "memoryRequested": { "type": "integer", "title": "Memoryrequested" },
+          "memoryAllocated": { "type": "integer", "title": "Memoryallocated" },
+          "resourceId": { "type": "integer", "title": "Resourceid" },
+          "resource": { "type": "string", "title": "Resource" },
+          "projectId": { "type": "integer", "title": "Projectid" },
+          "project": { "type": "string", "title": "Project" },
+          "requestorId": { "type": "integer", "title": "Requestorid" },
+          "requestor": { "type": "string", "title": "Requestor" },
+          "reviewerId": { "type": "integer", "title": "Reviewerid" },
+          "reviewer": { "title": "Reviewer" },
+          "computeUsed": { "type": "number", "title": "Computeused" }
         },
         "type": "object",
         "required": [
@@ -4229,66 +2680,21 @@
       },
       "PyTASPi": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
-          "email": {
-            "type": "string",
-            "title": "Email"
-          },
-          "firstName": {
-            "type": "string",
-            "title": "Firstname"
-          },
-          "lastName": {
-            "type": "string",
-            "title": "Lastname"
-          },
-          "institution": {
-            "type": "string",
-            "title": "Institution"
-          },
-          "institutionId": {
-            "type": "integer",
-            "title": "Institutionid"
-          },
-          "department": {
-            "type": "string",
-            "title": "Department"
-          },
-          "departmentId": {
-            "type": "integer",
-            "title": "Departmentid"
-          },
-          "citizenship": {
-            "type": "string",
-            "title": "Citizenship"
-          },
-          "citizenshipId": {
-            "type": "integer",
-            "title": "Citizenshipid"
-          },
-          "source": {
-            "type": "string",
-            "title": "Source"
-          },
-          "uid": {
-            "type": "integer",
-            "title": "Uid"
-          },
-          "homeDirectory": {
-            "type": "string",
-            "title": "Homedirectory"
-          },
-          "gid": {
-            "type": "integer",
-            "title": "Gid"
-          }
+          "id": { "type": "integer", "title": "Id" },
+          "username": { "type": "string", "title": "Username" },
+          "email": { "type": "string", "title": "Email" },
+          "firstName": { "type": "string", "title": "Firstname" },
+          "lastName": { "type": "string", "title": "Lastname" },
+          "institution": { "type": "string", "title": "Institution" },
+          "institutionId": { "type": "integer", "title": "Institutionid" },
+          "department": { "type": "string", "title": "Department" },
+          "departmentId": { "type": "integer", "title": "Departmentid" },
+          "citizenship": { "type": "string", "title": "Citizenship" },
+          "citizenshipId": { "type": "integer", "title": "Citizenshipid" },
+          "source": { "type": "string", "title": "Source" },
+          "uid": { "type": "integer", "title": "Uid" },
+          "homeDirectory": { "type": "string", "title": "Homedirectory" },
+          "gid": { "type": "integer", "title": "Gid" }
         },
         "type": "object",
         "required": [
@@ -4312,62 +2718,24 @@
       },
       "PyTASProject": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
-          },
-          "description": {
-            "type": "string",
-            "title": "Description"
-          },
-          "chargeCode": {
-            "type": "string",
-            "title": "Chargecode"
-          },
-          "gid": {
-            "type": "integer",
-            "title": "Gid"
-          },
-          "source": {
-            "title": "Source"
-          },
-          "fieldId": {
-            "type": "integer",
-            "title": "Fieldid"
-          },
-          "field": {
-            "type": "string",
-            "title": "Field"
-          },
-          "typeId": {
-            "type": "integer",
-            "title": "Typeid"
-          },
-          "type": {
-            "type": "string",
-            "title": "Type"
-          },
-          "piId": {
-            "type": "integer",
-            "title": "Piid"
-          },
-          "pi": {
-            "$ref": "#/components/schemas/PyTASPi"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "title": { "type": "string", "title": "Title" },
+          "description": { "type": "string", "title": "Description" },
+          "chargeCode": { "type": "string", "title": "Chargecode" },
+          "gid": { "type": "integer", "title": "Gid" },
+          "source": { "title": "Source" },
+          "fieldId": { "type": "integer", "title": "Fieldid" },
+          "field": { "type": "string", "title": "Field" },
+          "typeId": { "type": "integer", "title": "Typeid" },
+          "type": { "type": "string", "title": "Type" },
+          "piId": { "type": "integer", "title": "Piid" },
+          "pi": { "$ref": "#/components/schemas/PyTASPi" },
           "allocations": {
-            "items": {
-              "$ref": "#/components/schemas/PyTASAllocation"
-            },
+            "items": { "$ref": "#/components/schemas/PyTASAllocation" },
             "type": "array",
             "title": "Allocations"
           },
-          "nickname": {
-            "title": "Nickname"
-          }
+          "nickname": { "title": "Nickname" }
         },
         "type": "object",
         "required": [
@@ -4390,314 +2758,134 @@
       },
       "PyTASUser": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "username": {
-            "type": "string",
-            "title": "Username"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "username": { "type": "string", "title": "Username" },
           "role": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Role"
           },
           "firstName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Firstname"
           },
           "lastName": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Lastname"
           },
           "email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Email"
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "username"
-        ],
+        "required": ["id", "username"],
         "title": "PyTASUser"
       },
       "SensorCreateResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          }
-        },
+        "properties": { "id": { "type": "integer", "title": "Id" } },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorCreateResponse"
       },
       "SensorItem": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
+          "id": { "type": "integer", "title": "Id" },
           "alias": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Alias"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "postprocess": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Postprocess",
             "default": true
           },
           "postprocessscript": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Postprocessscript"
           },
           "units": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Units"
           },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           },
           "statistics": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/SensorStatistics"
-              },
-              {
-                "type": "null"
-              }
+              { "$ref": "#/components/schemas/SensorStatistics" },
+              { "type": "null" }
             ]
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorItem"
       },
       "SensorStatistics": {
         "properties": {
           "max_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Max Value"
           },
           "min_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Min Value"
           },
           "avg_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Avg Value"
           },
           "stddev_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Stddev Value"
           },
           "percentile_90": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Percentile 90"
           },
           "percentile_95": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Percentile 95"
           },
           "percentile_99": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Percentile 99"
           },
           "count": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "integer" }, { "type": "null" }],
             "title": "Count"
           },
           "first_measurement_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "First Measurement Value"
           },
           "first_measurement_collectiontime": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "First Measurement Collectiontime"
           },
           "last_measurement_time": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Last Measurement Time"
           },
           "last_measurement_value": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "number" }, { "type": "null" }],
             "title": "Last Measurement Value"
           },
           "stats_last_updated": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Stats Last Updated"
           }
@@ -4707,106 +2895,45 @@
       },
       "SensorSummaryForStations": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
+          "id": { "type": "integer", "title": "Id" },
           "variable_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variable Name"
           },
           "measurement_unit": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Measurement Unit"
           }
         },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "SensorSummaryForStations"
       },
       "SensorUpdate": {
         "properties": {
           "alias": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Alias"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "postprocess": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Postprocess",
             "default": true
           },
           "postprocessscript": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Postprocessscript"
           },
           "units": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Units"
           },
           "variablename": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Variablename"
           }
         },
@@ -4839,52 +2966,21 @@
       },
       "StationCreate": {
         "properties": {
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "name": { "type": "string", "title": "Name" },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Active",
             "default": true
           },
@@ -4899,115 +2995,54 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "start_date"
-        ],
+        "required": ["name", "start_date"],
         "title": "StationCreate"
       },
       "StationCreateResponse": {
-        "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          }
-        },
+        "properties": { "id": { "type": "integer", "title": "Id" } },
         "type": "object",
-        "required": [
-          "id"
-        ],
+        "required": ["id"],
         "title": "StationCreateResponse"
       },
       "StationItemWithSummary": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Active"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{}, { "type": "null" }],
             "title": "Geometry"
           },
-          "sensor_count": {
-            "type": "integer",
-            "title": "Sensor Count"
-          },
+          "sensor_count": { "type": "integer", "title": "Sensor Count" },
           "sensor_types": {
-            "items": {
-              "type": "string"
-            },
+            "items": { "type": "string" },
             "type": "array",
             "title": "Sensor Types"
           },
           "sensor_variables": {
-            "items": {
-              "type": "string"
-            },
+            "items": { "type": "string" },
             "type": "array",
             "title": "Sensor Variables"
           }
@@ -5024,89 +3059,42 @@
       },
       "StationType": {
         "type": "string",
-        "enum": [
-          "mobile",
-          "static"
-        ],
+        "enum": ["mobile", "static"],
         "title": "StationType"
       },
       "StationUpdate": {
         "properties": {
           "name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Name"
           },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Active"
           },
           "start_date": {
             "anyOf": [
-              {
-                "type": "string",
-                "format": "date-time"
-              },
-              {
-                "type": "null"
-              }
+              { "type": "string", "format": "date-time" },
+              { "type": "null" }
             ],
             "title": "Start Date"
           },
           "station_type": {
             "anyOf": [
-              {
-                "$ref": "#/components/schemas/StationType"
-              },
-              {
-                "type": "null"
-              }
+              { "$ref": "#/components/schemas/StationType" },
+              { "type": "null" }
             ]
           }
         },
@@ -5115,56 +3103,22 @@
       },
       "StationsListResponseItem": {
         "properties": {
-          "id": {
-            "type": "integer",
-            "title": "Id"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
+          "id": { "type": "integer", "title": "Id" },
+          "name": { "type": "string", "title": "Name" },
           "description": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Description"
           },
           "contact_name": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Name"
           },
           "contact_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "string" }, { "type": "null" }],
             "title": "Contact Email"
           },
           "active": {
-            "anyOf": [
-              {
-                "type": "boolean"
-              },
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{ "type": "boolean" }, { "type": "null" }],
             "title": "Active"
           },
           "start_date": {
@@ -5173,12 +3127,7 @@
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [
-              {},
-              {
-                "type": "null"
-              }
-            ],
+            "anyOf": [{}, { "type": "null" }],
             "title": "Geometry"
           },
           "sensors": {
@@ -5191,34 +3140,20 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "start_date"
-        ],
+        "required": ["id", "name", "start_date"],
         "title": "StationsListResponseItem"
       },
       "SummaryGetCampaign": {
         "properties": {
-          "station_count": {
-            "type": "integer",
-            "title": "Station Count"
-          },
-          "sensor_count": {
-            "type": "integer",
-            "title": "Sensor Count"
-          },
+          "station_count": { "type": "integer", "title": "Station Count" },
+          "sensor_count": { "type": "integer", "title": "Sensor Count" },
           "sensor_types": {
-            "items": {
-              "type": "string"
-            },
+            "items": { "type": "string" },
             "type": "array",
             "title": "Sensor Types"
           },
           "sensor_variables": {
-            "items": {
-              "type": "string"
-            },
+            "items": { "type": "string" },
             "type": "array",
             "title": "Sensor Variables"
           }
@@ -5236,29 +3171,15 @@
         "properties": {
           "sensor_types": {
             "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
             ],
             "title": "Sensor Types"
           },
           "variable_names": {
             "anyOf": [
-              {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              {
-                "type": "null"
-              }
+              { "items": { "type": "string" }, "type": "array" },
+              { "type": "null" }
             ],
             "title": "Variable Names"
           }
@@ -5269,46 +3190,22 @@
       "ValidationError": {
         "properties": {
           "loc": {
-            "items": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "integer"
-                }
-              ]
-            },
+            "items": { "anyOf": [{ "type": "string" }, { "type": "integer" }] },
             "type": "array",
             "title": "Location"
           },
-          "msg": {
-            "type": "string",
-            "title": "Message"
-          },
-          "type": {
-            "type": "string",
-            "title": "Error Type"
-          }
+          "msg": { "type": "string", "title": "Message" },
+          "type": { "type": "string", "title": "Error Type" }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       }
     },
     "securitySchemes": {
       "OAuth2PasswordBearer": {
         "type": "oauth2",
-        "flows": {
-          "password": {
-            "scopes": {},
-            "tokenUrl": "api/v1/token"
-          }
-        }
+        "flows": { "password": { "scopes": {}, "tokenUrl": "api/v1/token" } }
       }
     }
   }

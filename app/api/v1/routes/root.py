@@ -5,8 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from app.api.dependencies.auth import authenticate_user
 from app.core.config import get_settings
+from pydantic import BaseModel
 
 router = APIRouter()
+
+class LoginResponse(BaseModel):
+    access_token: str
+    token_type: str
 
 def get_jwt_secret() -> str:
     settings = get_settings()
@@ -20,12 +25,12 @@ def create_token(username: str, jwt_secret: str) -> str:
 async def login(
     form_data: OAuth2PasswordRequestForm = Depends(),
     jwt_secret: str = Depends(get_jwt_secret)
-) -> dict[str, str]:
+) -> LoginResponse:
     authenticated = authenticate_user(form_data.username, form_data.password)
     if not authenticated:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     # Create jwt token
-    return {
-        "access_token": create_token(form_data.username, jwt_secret),
-        "token_type": "bearer",
-    }
+    return LoginResponse(
+        access_token=create_token(form_data.username, jwt_secret),
+        token_type="bearer",
+    )
