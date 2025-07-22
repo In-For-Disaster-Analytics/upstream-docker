@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.v1.schemas.station import StationsListResponseItem
 
@@ -39,7 +39,7 @@ class ListCampaignsResponseItem(BaseModel):
     end_date: datetime | None = None
     allocation: str | None = None
     summary: SummaryListCampaigns
-    geometry: Any | None = None
+    geometry: dict = Field(default_factory=dict, nullable=True)
 
 class ListCampaignsResponsePagination(BaseModel):
     items: list[ListCampaignsResponseItem]
@@ -65,7 +65,7 @@ class GetCampaignResponse(BaseModel):
     allocation: str
     location: Location | None = None
     summary: SummaryGetCampaign
-    geometry: Any | None = None
+    geometry: dict = Field(default_factory=dict, nullable=True)
     stations: list[StationsListResponseItem] = []
 
 

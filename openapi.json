@@ -1789,8 +1789,9 @@
           },
           "summary": { "$ref": "#/components/schemas/SummaryGetCampaign" },
           "geometry": {
-            "anyOf": [{}, { "type": "null" }],
-            "title": "Geometry"
+            "type": "object",
+            "title": "Geometry",
+            "nullable": true
           },
           "stations": {
             "items": {
@@ -1872,8 +1873,9 @@
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [{}, { "type": "null" }],
-            "title": "Geometry"
+            "type": "object",
+            "title": "Geometry",
+            "nullable": true
           },
           "sensors": {
             "anyOf": [
@@ -1942,7 +1944,11 @@
             "title": "Allocation"
           },
           "summary": { "$ref": "#/components/schemas/SummaryListCampaigns" },
-          "geometry": { "anyOf": [{}, { "type": "null" }], "title": "Geometry" }
+          "geometry": {
+            "type": "object",
+            "title": "Geometry",
+            "nullable": true
+          }
         },
         "type": "object",
         "required": ["id", "name", "summary"],
@@ -2665,8 +2671,9 @@
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [{}, { "type": "null" }],
-            "title": "Geometry"
+            "type": "object",
+            "title": "Geometry",
+            "nullable": true
           },
           "sensor_count": { "type": "integer", "title": "Sensor Count" },
           "sensor_types": {
@@ -2760,8 +2767,9 @@
             "title": "Start Date"
           },
           "geometry": {
-            "anyOf": [{}, { "type": "null" }],
-            "title": "Geometry"
+            "type": "object",
+            "title": "Geometry",
+            "nullable": true
           },
           "sensors": {
             "items": {

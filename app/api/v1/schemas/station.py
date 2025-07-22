@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Any, Optional, List
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.v1.schemas.sensor import SensorItem
 
@@ -29,7 +29,7 @@ class StationItem(BaseModel):
     contact_email: str | None = None
     active: bool | None = None
     start_date: datetime | None = None
-    geometry: Any | None = None # no geometry for now breaks the openapi schema
+    geometry: dict = Field(default_factory=dict, nullable=True)
 
 class StationItemWithSummary(StationItem):
     sensor_count: int

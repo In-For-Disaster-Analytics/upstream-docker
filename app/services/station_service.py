@@ -10,7 +10,7 @@ class StationService:
 
     def create_station(self, station: StationCreate, campaign_id: int) -> StationCreateResponse:
         return StationCreateResponse(id=self.station_repository.create_station(station, campaign_id).stationid)
-    
+
     def update_station(self, station_id: int, station: StationUpdate) -> StationCreateResponse | None:
         response = self.station_repository.update_station(station_id, station)
         if not response:
@@ -31,7 +31,7 @@ class StationService:
         for row in rows:
             sensor_types : list[str | None] = row[2]
             sensor_variables : list[str | None] = row[3]
-            geometry = json.loads(row[4]) if row[4] else None
+            geometry = json.loads(row[4]) if row[4] else {}
             station = StationItemWithSummary(
                 id=row[0].stationid,
                 name=row[0].stationname,
@@ -47,7 +47,7 @@ class StationService:
 
     def get_station(self, station_id: int) -> GetStationResponse | None:
         row = self.station_repository.get_station(station_id)
-        geometry = None
+        geometry = {}
         if row:
             try:
                 geometry = json.loads(row.geometry) # type: ignore[arg-type]

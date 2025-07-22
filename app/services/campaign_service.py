@@ -61,7 +61,7 @@ class CampaignService:
                     bbox_south=row[0].bbox_south,
                     bbox_north=row[0].bbox_north,
                 ),
-                geometry=json.loads(row[5]) if row[5] else None,
+                geometry=json.loads(row[5]) if row[5] else {},
                 summary=SummaryListCampaigns(
                     sensor_types=[x for x in sensor_types if x is not None],
                     variable_names=[x for x in variable_names if x is not None]
@@ -82,7 +82,7 @@ class CampaignService:
             contact_email=station.contactemail,
             active=station.active,
             start_date=station.startdate,
-            geometry=json.loads(station.geometry) if station.geometry else None,
+            geometry=json.loads(station.geometry) if station.geometry else {},
             sensors=[SensorSummaryForStations(
                 id=sensor.sensorid,
                 variable_name=sensor.variablename,
@@ -104,7 +104,7 @@ class CampaignService:
                 bbox_south=campaign.bbox_south,
                 bbox_north=campaign.bbox_north,
             ),
-            geometry=json.loads(campaign.geometry) if campaign.geometry else None, # type: ignore[arg-type]
+            geometry=json.loads(campaign.geometry) if campaign.geometry else {},
             stations=stations,
             summary=SummaryGetCampaign(
                 station_count=self.campaign_repository.count_stations(campaign_id),
@@ -116,7 +116,6 @@ class CampaignService:
 
     def delete_campaign_station(self, campaign_id: int) ->bool:
             return self.campaign_repository.delete_campaign_stations(campaign_id)
-    
+
     def delete_campaign(self, campaign_id: int) ->bool:
             return self.campaign_repository.delete_campaign(campaign_id)
-    

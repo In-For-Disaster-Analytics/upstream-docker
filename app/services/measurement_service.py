@@ -24,7 +24,7 @@ class MeasurementService:
                     variabletype=row[0].variabletype,
                     variablename=row[0].variablename,
                     sensorid=row[0].sensorid,
-                    geometry=json.loads(row[1])
+                    geometry=json.loads(row[1]) if row[1] else {}
                 ))
             else:
                 print(f"Measurement {row[0].measurementid} has no geometry {row[1]}")
@@ -54,7 +54,7 @@ class MeasurementService:
 
     def get_measurements_with_confidence_intervals(self, sensor_id: int, interval: str, interval_value: int, start_date: datetime | None, end_date: datetime | None, min_value: float | None, max_value: float | None) -> list[AggregatedMeasurement]:
         return self.measurement_repository.get_measurements_with_confidence_intervals(sensor_id=sensor_id, interval=interval, interval_value=interval_value, start_date=start_date, end_date=end_date, min_value=min_value, max_value=max_value)
-    
+
     def update_measurement(self, measurement_id: int, measurement: MeasurementUpdate) -> MeasurementCreateResponse | None:
         response = self.measurement_repository.update_measurement(measurement_id, measurement)
         if not response:
