@@ -51,7 +51,7 @@ MOCK_GET_STATION_RESPONSE = {
     "contact_email": "dr.test@example.com",
     "active": True,
     "start_date": "2024-01-15T10:00:00Z", # Assuming timezone info might be added
-    "geometry": None,
+    "geometry": {},
     "sensors": []
 }
 
@@ -59,7 +59,7 @@ MOCK_STATION_ITEM_SUMMARY = {
     "id": 123,
     "name": "Test Station Alpha",
     "description": "A station for testing purposes",
-    "geometry": None,
+    "geometry": {},
     "sensor_types": ["temperature"],
     "sensor_variables": ["temp_celsius"],
     "sensor_count": 1
