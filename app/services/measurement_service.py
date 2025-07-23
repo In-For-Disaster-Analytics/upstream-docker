@@ -24,7 +24,7 @@ class MeasurementService:
                     variabletype=row[0].variabletype,
                     variablename=row[0].variablename,
                     sensorid=row[0].sensorid,
-                    geometry=json.loads(row[1]) if row[1] else {}
+                    geometry=json.loads(row[1])
                 ))
             else:
                 print(f"Measurement {row[0].measurementid} has no geometry {row[1]}")

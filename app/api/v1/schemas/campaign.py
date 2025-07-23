@@ -39,7 +39,7 @@ class ListCampaignsResponseItem(BaseModel):
     end_date: datetime | None = None
     allocation: str | None = None
     summary: SummaryListCampaigns
-    geometry: dict = Field(default_factory=dict, nullable=True)
+    geometry: dict = Field(default_factory=dict, nullable=True)  # type: ignore[call-overload,type-arg]
 
 class ListCampaignsResponsePagination(BaseModel):
     items: list[ListCampaignsResponseItem]
@@ -65,7 +65,7 @@ class GetCampaignResponse(BaseModel):
     allocation: str
     location: Location | None = None
     summary: SummaryGetCampaign
-    geometry: dict = Field(default_factory=dict, nullable=True)
+    geometry: dict = Field(default_factory=dict, nullable=True)  # type: ignore[call-overload,type-arg]
     stations: list[StationsListResponseItem] = []
 
 

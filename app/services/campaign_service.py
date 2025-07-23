@@ -104,7 +104,7 @@ class CampaignService:
                 bbox_south=campaign.bbox_south,
                 bbox_north=campaign.bbox_north,
             ),
-            geometry=json.loads(campaign.geometry) if campaign.geometry else {},
+            geometry=json.loads(campaign.geometry) if campaign.geometry else {},  # type: ignore[arg-type]
             stations=stations,
             summary=SummaryGetCampaign(
                 station_count=self.campaign_repository.count_stations(campaign_id),

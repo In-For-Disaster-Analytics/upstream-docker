@@ -29,7 +29,7 @@ class StationItem(BaseModel):
     contact_email: str | None = None
     active: bool | None = None
     start_date: datetime | None = None
-    geometry: dict = Field(default_factory=dict, nullable=True)
+    geometry: dict = Field(default_factory=dict, nullable=True)  # type: ignore[call-overload,type-arg]
 
 class StationItemWithSummary(StationItem):
     sensor_count: int
