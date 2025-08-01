@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 import pandas as pd
 from sqlalchemy import insert
 from sqlalchemy.dialects.postgresql import insert
@@ -43,9 +44,10 @@ def process_sensors_file(file: UploadFile, station_id: int, upload_event_id: int
 
     try:
         validator.validate(dataframe=df_sensors, errors="raise")
-    except ValueError:
-        raise HTTPException(status_code=400, detail="Validation failed!")
-
+    except ValueError as e:
+        file.file.close()
+        logging.error(f"Validation error: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Validation failed: {str(e)}")
     # Process each row
     for _, sensor_row in df_sensors.iterrows():
         sensor: Sensor = Sensor(
