@@ -257,8 +257,9 @@ class SensorRepository:
         return result, total_count
 
     def delete_sensor(self, sensor_id: int) -> bool:
-        db_sensor = self.get_sensor(sensor_id)
+        db_sensor = self.db.query(Sensor).filter(Sensor.sensorid == sensor_id).first()
         if db_sensor:
+            # Database CASCADE will automatically delete measurements and statistics
             self.db.delete(db_sensor)
             self.db.commit()
             return True
