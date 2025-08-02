@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Optional, List, Tuple
+import logging
 
 from app.api.v1.schemas.sensor import (
     SensorCreateResponse,
@@ -7,7 +8,8 @@ from app.api.v1.schemas.sensor import (
     GetSensorResponse,
     SensorStatistics,
     SensorItem,
-    SensorUpdate
+    SensorUpdate,
+    ForceUpdateSensorStatisticsResponse
 )
 from app.db.repositories.sensor_repository import SensorRepository, SortField
 from app.db.repositories.measurement_repository import MeasurementRepository
@@ -175,3 +177,27 @@ class SensorService:
     def get_latest_measurement(self, sensor_id: int) -> Optional[datetime]:
         measurement = self.measurement_repository.get_latest_measurement_by_sensor_id(sensor_id)
         return measurement.collectiontime if measurement else None
+
+    def force_update_station_sensor_statistics(self, station_id: int) -> ForceUpdateSensorStatisticsResponse:
+        """Force update statistics for all sensors in a station."""
+        from app.db.models.sensor import Sensor
+        
+        # Get all sensors for the station
+        sensors = self.sensor_repository.db.query(Sensor).filter(Sensor.stationid == station_id).all()
+        sensor_ids = [sensor.sensorid for sensor in sensors]
+        updated_sensor_ids = []
+
+        for sensor_id in sensor_ids:
+            try:
+                self.sensor_repository.delete_sensor_statistics(sensor_id)
+                self.sensor_repository.refresh_sensor_statistics(sensor_id)
+                updated_sensor_ids.append(sensor_id)
+            except Exception:
+                # Continue with other sensors if one fails
+                logging.warning("Failed to update statistics for sensor ID %s", sensor_id)
+                continue
+
+        return ForceUpdateSensorStatisticsResponse(
+            updated_sensor_ids=updated_sensor_ids,
+            total_updated=len(updated_sensor_ids)
+        )

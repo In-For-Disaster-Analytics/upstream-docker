@@ -72,3 +72,8 @@ class SensorUpdate(BaseModel):
     postprocessscript: Optional[str] = None
     units: Optional[str] = None
     variablename: Optional[str] | None = None
+
+
+class ForceUpdateSensorStatisticsResponse(BaseModel):
+    updated_sensor_ids: List[int]
+    total_updated: int

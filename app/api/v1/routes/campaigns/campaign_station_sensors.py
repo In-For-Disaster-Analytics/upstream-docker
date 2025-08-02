@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from app.api.dependencies.auth import get_current_user
 from app.api.dependencies.pytas import check_allocation_permission
-from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics, SensorCreateResponse, SensorUpdate
+from app.api.v1.schemas.sensor import SensorItem, GetSensorResponse, ListSensorsResponsePagination, SensorStatistics, SensorCreateResponse, SensorUpdate, ForceUpdateSensorStatisticsResponse
 from app.api.v1.schemas.user import User
 from app.db.session import get_db
 from app.db.repositories.sensor_repository import SensorRepository, SortField
@@ -139,3 +139,23 @@ def partial_update_sensor(
     if not update_station:
         raise HTTPException(status_code=404, detail="Station not found")
     return update_station
+
+
+@router.post("/sensors/statistics", 
+             response_model=ForceUpdateSensorStatisticsResponse,
+             description="Force update sensor statistics for all sensors in the station")
+def force_update_sensor_statistics(
+    campaign_id: int,
+    station_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ForceUpdateSensorStatisticsResponse:
+    if not check_allocation_permission(current_user, campaign_id):
+        raise HTTPException(status_code=404, detail="Allocation is incorrect")
+    
+    sensor_service = SensorService(
+        sensor_repository=SensorRepository(db),
+        measurement_repository=MeasurementRepository(db)
+    )
+    
+    return sensor_service.force_update_station_sensor_statistics(station_id)
