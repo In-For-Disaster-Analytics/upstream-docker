@@ -9,7 +9,8 @@ from app.api.v1.schemas.sensor import (
     SensorStatistics,
     SensorItem,
     SensorUpdate,
-    ForceUpdateSensorStatisticsResponse
+    ForceUpdateSensorStatisticsResponse,
+    UpdateSensorStatisticsResponse
 )
 from app.db.repositories.sensor_repository import SensorRepository, SortField
 from app.db.repositories.measurement_repository import MeasurementRepository
@@ -201,3 +202,13 @@ class SensorService:
             updated_sensor_ids=updated_sensor_ids,
             total_updated=len(updated_sensor_ids)
         )
+
+    def force_update_single_sensor_statistics(self, sensor_id: int) -> UpdateSensorStatisticsResponse:
+        """Force update statistics for a single sensor."""
+        try:
+            self.sensor_repository.delete_sensor_statistics(sensor_id)
+            self.sensor_repository.refresh_sensor_statistics(sensor_id)
+            return UpdateSensorStatisticsResponse(sensor_id=sensor_id, updated=True)
+        except Exception as e:
+            logging.warning("Failed to update statistics for sensor ID %s: %s", sensor_id, str(e))
+            return UpdateSensorStatisticsResponse(sensor_id=sensor_id, updated=False)

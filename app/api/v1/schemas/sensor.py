@@ -77,3 +77,8 @@ class SensorUpdate(BaseModel):
 class ForceUpdateSensorStatisticsResponse(BaseModel):
     updated_sensor_ids: List[int]
     total_updated: int
+
+
+class UpdateSensorStatisticsResponse(BaseModel):
+    sensor_id: int
+    updated: bool
