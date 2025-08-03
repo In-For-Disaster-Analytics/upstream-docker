@@ -105,9 +105,10 @@ def process_measurements_file(
     alias_to_sensorid_map: dict[str, int],
     upload_event_id: int,
     session: Session
-) -> int:
-    """Process the measurements CSV file and return total number of measurements processed."""
+) -> tuple[int, list[str]]:
+    """Process the measurements CSV file and return total number of measurements processed and any errors."""
     # Read CSV using pandas
+
     df = pd.read_csv(
         file.file,
         keep_default_na=False,  # Prevent NaN creation
@@ -116,10 +117,15 @@ def process_measurements_file(
     )
     measurement_batch = []
     total_measurements = 0
+    errors = []
     df['geometry_str'] = 'Point (' + df['Lon_deg'] + ' ' + df['Lat_deg'] + ')'
 
     for alias, sensor_id in alias_to_sensorid_map.items():
         if alias not in df.columns:
+            # Handle errors if alias is missing in the file
+            error_msg = f"Measurements columns are {df.columns.tolist()} doesn't match with '{alias}'"
+            logging.error(error_msg)
+            errors.append(error_msg)
             continue
         valid_mask = pd.notna(df[alias])
         if not valid_mask.any():
@@ -150,7 +156,7 @@ def process_measurements_file(
         total_measurements += process_batch(measurement_batch, session)
         measurement_batch = []
 
-    return total_measurements
+    return total_measurements, errors
 
 def update_sensor_statistics(sensor_repository: SensorRepository, alias_to_sensorid_map: dict[str, int]) -> None:
     """Update statistics for all sensors."""

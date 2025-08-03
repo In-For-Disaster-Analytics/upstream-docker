@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api.dependencies.auth import get_current_user
 from app.api.v1.schemas.user import User
+from app.api.v1.schemas.error import Error
 from app.db.models.upload_file_event import UploadFileEvent
 from app.db.session import SessionLocal, get_db
 from app.db.repositories.sensor_repository import SensorRepository
@@ -59,7 +60,7 @@ def post_sensor_and_measurement(
     upload_file_sensors.file.close()
 
     # Process measurements file
-    total_measurements = process_measurements_file(upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, db)
+    total_measurements, errors = process_measurements_file(upload_file_measurements, station_id, alias_to_sensorid_map, upload_event.id, db)
     upload_file_measurements.file.close()
     data_processing_time = round(time.time() - start_time, 1)
     update_sensor_statistics(sensor_repository, alias_to_sensorid_map)
@@ -68,6 +69,7 @@ def post_sensor_and_measurement(
         'Total sensors processed': len(alias_to_sensorid_map),
         'Total measurements added to database': total_measurements,
         'Data Processing time': f"{data_processing_time} seconds.",
+        'errors': [Error(message=error) for error in errors]
     })
 
     return response
