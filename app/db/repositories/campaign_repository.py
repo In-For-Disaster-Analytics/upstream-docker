@@ -47,13 +47,11 @@ class CampaignRepository:
         campaign : Campaign = result[0]
 
         if campaign:
-            campaign.geometry = self.db.scalar(select(ST_AsGeoJSON(Campaign.geometry)))
-            if campaign.geometry:
-                print(f"Campaign geometry: {json.dump(campaign.geometry)}")
+            campaign.geometry = self.db.scalar(select(ST_AsGeoJSON(Campaign.geometry)).filter(Campaign.campaignid == id))
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
-                    station_geometry_stmt = select(ST_AsGeoJSON(Station.geometry))
+                    station_geometry_stmt = select(ST_AsGeoJSON(Station.geometry)).filter(Station.stationid == station.stationid)
                     station.geometry = self.db.scalar(station_geometry_stmt)
 
         return campaign
