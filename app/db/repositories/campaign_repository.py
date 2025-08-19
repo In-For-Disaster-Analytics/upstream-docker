@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from typing import Union
 
 from sqlalchemy.orm import Session, joinedload
@@ -47,6 +48,8 @@ class CampaignRepository:
 
         if campaign:
             campaign.geometry = self.db.scalar(select(ST_AsGeoJSON(Campaign.geometry)))
+            if campaign.geometry:
+                print(f"Campaign geometry: {json.loads(campaign.geometry)}")
             for station in campaign.stations:
                 if station.geometry:
                     # Convert each station's geometry to string
@@ -138,17 +141,17 @@ class CampaignRepository:
     def get_sensor_variables(self, campaign_id: int) -> list[str]:
         stations = self.db.query(Station).filter(Station.campaignid == campaign_id).all()
         return list(set(sensor.variablename for station in stations for sensor in station.sensors))
-    
+
     def delete_campaign_stations(self, campaign_id: int) -> bool:
         self.db.query(Station).filter(Station.campaignid == campaign_id).delete()
         self.db.commit()
         return True
-    
+
     def update_campaign(self, campaign_id: int, request: Union[CampaignsIn, CampaignUpdate], partial: bool = False) -> Campaign | None:
         db_campaign = self.db.query(Campaign).filter(Campaign.campaignid == campaign_id).first()
         if not db_campaign:
             return None
-        
+
         if partial:
             # Get only the fields that were explicitly set in the request
             update_data = request.model_dump(exclude_unset=True)
@@ -159,7 +162,7 @@ class CampaignRepository:
                 'start_date': 'startdate',
                 'end_date': 'enddate'
             }
-        
+
             for field, value in update_data.items():
                 db_field = field_mapping.get(field, field)
                 setattr(db_campaign, db_field, value)
@@ -192,11 +195,11 @@ class CampaignRepository:
             db_campaign.campaignname = name
             db_campaign.description = description
             db_campaign.contactname = contact_name
-            db_campaign.contactemail = contact_email 
+            db_campaign.contactemail = contact_email
             db_campaign.allocation = allocation
             db_campaign.startdate = start_date
             db_campaign.enddate = end_date
-        
+
         self.db.commit()
         self.db.refresh(db_campaign)
         return db_campaign

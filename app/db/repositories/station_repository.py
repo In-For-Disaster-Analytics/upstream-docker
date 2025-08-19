@@ -101,19 +101,19 @@ class StationRepository:
             self.db.commit()
             return True
         return False
-    
+
     def delete_station_sensors(self, station_id: int) -> bool:
         self.db.query(Sensor).filter(Sensor.stationid == station_id).delete()
         self.db.commit()
         return True
 
     def update_station(self, station_id: int, request:  StationUpdate, partial: bool = False) -> Station | None:
-        
+
         db_station = self.db.query(Station).filter(Station.stationid == station_id).first()
-        
+
         if not db_station:
             return None
-        
+
         if partial:
             # Get only the fields that were explicitly set in the request
             update_data = request.model_dump(exclude_unset=True)
@@ -123,9 +123,9 @@ class StationRepository:
                 'contact_email': 'contactemail',
                 'active': 'active',
                 'start_date': 'startdate',
-                
+
             }
-        
+
             for field, value in update_data.items():
                 db_field = field_mapping.get(field, field)
                 setattr(db_station, db_field, value)
@@ -138,7 +138,7 @@ class StationRepository:
             contact_email = request.contact_email
             active = request.active
             start_date = request.start_date
-            
+
 
             if name is None:
                 raise ValueError("Campaign name must be provided for a full update")
@@ -152,14 +152,14 @@ class StationRepository:
                 raise ValueError("Active must be provided for a full update")
             if start_date is None:
                 raise ValueError("Start date must be provided for a full update")
-            
+
             db_station.stationname = name
             db_station.description = description
             db_station.contactname = contact_name
-            db_station.contactemail = contact_email 
+            db_station.contactemail = contact_email
             db_station.active = active
             db_station.startdate = start_date
-            
+
         self.db.commit()
         self.db.refresh(db_station)
         return db_station
