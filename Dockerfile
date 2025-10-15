@@ -19,7 +19,4 @@ RUN pip install --no-cache-dir -r requirements-dev.txt
 
 # copy project
 COPY . /upstream
-RUN chmod +x /upstream/scripts/docker-entrypoint.sh
-
-ENTRYPOINT ["/upstream/scripts/docker-entrypoint.sh"]
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+#COPY . .
